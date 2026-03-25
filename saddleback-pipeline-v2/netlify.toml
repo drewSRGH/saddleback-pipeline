@@ -1,5 +1,6 @@
 [build]
-  publish = "."
+  base = "saddleback-pipeline-v2"
+  publish = "public"
   functions = "netlify/functions"
 
 [[redirects]]
