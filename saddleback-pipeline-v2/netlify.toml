@@ -1,9 +1,9 @@
 [build]
-  base = "saddleback-pipeline-v2"
-  publish = "public"
+  base      = "saddleback-pipeline-v2"
+  publish   = "."
   functions = "netlify/functions"
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to   = "/.netlify/functions/:splat"
   status = 200
