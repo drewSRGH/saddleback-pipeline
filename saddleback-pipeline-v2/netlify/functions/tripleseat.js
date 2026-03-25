@@ -1,133 +1,91 @@
-const crypto = require('crypto');
-const https  = require('https');
-const url    = require('url');
+const https = require('https');
 
-// ── Tripleseat OAuth 1.0 credentials ─────────────────────────────────────────
 const CONSUMER_KEY    = 'JrpAFIveyQLLQE3dyQmMPlGdiJN6RiKdLf8FX8JQ';
 const CONSUMER_SECRET = 'CuEe00aoUotCJqNk2KZmhgNEEg34A760xi123Tf5';
-const TS_BASE         = 'https://api.tripleseat.com/v1';
 
-// ── CORS headers ──────────────────────────────────────────────────────────────
-const HEADERS = {
+const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Content-Type': 'application/json',
 };
 
-// ── OAuth 1.0 signature generator ────────────────────────────────────────────
-function buildOAuthHeader(method, baseUrl, params = {}) {
-  const oauthParams = {
-    oauth_consumer_key:     CONSUMER_KEY,
-    oauth_nonce:            crypto.randomBytes(16).toString('hex'),
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_timestamp:        Math.floor(Date.now() / 1000).toString(),
-    oauth_version:          '1.0',
-  };
-
-  // Merge all params for signature
-  const allParams = { ...params, ...oauthParams };
-
-  // Sort and encode params
-  const sortedParams = Object.keys(allParams)
-    .sort()
-    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(allParams[k])}`)
-    .join('&');
-
-  // Build signature base string
-  const sigBase = [
-    method.toUpperCase(),
-    encodeURIComponent(baseUrl),
-    encodeURIComponent(sortedParams),
-  ].join('&');
-
-  // Sign with HMAC-SHA1
-  const signingKey = `${encodeURIComponent(CONSUMER_SECRET)}&`;
-  const signature  = crypto
-    .createHmac('sha1', signingKey)
-    .update(sigBase)
-    .digest('base64');
-
-  oauthParams.oauth_signature = signature;
-
-  // Build Authorization header
-  const headerValue = 'OAuth ' + Object.keys(oauthParams)
-    .map(k => `${encodeURIComponent(k)}="${encodeURIComponent(oauthParams[k])}"`)
-    .join(', ');
-
-  return headerValue;
-}
-
-// ── Simple HTTPS GET ──────────────────────────────────────────────────────────
-function httpsGet(fullUrl, authHeader) {
+function httpsRequest(options, body) {
   return new Promise((resolve, reject) => {
-    const parsed = url.parse(fullUrl);
-    const options = {
-      hostname: parsed.hostname,
-      path:     parsed.path,
-      method:   'GET',
-      headers: {
-        'Authorization': authHeader,
-        'Accept':        'application/json',
-        'User-Agent':    'SaddlebackCateringPipeline/1.0',
-      },
-    };
     const req = https.request(options, res => {
       let data = '';
-      res.on('data', chunk => data += chunk);
+      res.on('data', c => data += c);
       res.on('end', () => resolve({ status: res.statusCode, body: data }));
     });
     req.on('error', reject);
+    if (body) req.write(body);
     req.end();
   });
 }
 
-// ── Lambda handler ────────────────────────────────────────────────────────────
+async function getToken() {
+  const payload = JSON.stringify({
+    client_id:     CONSUMER_KEY,
+    client_secret: CONSUMER_SECRET,
+    grant_type:    'client_credentials',
+  });
+  const res = await httpsRequest({
+    hostname: 'api.tripleseat.com',
+    path:     '/oauth/token',
+    method:   'POST',
+    headers: {
+      'Content-Type':   'application/json',
+      'Content-Length': Buffer.byteLength(payload),
+      'Accept':         'application/json',
+    },
+  }, payload);
+  console.log('Token status:', res.status, '| body:', res.body.substring(0, 200));
+  if (res.status !== 200) throw new Error(`Token failed ${res.status}: ${res.body}`);
+  return JSON.parse(res.body).access_token;
+}
+
+async function tsGet(path, token) {
+  const res = await httpsRequest({
+    hostname: 'api.tripleseat.com',
+    path,
+    method:  'GET',
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+  });
+  console.log(`GET ${path} → ${res.status}`);
+  return res;
+}
+
 exports.handler = async (event) => {
-  // CORS preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: HEADERS, body: '' };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
-  const endpoint = event.queryStringParameters?.endpoint || 'events';
-  const page     = event.queryStringParameters?.page     || '1';
-  const limit    = event.queryStringParameters?.limit    || '50';
-
-  const allowed = ['leads', 'events', 'bookings', 'contacts', 'locations', 'rooms'];
-  if (!allowed.includes(endpoint)) {
-    return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: 'Invalid endpoint' }) };
-  }
-
-  // Build URL + query params
-  const queryParams = { page, limit };
-  const queryString = Object.keys(queryParams)
-    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(queryParams[k])}`)
-    .join('&');
-  const fullUrl  = `${TS_BASE}/${endpoint}.json?${queryString}`;
-  const baseUrl  = `${TS_BASE}/${endpoint}.json`;
+  const ep    = (event.queryStringParameters?.endpoint || 'events');
+  const page  = event.queryStringParameters?.page  || '1';
+  const limit = event.queryStringParameters?.limit || '100';
 
   try {
-    const authHeader = buildOAuthHeader('GET', baseUrl, queryParams);
-    const result     = await httpsGet(fullUrl, authHeader);
+    const token = await getToken();
 
-    if (result.status !== 200) {
-      // Log the error body for debugging in Netlify function logs
-      console.error(`Tripleseat ${endpoint} returned ${result.status}:`, result.body);
-      return {
-        statusCode: result.status,
-        headers: HEADERS,
-        body: JSON.stringify({ error: `Tripleseat error ${result.status}`, detail: result.body }),
-      };
-    }
+    // Use the correct search endpoints per Tripleseat docs
+    const pathMap = {
+      events:    `/v1/events/search.json?page=${page}&limit=${limit}&sort_direction=desc&order=updated_at`,
+      leads:     `/v1/leads.json?page=${page}&limit=${limit}`,
+      bookings:  `/v1/bookings/search.json?page=${page}&limit=${limit}`,
+      contacts:  `/v1/contacts.json?page=${page}&limit=${limit}`,
+      locations: `/v1/locations.json`,
+    };
 
-    return { statusCode: 200, headers: HEADERS, body: result.body };
+    const path = pathMap[ep];
+    if (!path) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid endpoint' }) };
+
+    const result = await tsGet(path, token);
+    return { statusCode: 200, headers: CORS, body: result.body };
 
   } catch (err) {
-    console.error('Function error:', err);
+    console.error('Error:', err.message);
     return {
       statusCode: 500,
-      headers: HEADERS,
-      body: JSON.stringify({ error: 'Proxy error', detail: err.message }),
+      headers: CORS,
+      body: JSON.stringify({ error: err.message, events: [], leads: [] }),
     };
   }
 };
