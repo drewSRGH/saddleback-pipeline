@@ -19,31 +19,11 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
     }
-    header h1 {
-      font-size: 1.4rem;
-      color: #f5a623;
-      letter-spacing: 0.5px;
-    }
-    header span {
-      font-size: 0.8rem;
-      color: #999;
-    }
-    #debug-panel {
-      background: #111;
-      border: 1px solid #444;
-      border-radius: 6px;
-      margin: 16px 24px;
-      padding: 12px 16px;
-      font-size: 0.75rem;
-      font-family: monospace;
-      color: #7fff7f;
-      max-height: 200px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-    #debug-panel h3 { color: #f5a623; margin-bottom: 6px; font-size: 0.8rem; }
+    header h1 { font-size: 1.4rem; color: #f5a623; letter-spacing: 0.5px; }
+    header span { font-size: 0.8rem; color: #999; }
     .controls {
       padding: 16px 24px;
       display: flex;
@@ -78,6 +58,15 @@
     }
     #status-bar.error { color: #ff6b6b; }
     #status-bar.ok { color: #7fff7f; }
+    .summary-bar {
+      padding: 4px 24px 14px;
+      display: flex;
+      gap: 20px;
+      font-size: 0.8rem;
+      color: #aaa;
+      flex-wrap: wrap;
+    }
+    .summary-bar span { color: #f0f0f0; font-weight: 700; }
     .pipeline {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -93,20 +82,17 @@
       position: relative;
     }
     .card:hover { border-color: #c8621a; }
-    .card.overdue { border-left: 4px solid #ff4444; }
-    .card.pending { border-left: 4px solid #f5a623; }
-    .card.new { border-left: 4px solid #4caf50; }
+    .card.overdue  { border-left: 4px solid #ff4444; }
+    .card.pending  { border-left: 4px solid #f5a623; }
+    .card.new      { border-left: 4px solid #4caf50; }
+    .card.closed   { border-left: 4px solid #555; opacity: 0.7; }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 10px;
     }
-    .card-name {
-      font-weight: 700;
-      font-size: 1rem;
-      color: #fff;
-    }
+    .card-name { font-weight: 700; font-size: 1rem; color: #fff; }
     .badge {
       font-size: 0.65rem;
       font-weight: 700;
@@ -114,127 +100,66 @@
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
     .badge.overdue { background: #ff4444; color: white; }
     .badge.pending { background: #f5a623; color: #1a1a1a; }
-    .badge.new { background: #4caf50; color: white; }
-    .badge.closed { background: #555; color: #ccc; }
-    .card-detail {
-      font-size: 0.8rem;
-      color: #bbb;
-      margin-bottom: 4px;
-    }
+    .badge.new     { background: #4caf50; color: white; }
+    .badge.closed  { background: #555; color: #ccc; }
+    .card-detail { font-size: 0.8rem; color: #bbb; margin-bottom: 4px; }
     .card-detail strong { color: #ddd; }
-    .card-actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .card-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-email {
-      background: #c8621a;
-      color: white;
-      border: none;
-      padding: 7px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.78rem;
-      font-weight: 600;
+      background: #c8621a; color: white; border: none;
+      padding: 7px 14px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; font-weight: 600;
     }
     .btn-email:hover { background: #e07020; }
     .btn-email:disabled { background: #555; cursor: not-allowed; }
     .btn-ts {
-      background: transparent;
-      color: #f5a623;
-      border: 1px solid #f5a623;
-      padding: 7px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.78rem;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-block;
+      background: transparent; color: #f5a623;
+      border: 1px solid #f5a623; padding: 7px 14px;
+      border-radius: 6px; cursor: pointer; font-size: 0.78rem;
+      font-weight: 600; text-decoration: none; display: inline-block;
     }
     .btn-ts:hover { background: #f5a6231a; }
     /* Modal */
     #modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.75);
-      z-index: 100;
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 100;
+      justify-content: center; align-items: center;
     }
     #modal-overlay.open { display: flex; }
     #modal {
-      background: #252525;
-      border: 1px solid #444;
-      border-radius: 12px;
-      padding: 24px;
-      width: 90%;
-      max-width: 580px;
-      max-height: 80vh;
-      overflow-y: auto;
+      background: #252525; border: 1px solid #444;
+      border-radius: 12px; padding: 24px;
+      width: 90%; max-width: 580px; max-height: 80vh; overflow-y: auto;
     }
     #modal h2 { color: #f5a623; margin-bottom: 16px; font-size: 1.1rem; }
     #modal textarea {
-      width: 100%;
-      min-height: 220px;
-      background: #1a1a1a;
-      border: 1px solid #444;
-      border-radius: 6px;
-      color: #f0f0f0;
-      padding: 12px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      resize: vertical;
+      width: 100%; min-height: 220px; background: #1a1a1a;
+      border: 1px solid #444; border-radius: 6px; color: #f0f0f0;
+      padding: 12px; font-size: 0.85rem; line-height: 1.5; resize: vertical;
     }
-    .modal-actions {
-      margin-top: 14px;
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
+    .modal-actions { margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; }
     .modal-actions button {
-      padding: 8px 18px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
+      padding: 8px 18px; border-radius: 6px;
+      font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none;
     }
     #btn-copy { background: #c8621a; color: white; }
     #btn-copy:hover { background: #e07020; }
     #btn-close-modal { background: #444; color: #ccc; }
     #btn-close-modal:hover { background: #555; }
     .spinner {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid #fff4;
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid #fff4; border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+      vertical-align: middle; margin-right: 6px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 60px 24px;
-      color: #666;
-    }
+    .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 24px; color: #666; }
     .empty-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
-    .summary-bar {
-      padding: 8px 24px 16px;
-      display: flex;
-      gap: 20px;
-      font-size: 0.8rem;
-      color: #aaa;
-      flex-wrap: wrap;
-    }
-    .summary-bar span { color: #f0f0f0; font-weight: 700; }
+    .page-info { padding: 0 24px 8px; font-size: 0.75rem; color: #666; }
   </style>
 </head>
 <body>
@@ -244,33 +169,26 @@
   <span id="last-updated"></span>
 </header>
 
-<div id="debug-panel" style="display:none">
-  <h3>🔍 API Debug (auto-hides in 15s)</h3>
-  <div id="debug-content"></div>
-</div>
-
 <div class="controls">
   <select id="filter-status">
     <option value="all">All Statuses</option>
     <option value="new">New</option>
     <option value="pending">Pending</option>
     <option value="overdue">Overdue</option>
-    <option value="closed">Closed</option>
+    <option value="closed">Closed / Turned Down</option>
   </select>
   <select id="filter-location">
     <option value="all">All Locations</option>
-    <option value="saddleback">Saddleback BBQ</option>
-    <option value="slice">Slice by Saddleback</option>
-    <option value="reo">REO Town</option>
-    <option value="okemos">Okemos</option>
-    <option value="coaches">Coach's Bar & Grill</option>
+    <option value="Saddleback BBQ Lansing">Saddleback BBQ Lansing</option>
+    <option value="Saddleback BBQ Okemos">Saddleback BBQ Okemos</option>
   </select>
-  <input type="text" id="search-input" placeholder="Search name, company…" style="width:200px" />
+  <input type="text" id="search-input" placeholder="Search name, company, event…" style="width:220px" />
   <button onclick="loadLeads()">↻ Refresh</button>
 </div>
 
 <div id="status-bar">Loading leads…</div>
 <div class="summary-bar" id="summary-bar"></div>
+<div class="page-info" id="page-info"></div>
 
 <div class="pipeline" id="pipeline"></div>
 
@@ -287,29 +205,16 @@
 </div>
 
 <script>
-// ─── Config ────────────────────────────────────────────────────────────────
-const API_BASE = '/.netlify/functions/tripleseat';
+const API_BASE   = '/.netlify/functions/tripleseat';
 const TS_ACCOUNT = 'saddlebackbbq.tripleseat.com';
 
-// ─── State ─────────────────────────────────────────────────────────────────
 let allLeads = [];
-let debugShown = false;
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────────────────
 function setStatus(msg, type = '') {
   const el = document.getElementById('status-bar');
   el.textContent = msg;
   el.className = type;
-}
-
-function showDebug(data) {
-  if (debugShown) return;
-  debugShown = true;
-  const panel = document.getElementById('debug-panel');
-  const content = document.getElementById('debug-content');
-  panel.style.display = 'block';
-  content.textContent = JSON.stringify(data, null, 2).slice(0, 3000);
-  setTimeout(() => { panel.style.display = 'none'; }, 15000);
 }
 
 function daysSince(dateStr) {
@@ -327,114 +232,106 @@ function formatDate(dateStr) {
 }
 
 function leadStatus(lead) {
-  const raw = (lead.status || '').toLowerCase();
-  if (raw === 'closed' || raw === 'won' || raw === 'lost') return 'closed';
+  // Turned down = closed
+  if (lead.turned_down_at) return 'closed';
+  // Converted = closed
+  if (lead.converted_at) return 'closed';
   const days = daysSince(lead.updated_at || lead.created_at);
   if (days === null) return 'new';
-  if (days > 5) return 'overdue';
+  if (days > 5)  return 'overdue';
   if (days >= 2) return 'pending';
   return 'new';
 }
 
-// ─── Tripleseat JSON unwrapper ─────────────────────────────────────────────
-// Tripleseat wraps: { "leads": [ { "lead": { ...fields... } }, ... ] }
-// We normalize each item to a flat object.
-function unwrapCollection(data, collectionKey, itemKey) {
-  // Handle both { leads: [...] } and bare arrays
-  let arr = Array.isArray(data) ? data : (data[collectionKey] || []);
-  return arr.map(item => {
-    // Each item may be wrapped: { lead: { ... } } or already flat
-    if (itemKey && item[itemKey]) return item[itemKey];
-    return item;
-  });
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// ─── Load Leads ────────────────────────────────────────────────────────────
+// ── Load Leads ────────────────────────────────────────────────────────────────
 async function loadLeads() {
   setStatus('Fetching leads from Tripleseat…');
   document.getElementById('pipeline').innerHTML = '';
+  document.getElementById('summary-bar').innerHTML = '';
+  document.getElementById('page-info').innerHTML = '';
 
   try {
-    const res = await fetch(`${API_BASE}?endpoint=leads`);
+    // Fetch page 1, sorted newest-updated first
+    const url = `${API_BASE}?endpoint=leads&page=1&limit=100&sort_direction=desc&order=updated_at`;
+    const res = await fetch(url);
     if (!res.ok) {
       const txt = await res.text();
-      throw new Error(`HTTP ${res.status}: ${txt.slice(0, 200)}`);
+      throw new Error(`HTTP ${res.status}: ${txt.slice(0, 300)}`);
     }
 
     const raw = await res.json();
 
-    // Show the raw structure in debug panel on first load
-    showDebug(raw);
-
-    // ── Unwrap based on Tripleseat's envelope pattern ──
-    // Try known patterns gracefully
-    let leads = [];
-
-    if (Array.isArray(raw)) {
-      // Bare array — each item might be { lead: {...} } or flat
-      leads = raw.map(item => item.lead || item);
-    } else if (raw.leads) {
-      // { leads: [ { lead: {...} }, ... ] }
-      leads = raw.leads.map(item => item.lead || item);
-    } else if (raw.lead) {
-      // Single lead object
-      leads = [raw.lead];
-    } else {
-      // Unknown structure — log keys and show debug
-      console.warn('Unexpected Tripleseat response shape. Keys:', Object.keys(raw));
-      showDebug(raw);
-      leads = [];
-    }
+    // Tripleseat returns: { "total_pages": N, "results": [ {...}, {...} ] }
+    const totalPages = raw.total_pages || 1;
+    const leads = raw.results || [];
 
     allLeads = leads;
 
     document.getElementById('last-updated').textContent =
       `Updated ${new Date().toLocaleTimeString()}`;
 
+    document.getElementById('page-info').textContent =
+      `Showing page 1 of ${totalPages} (${leads.length} leads loaded). Most recently updated first.` +
+      (totalPages > 1 ? ` You have ~${totalPages * 100} total leads in Tripleseat.` : '');
+
     renderPipeline();
     setStatus(`Loaded ${leads.length} leads`, 'ok');
+
   } catch (err) {
     console.error(err);
-    setStatus(`Error loading leads: ${err.message}`, 'error');
+    setStatus(`Error: ${err.message}`, 'error');
     document.getElementById('pipeline').innerHTML = `
       <div class="empty-state">
         <h2>⚠️ Could not load leads</h2>
-        <p style="margin-top:8px;color:#888">${err.message}</p>
-        <p style="margin-top:8px;color:#666;font-size:0.8rem">Check browser console for details.</p>
+        <p style="margin-top:8px;color:#888">${escHtml(err.message)}</p>
       </div>`;
   }
 }
 
-// ─── Render ────────────────────────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────────────────────────
 function renderPipeline() {
   const filterStatus = document.getElementById('filter-status').value;
-  const filterLoc = document.getElementById('filter-location').value;
-  const search = document.getElementById('search-input').value.toLowerCase();
+  const filterLoc    = document.getElementById('filter-location').value;
+  const search       = document.getElementById('search-input').value.toLowerCase().trim();
 
   let leads = allLeads.filter(lead => {
+    // Status filter
     const status = leadStatus(lead);
     if (filterStatus !== 'all' && status !== filterStatus) return false;
+
+    // Location filter — location is nested: lead.location.name
     if (filterLoc !== 'all') {
-      const loc = (lead.location_name || lead.site_name || '').toLowerCase();
-      if (!loc.includes(filterLoc)) return false;
+      const loc = (lead.location?.name || '').trim();
+      if (loc !== filterLoc) return false;
     }
+
+    // Search filter
     if (search) {
       const hay = [
-        lead.first_name, lead.last_name, lead.company_name,
-        lead.account_name, lead.event_description, lead.email_address
+        lead.first_name, lead.last_name, lead.company,
+        lead.email_address, lead.event_description,
+        lead.location?.name
       ].join(' ').toLowerCase();
       if (!hay.includes(search)) return false;
     }
+
     return true;
   });
 
-  // Sort: overdue first, then pending, then new, then closed
+  // Sort: overdue → pending → new → closed
   const order = { overdue: 0, pending: 1, new: 2, closed: 3 };
   leads.sort((a, b) => (order[leadStatus(a)] ?? 9) - (order[leadStatus(b)] ?? 9));
 
-  // Summary
+  // Summary counts
   const counts = { overdue: 0, pending: 0, new: 0, closed: 0 };
-  leads.forEach(l => counts[leadStatus(l)]++);
+  leads.forEach(l => { counts[leadStatus(l)]++; });
+
   document.getElementById('summary-bar').innerHTML =
     `<div>Showing <span>${leads.length}</span> of <span>${allLeads.length}</span> leads</div>` +
     `<div>🔴 Overdue: <span>${counts.overdue}</span></div>` +
@@ -456,15 +353,20 @@ function renderPipeline() {
 }
 
 function cardHTML(lead) {
-  const status = leadStatus(lead);
-  const name = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Unknown Contact';
-  const company = lead.company_name || lead.account_name || '';
-  const eventDate = formatDate(lead.event_date || lead.start_date);
-  const guestCount = lead.guest_count || lead.number_of_guests || '—';
-  const location = lead.location_name || lead.site_name || '—';
-  const lastContact = formatDate(lead.updated_at || lead.last_activity_at);
-  const daysAgo = daysSince(lead.updated_at || lead.created_at);
-  const tsLink = `https://${TS_ACCOUNT}/leads/${lead.id}`;
+  const status      = leadStatus(lead);
+  const name        = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Unknown';
+  const company     = lead.company || '';
+  const location    = lead.location?.name || '—';   // ← THE KEY FIX: nested location
+  const eventDate   = formatDate(lead.event_date);
+  const guests      = lead.guest_count || '—';
+  const lastUpdated = formatDate(lead.updated_at);
+  const daysAgo     = daysSince(lead.updated_at);
+  const notes       = lead.event_description || lead.additional_information || '';
+  const tsLink      = `https://${TS_ACCOUNT}/leads/${lead.id}`;
+
+  const turnedDown  = lead.turned_down_at
+    ? `<div class="card-detail" style="color:#ff6b6b"><strong>Turned Down:</strong> ${lead.turned_down_reason || 'Yes'}</div>`
+    : '';
 
   return `
   <div class="card ${status}" data-id="${lead.id}">
@@ -473,11 +375,13 @@ function cardHTML(lead) {
       <span class="badge ${status}">${status}</span>
     </div>
     ${company ? `<div class="card-detail"><strong>Company:</strong> ${escHtml(company)}</div>` : ''}
-    <div class="card-detail"><strong>Event Date:</strong> ${eventDate}</div>
-    <div class="card-detail"><strong>Guests:</strong> ${guestCount}</div>
+    <div class="card-detail"><strong>Event:</strong> ${escHtml(lead.event_description || '—')}</div>
+    <div class="card-detail"><strong>Date:</strong> ${eventDate} &nbsp;|&nbsp; <strong>Guests:</strong> ${guests}</div>
     <div class="card-detail"><strong>Location:</strong> ${escHtml(location)}</div>
-    <div class="card-detail"><strong>Last Updated:</strong> ${lastContact}${daysAgo !== null ? ` <em style="color:#888">(${daysAgo}d ago)</em>` : ''}</div>
-    ${lead.event_description ? `<div class="card-detail" style="margin-top:6px;color:#999;font-style:italic;font-size:0.75rem">${escHtml(String(lead.event_description).slice(0, 120))}${lead.event_description.length > 120 ? '…' : ''}</div>` : ''}
+    <div class="card-detail"><strong>Updated:</strong> ${lastUpdated}${daysAgo !== null ? ` <em style="color:#777">(${daysAgo}d ago)</em>` : ''}</div>
+    ${lead.email_address ? `<div class="card-detail"><strong>Email:</strong> ${escHtml(lead.email_address)}</div>` : ''}
+    ${turnedDown}
+    ${notes && notes !== lead.event_description ? `<div class="card-detail" style="margin-top:6px;color:#888;font-size:0.75rem;font-style:italic">${escHtml(String(notes).slice(0,120))}${notes.length>120?'…':''}</div>` : ''}
     <div class="card-actions">
       <button class="btn-email" onclick="generateEmail(${lead.id})">✉ AI Follow-Up</button>
       <a class="btn-ts" href="${tsLink}" target="_blank">Open in TS →</a>
@@ -485,45 +389,35 @@ function cardHTML(lead) {
   </div>`;
 }
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-// ─── Filter Events ─────────────────────────────────────────────────────────
+// ── Filter listeners ──────────────────────────────────────────────────────────
 document.getElementById('filter-status').addEventListener('change', renderPipeline);
 document.getElementById('filter-location').addEventListener('change', renderPipeline);
 document.getElementById('search-input').addEventListener('input', renderPipeline);
 
-// ─── AI Email Generation ───────────────────────────────────────────────────
+// ── AI Email ──────────────────────────────────────────────────────────────────
 async function generateEmail(leadId) {
   const lead = allLeads.find(l => String(l.id) === String(leadId));
   if (!lead) return;
 
   const btn = document.querySelector(`.card[data-id="${leadId}"] .btn-email`);
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Generating…';
-  }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Generating…'; }
 
-  openModal(`Follow-Up: ${[lead.first_name, lead.last_name].filter(Boolean).join(' ')}`, 'Generating email with AI…');
+  const name = [lead.first_name, lead.last_name].filter(Boolean).join(' ');
+  openModal(`Follow-Up: ${name}`, 'Generating email with AI…');
 
-  const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan. 
+  const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan.
 Write a warm, professional follow-up email for this catering lead.
 
-Contact: ${[lead.first_name, lead.last_name].filter(Boolean).join(' ')}
-${lead.company_name ? `Company: ${lead.company_name}` : ''}
-${lead.email_address ? `Email: ${lead.email_address}` : ''}
-Event Date: ${lead.event_date || lead.start_date || 'TBD'}
-Guest Count: ${lead.guest_count || lead.number_of_guests || 'TBD'}
-Location: ${lead.location_name || lead.site_name || 'Saddleback BBQ'}
-Event Type/Notes: ${lead.event_description || lead.description || 'General catering inquiry'}
-Last Updated: ${lead.updated_at || 'Recently'}
+Contact: ${name}
+${lead.company ? `Company: ${lead.company}` : ''}
+Email: ${lead.email_address || 'N/A'}
+Event: ${lead.event_description || 'General catering inquiry'}
+Event Date: ${lead.event_date || 'TBD'}
+Guest Count: ${lead.guest_count || 'TBD'}
+Location: ${lead.location?.name || 'Saddleback BBQ'}
+Notes: ${lead.additional_information || 'None'}
 
-Write a 3–4 paragraph email. Be friendly, mention our award-winning BBQ, and include a clear call to action to schedule a tasting or confirm details. Sign off as Ryan.`;
+Write a 3–4 paragraph follow-up email. Be friendly and personal, reference their specific event type, mention our award-winning BBQ and full-service catering. Include a clear call to action to schedule a tasting or a quick call to confirm details. Sign as Ryan, Catering Director, Saddleback Restaurant Group.`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -542,10 +436,7 @@ Write a 3–4 paragraph email. Be friendly, mention our award-winning BBQ, and i
     document.getElementById('modal-email').value = `Error: ${err.message}`;
   }
 
-  if (btn) {
-    btn.disabled = false;
-    btn.innerHTML = '✉ AI Follow-Up';
-  }
+  if (btn) { btn.disabled = false; btn.innerHTML = '✉ AI Follow-Up'; }
 }
 
 function openModal(title, body) {
@@ -553,11 +444,9 @@ function openModal(title, body) {
   document.getElementById('modal-email').value = body;
   document.getElementById('modal-overlay').classList.add('open');
 }
-
 function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
 }
-
 function copyEmail() {
   const txt = document.getElementById('modal-email').value;
   navigator.clipboard.writeText(txt).then(() => {
@@ -566,12 +455,11 @@ function copyEmail() {
     setTimeout(() => { btn.textContent = 'Copy Email'; }, 2000);
   });
 }
-
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// ─── Boot ──────────────────────────────────────────────────────────────────
+// ── Boot ──────────────────────────────────────────────────────────────────────
 loadLeads();
 </script>
 </body>
