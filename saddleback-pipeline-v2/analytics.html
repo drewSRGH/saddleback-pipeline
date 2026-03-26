@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Saddleback — Catering Analytics</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f0e;
+    --surface: #181817;
+    --surface2: #1f1f1d;
+    --border: #2a2a27;
+    --border2: #333330;
+    --text: #f0ede8;
+    --muted: #8a8780;
+    --muted2: #5a5855;
+    --accent: #e8772a;
+    --accent2: #f5a623;
+    --green: #4caf7d;
+    --red: #e05252;
+    --blue: #5b8dee;
+    --bbq: #e8772a;
+    --slice: #5b8dee;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 0 28px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .nav-brand {
+    font-family: 'Fraunces', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin-right: 32px;
+    letter-spacing: -0.3px;
+  }
+  .nav-tabs { display: flex; gap: 0; }
+  .nav-tab {
+    padding: 0 16px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .page { padding: 28px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── HEADER ROW ── */
+  .header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .page-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .page-subtitle { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+  .year-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .year-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace;
+  }
+  .year-btn:hover { border-color: var(--accent); color: var(--text); }
+  .year-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .year-btn.all-years { background: var(--surface2); color: var(--text); }
+  .year-btn.all-years.active { background: var(--blue); border-color: var(--blue); }
+
+  /* ── KPI CARDS ── */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 20px 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .kpi-card:hover { border-color: var(--border2); }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-line, var(--accent));
+    opacity: 0.6;
+  }
+  .kpi-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .kpi-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .kpi-sub {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+  }
+  .kpi-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+  .kpi-delta.up { background: rgba(76,175,125,0.15); color: var(--green); }
+  .kpi-delta.down { background: rgba(224,82,82,0.15); color: var(--red); }
+
+  /* split bar */
+  .split-bar { margin-top: 10px; }
+  .split-track {
+    height: 4px;
+    background: var(--border2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .split-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--bbq) var(--bbq-pct), var(--slice) var(--bbq-pct));
+    border-radius: 4px;
+    width: 100%;
+  }
+  .split-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .split-labels span:first-child { color: var(--bbq); }
+  .split-labels span:last-child { color: var(--slice); }
+
+  /* ── CHART GRID ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 900px) { .chart-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .chart-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+  .chart-hint { font-size: 0.7rem; color: var(--muted); }
+  .chart-wrap { position: relative; height: 220px; }
+  .chart-wrap.tall { height: 260px; }
+
+  /* ── TABLE ── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .table-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-title { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  thead th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    background: var(--surface);
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-icon { margin-left: 4px; opacity: 0.5; }
+  thead th.sorted { color: var(--accent2); }
+  thead th.sorted .sort-icon { opacity: 1; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  td {
+    padding: 10px 16px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+  }
+  td.month-col { font-family: 'DM Sans', sans-serif; font-weight: 500; color: var(--text); }
+  td.strong { color: var(--green); }
+  td.weak { color: var(--red); }
+
+  .bar-cell { display: flex; align-items: center; gap: 8px; }
+  .inline-bar { flex: 1; height: 4px; background: var(--border2); border-radius: 4px; overflow: hidden; max-width: 80px; }
+  .inline-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+
+  /* ── INSIGHTS ── */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+  }
+  .insight-card:hover { border-color: var(--border2); }
+  .insight-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .insight-icon.positive { background: rgba(76,175,125,0.15); }
+  .insight-icon.negative { background: rgba(224,82,82,0.15); }
+  .insight-icon.neutral  { background: rgba(91,141,238,0.15); }
+  .insight-icon.warning  { background: rgba(245,166,35,0.15); }
+  .insight-body {}
+  .insight-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+  .insight-tag.positive { color: var(--green); }
+  .insight-tag.negative { color: var(--red); }
+  .insight-tag.neutral  { color: var(--blue); }
+  .insight-tag.warning  { color: var(--accent2); }
+  .insight-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+  .insight-text strong { color: var(--accent2); }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted2);
+    margin-bottom: 12px;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">🔥 Saddleback SRG</div>
+  <div class="nav-tabs">
+    <a href="/" class="nav-tab">Pipeline</a>
+    <a href="#" class="nav-tab active">Analytics</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header-row">
+    <div>
+      <div class="page-title">Catering Analytics</div>
+      <div class="page-subtitle">Revenue & lead performance · 2021–2026</div>
+    </div>
+    <div class="year-controls" id="yearControls"></div>
+  </div>
+
+  <!-- KPI BAR -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- CHARTS -->
+  <div class="section-label">Revenue & Volume</div>
+  <div class="chart-grid">
+    <div class="chart-card full">
+      <div class="chart-header">
+        <span class="chart-title">Monthly Revenue</span>
+        <span class="chart-hint">BBQ + Slice</span>
+      </div>
+      <div class="chart-wrap tall"><canvas id="revenueChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Leads by Month</span>
+        <span class="chart-hint">Inquiry volume</span>
+      </div>
+      <div class="chart-wrap"><canvas id="leadsChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <span class="chart-title">Revenue per Lead</span>
+        <span class="chart-hint">Conversion efficiency</span>
+      </div>
+      <div class="chart-wrap"><canvas id="rplChart"></canvas></div>
+    </div>
+    <div class="chart-card full">
+      <div class="chart-header">
+        <span class="chart-title">BBQ vs Slice Mix</span>
+        <span class="chart-hint">Revenue composition by month</span>
+      </div>
+      <div class="chart-wrap"><canvas id="mixChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="section-label">Monthly Detail</div>
+  <div class="table-card">
+    <div class="table-head-row">
+      <div class="table-title" id="tableTitle">Monthly Breakdown</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('month')">Month <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('total')" class="sorted">Revenue <span class="sort-icon">↓</span></th>
+            <th onclick="sortTable('leads')">Leads <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('rpl')">Rev / Lead <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('bbq')">BBQ Rev <span class="sort-icon">↕</span></th>
+            <th onclick="sortTable('slice')">Slice Rev <span class="sort-icon">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Insights</div>
+  <div class="insights-grid" id="insightsGrid"></div>
+
+</div>
+
+<script>
+const RAW = [
+  {year:2021,month:"January",bbq:1205,slice:0,total:1205,leads:26},
+  {year:2021,month:"February",bbq:684,slice:0,total:684,leads:27},
+  {year:2021,month:"March",bbq:2556,slice:0,total:2556,leads:21},
+  {year:2021,month:"April",bbq:1164,slice:0,total:1164,leads:41},
+  {year:2021,month:"May",bbq:18615,slice:0,total:18615,leads:70},
+  {year:2021,month:"June",bbq:37422,slice:0,total:37422,leads:67},
+  {year:2021,month:"July",bbq:25735,slice:0,total:25735,leads:61},
+  {year:2021,month:"August",bbq:63094,slice:0,total:63094,leads:64},
+  {year:2021,month:"September",bbq:42224,slice:0,total:42224,leads:56},
+  {year:2021,month:"October",bbq:29717,slice:0,total:29717,leads:30},
+  {year:2021,month:"November",bbq:16155,slice:0,total:16155,leads:36},
+  {year:2021,month:"December",bbq:16526,slice:0,total:16526,leads:41},
+  {year:2022,month:"January",bbq:11895,slice:0,total:11895,leads:64},
+  {year:2022,month:"February",bbq:7401,slice:2324,total:9725,leads:49},
+  {year:2022,month:"March",bbq:4274,slice:0,total:4274,leads:66},
+  {year:2022,month:"April",bbq:11099,slice:989,total:12088,leads:77},
+  {year:2022,month:"May",bbq:32529,slice:1866,total:34395,leads:73},
+  {year:2022,month:"June",bbq:105637,slice:10846,total:116483,leads:56},
+  {year:2022,month:"July",bbq:42997,slice:2798,total:45795,leads:44},
+  {year:2022,month:"August",bbq:59605,slice:5532,total:65137,leads:53},
+  {year:2022,month:"September",bbq:89550,slice:14908,total:104458,leads:55},
+  {year:2022,month:"October",bbq:57528,slice:16516,total:74044,leads:46},
+  {year:2022,month:"November",bbq:55374,slice:7826,total:63200,leads:51},
+  {year:2022,month:"December",bbq:38753,slice:397,total:39150,leads:29},
+  {year:2023,month:"January",bbq:12309,slice:260,total:12569,leads:71},
+  {year:2023,month:"February",bbq:6501,slice:3607,total:10108,leads:50},
+  {year:2023,month:"March",bbq:14854,slice:0,total:14854,leads:55},
+  {year:2023,month:"April",bbq:25389,slice:5140,total:30529,leads:83},
+  {year:2023,month:"May",bbq:38583,slice:1471,total:40054,leads:53},
+  {year:2023,month:"June",bbq:136196,slice:15635,total:151831,leads:62},
+  {year:2023,month:"July",bbq:40776,slice:4077,total:44853,leads:54},
+  {year:2023,month:"August",bbq:77418,slice:8400,total:85818,leads:58},
+  {year:2023,month:"September",bbq:106927,slice:3300,total:110227,leads:62},
+  {year:2023,month:"October",bbq:68159,slice:6279,total:74438,leads:44},
+  {year:2023,month:"November",bbq:22366,slice:1308,total:23674,leads:49},
+  {year:2023,month:"December",bbq:68585,slice:378,total:68963,leads:45},
+  {year:2024,month:"January",bbq:24881,slice:1125,total:26006,leads:55},
+  {year:2024,month:"February",bbq:19186,slice:1800,total:20986,leads:69},
+  {year:2024,month:"March",bbq:30365,slice:6742,total:37107,leads:63},
+  {year:2024,month:"April",bbq:34562,slice:9783,total:44345,leads:86},
+  {year:2024,month:"May",bbq:39374,slice:13950,total:53324,leads:60},
+  {year:2024,month:"June",bbq:105913,slice:28968,total:134881,leads:65},
+  {year:2024,month:"July",bbq:55523,slice:6277,total:61800,leads:73},
+  {year:2024,month:"August",bbq:52652,slice:13205,total:65857,leads:67},
+  {year:2024,month:"September",bbq:79098,slice:10286,total:89384,leads:47},
+  {year:2024,month:"October",bbq:37720,slice:14247,total:51967,leads:58},
+  {year:2024,month:"November",bbq:19675,slice:1145,total:20820,leads:70},
+  {year:2024,month:"December",bbq:46296,slice:2371,total:48667,leads:43},
+  {year:2025,month:"January",bbq:9123,slice:537,total:9660,leads:78},
+  {year:2025,month:"February",bbq:23410,slice:4665,total:28075,leads:49},
+  {year:2025,month:"March",bbq:33329,slice:5503,total:38832,leads:66},
+  {year:2025,month:"April",bbq:8802,slice:1231,total:10033,leads:88},
+  {year:2025,month:"May",bbq:35099,slice:8431,total:43530,leads:93},
+  {year:2025,month:"June",bbq:50379,slice:15891,total:66270,leads:118},
+  {year:2025,month:"July",bbq:29645,slice:12064,total:41709,leads:72},
+  {year:2025,month:"August",bbq:27983,slice:10941,total:38924,leads:66},
+  {year:2025,month:"September",bbq:28934,slice:11343,total:40277,leads:63},
+  {year:2025,month:"October",bbq:24061,slice:10315,total:34376,leads:64},
+  {year:2025,month:"November",bbq:16569,slice:5885,total:22454,leads:52},
+  {year:2025,month:"December",bbq:12236,slice:4201,total:16437,leads:41},
+  {year:2026,month:"January",bbq:11072,slice:1107,total:12179,leads:70},
+  {year:2026,month:"February",bbq:11000,slice:868,total:11868,leads:70},
+];
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const YEARS = [...new Set(RAW.map(d=>d.year))].sort();
+const fmt$ = v => v >= 1000 ? '$' + (v/1000).toFixed(1) + 'k' : '$' + v;
+const fmtFull$ = v => '$' + v.toLocaleString();
+const fmtRpl = v => '$' + Math.round(v).toLocaleString();
+
+let selectedYear = Math.max(...YEARS);
+let allYears = false;
+let sortKey = 'total';
+let sortDir = -1;
+let charts = {};
+
+function getData() {
+  if (allYears) return RAW;
+  return RAW.filter(d => d.year === selectedYear);
+}
+
+// ── YEAR CONTROLS ────────────────────────────────────────────────────────────
+function buildYearControls() {
+  const c = document.getElementById('yearControls');
+  c.innerHTML = '';
+  YEARS.forEach(y => {
+    const b = document.createElement('button');
+    b.className = 'year-btn' + (selectedYear===y && !allYears ? ' active':'');
+    b.textContent = y;
+    b.onclick = () => { selectedYear=y; allYears=false; render(); };
+    c.appendChild(b);
+  });
+  const all = document.createElement('button');
+  all.className = 'year-btn all-years' + (allYears?' active':'');
+  all.textContent = 'All Years';
+  all.onclick = () => { allYears=true; render(); };
+  c.appendChild(all);
+}
+
+// ── KPI ──────────────────────────────────────────────────────────────────────
+function buildKPIs() {
+  const data = getData();
+  const totalRev = data.reduce((s,d)=>s+d.total,0);
+  const totalLeads = data.reduce((s,d)=>s+d.leads,0);
+  const rpl = totalLeads ? totalRev/totalLeads : 0;
+  const totalBBQ = data.reduce((s,d)=>s+d.bbq,0);
+  const totalSlice = data.reduce((s,d)=>s+d.slice,0);
+  const bbqPct = totalRev ? Math.round(totalBBQ/totalRev*100) : 0;
+  const slicePct = 100-bbqPct;
+
+  // YoY delta
+  let deltaHtml = '';
+  if (!allYears && selectedYear > YEARS[0]) {
+    const prevData = RAW.filter(d=>d.year===selectedYear-1);
+    const prevRev = prevData.reduce((s,d)=>s+d.total,0);
+    if (prevRev) {
+      const pct = Math.round((totalRev-prevRev)/prevRev*100);
+      const cls = pct>=0?'up':'down';
+      deltaHtml = `<div class="kpi-delta ${cls}">${pct>=0?'↑':'↓'} ${Math.abs(pct)}% vs ${selectedYear-1}</div>`;
+    }
+  }
+
+  let rplDeltaHtml = '';
+  if (!allYears && selectedYear > YEARS[0]) {
+    const prevData = RAW.filter(d=>d.year===selectedYear-1);
+    const prevRev = prevData.reduce((s,d)=>s+d.total,0);
+    const prevLeads = prevData.reduce((s,d)=>s+d.leads,0);
+    const prevRpl = prevLeads ? prevRev/prevLeads : 0;
+    if (prevRpl) {
+      const pct = Math.round((rpl-prevRpl)/prevRpl*100);
+      const cls = pct>=0?'up':'down';
+      rplDeltaHtml = `<div class="kpi-delta ${cls}">${pct>=0?'↑':'↓'} ${Math.abs(pct)}% vs ${selectedYear-1}</div>`;
+    }
+  }
+
+  const yearLabel = allYears ? '2021–2026' : selectedYear;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card" style="--accent-line:var(--accent)">
+      <div class="kpi-label">Total Revenue</div>
+      <div class="kpi-value">${fmt$(totalRev)}</div>
+      <div class="kpi-sub">${yearLabel}</div>
+      ${deltaHtml}
+    </div>
+    <div class="kpi-card" style="--accent-line:var(--blue)">
+      <div class="kpi-label">Total Leads</div>
+      <div class="kpi-value">${totalLeads.toLocaleString()}</div>
+      <div class="kpi-sub">Inquiries received</div>
+    </div>
+    <div class="kpi-card" style="--accent-line:var(--green)">
+      <div class="kpi-label">Revenue / Lead</div>
+      <div class="kpi-value">${fmtRpl(rpl)}</div>
+      <div class="kpi-sub">Conversion efficiency</div>
+      ${rplDeltaHtml}
+    </div>
+    <div class="kpi-card" style="--accent-line:var(--muted2)">
+      <div class="kpi-label">BBQ vs Slice Mix</div>
+      <div class="split-bar">
+        <div class="split-track"><div class="split-fill" style="--bbq-pct:${bbqPct}%"></div></div>
+        <div class="split-labels"><span>BBQ ${bbqPct}%</span><span>Slice ${slicePct}%</span></div>
+      </div>
+      <div class="kpi-sub">${fmtFull$(totalBBQ)} BBQ · ${fmtFull$(totalSlice)} Slice</div>
+    </div>
+  `;
+}
+
+// ── CHARTS ───────────────────────────────────────────────────────────────────
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { backgroundColor:'#1f1f1d', borderColor:'#2a2a27', borderWidth:1, titleColor:'#f0ede8', bodyColor:'#8a8780', padding:10, cornerRadius:8 } },
+  scales: {
+    x: { grid: { color:'#2a2a27', drawBorder:false }, ticks: { color:'#5a5855', font:{size:11,family:"'DM Mono'"} } },
+    y: { grid: { color:'#2a2a27', drawBorder:false }, ticks: { color:'#5a5855', font:{size:11,family:"'DM Mono'"} } }
+  }
+};
+
+function destroyChart(id) { if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
+
+function buildCharts() {
+  const data = getData();
+
+  if (allYears) {
+    buildAllYearsCharts();
+    return;
+  }
+
+  const labels = data.map(d=>d.month.slice(0,3));
+
+  // Revenue chart
+  destroyChart('revenue');
+  charts['revenue'] = new Chart(document.getElementById('revenueChart'), {
+    type:'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'BBQ', data: data.map(d=>d.bbq), backgroundColor: 'rgba(232,119,42,0.85)', borderRadius:5, borderSkipped:false },
+        { label:'Slice', data: data.map(d=>d.slice), backgroundColor: 'rgba(91,141,238,0.85)', borderRadius:5, borderSkipped:false }
+      ]
+    },
+    options: { ...CHART_DEFAULTS, plugins:{...CHART_DEFAULTS.plugins, legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}}, scales:{...CHART_DEFAULTS.scales, x:{...CHART_DEFAULTS.scales.x,stacked:true},y:{...CHART_DEFAULTS.scales.y,stacked:true,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>fmt$(v)}}}}
+  });
+
+  // Leads chart
+  destroyChart('leads');
+  charts['leads'] = new Chart(document.getElementById('leadsChart'), {
+    type:'line',
+    data: { labels, datasets: [{ label:'Leads', data:data.map(d=>d.leads), borderColor:'#5b8dee', backgroundColor:'rgba(91,141,238,0.08)', borderWidth:2, pointBackgroundColor:'#5b8dee', pointRadius:4, tension:0.35, fill:true }]},
+    options: { ...CHART_DEFAULTS, scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,ticks:{...CHART_DEFAULTS.scales.y.ticks}}}}
+  });
+
+  // RPL chart
+  destroyChart('rpl');
+  charts['rpl'] = new Chart(document.getElementById('rplChart'), {
+    type:'line',
+    data: { labels, datasets:[{ label:'Rev/Lead', data:data.map(d=>d.leads?Math.round(d.total/d.leads):0), borderColor:'#4caf7d', backgroundColor:'rgba(76,175,125,0.08)', borderWidth:2, pointBackgroundColor:'#4caf7d', pointRadius:4, tension:0.35, fill:true }]},
+    options: {...CHART_DEFAULTS, scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>'$'+v}}}}
+  });
+
+  // Mix chart
+  destroyChart('mix');
+  const bbqPcts = data.map(d=>d.total ? Math.round(d.bbq/d.total*100) : 0);
+  const slicePcts = data.map(d=>d.total ? Math.round(d.slice/d.total*100) : 0);
+  charts['mix'] = new Chart(document.getElementById('mixChart'), {
+    type:'bar',
+    data: { labels, datasets:[
+      {label:'BBQ %', data:bbqPcts, backgroundColor:'rgba(232,119,42,0.85)', borderRadius:4, borderSkipped:false},
+      {label:'Slice %', data:slicePcts, backgroundColor:'rgba(91,141,238,0.85)', borderRadius:4, borderSkipped:false}
+    ]},
+    options:{...CHART_DEFAULTS, plugins:{...CHART_DEFAULTS.plugins,legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}}, scales:{...CHART_DEFAULTS.scales,x:{...CHART_DEFAULTS.scales.x,stacked:true},y:{...CHART_DEFAULTS.scales.y,stacked:true,max:100,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>v+'%'}}}}
+  });
+}
+
+function buildAllYearsCharts() {
+  const colors = ['#5b8dee','#e8772a','#4caf7d','#f5a623','#e05252','#a78bfa'];
+  const makeYearDatasets = (key) => YEARS.map((y,i) => ({
+    label: String(y),
+    data: MONTHS.map(m => { const r=RAW.find(d=>d.year===y&&d.month===m); return r?r[key]:0; }),
+    borderColor: colors[i%colors.length],
+    backgroundColor: colors[i%colors.length]+'22',
+    borderWidth: y===2026?3:1.5,
+    pointRadius: y===2026?5:2,
+    tension:0.35, fill:false
+  }));
+
+  destroyChart('revenue');
+  charts['revenue'] = new Chart(document.getElementById('revenueChart'), {
+    type:'line',
+    data:{ labels:MONTHS.map(m=>m.slice(0,3)), datasets:makeYearDatasets('total') },
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}},scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>fmt$(v)}}}}
+  });
+
+  destroyChart('leads');
+  charts['leads'] = new Chart(document.getElementById('leadsChart'), {
+    type:'line',
+    data:{labels:MONTHS.map(m=>m.slice(0,3)),datasets:makeYearDatasets('leads')},
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}}}
+  });
+
+  destroyChart('rpl');
+  charts['rpl'] = new Chart(document.getElementById('rplChart'), {
+    type:'line',
+    data:{labels:MONTHS.map(m=>m.slice(0,3)),datasets:YEARS.map((y,i)=>({
+      label:String(y), borderColor:colors[i%colors.length], backgroundColor:colors[i%colors.length]+'22',
+      borderWidth:y===2026?3:1.5, pointRadius:y===2026?5:2, tension:0.35, fill:false,
+      data:MONTHS.map(m=>{const r=RAW.find(d=>d.year===y&&d.month===m);return r&&r.leads?Math.round(r.total/r.leads):0;})
+    }))},
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}},scales:{...CHART_DEFAULTS.scales,y:{...CHART_DEFAULTS.scales.y,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>'$'+v}}}}
+  });
+
+  // Slice % growth over years
+  destroyChart('mix');
+  charts['mix'] = new Chart(document.getElementById('mixChart'), {
+    type:'bar',
+    data:{labels:YEARS.map(String),datasets:[
+      {label:'BBQ',data:YEARS.map(y=>{const d=RAW.filter(r=>r.year===y);const t=d.reduce((s,r)=>s+r.total,0);return t?Math.round(d.reduce((s,r)=>s+r.bbq,0)/t*100):0;}),backgroundColor:'rgba(232,119,42,0.85)',borderRadius:6},
+      {label:'Slice',data:YEARS.map(y=>{const d=RAW.filter(r=>r.year===y);const t=d.reduce((s,r)=>s+r.total,0);return t?Math.round(d.reduce((s,r)=>s+r.slice,0)/t*100):0;}),backgroundColor:'rgba(91,141,238,0.85)',borderRadius:6}
+    ]},
+    options:{...CHART_DEFAULTS,plugins:{...CHART_DEFAULTS.plugins,legend:{display:true,labels:{color:'#8a8780',font:{size:11}}}},scales:{...CHART_DEFAULTS.scales,x:{...CHART_DEFAULTS.scales.x,stacked:true},y:{...CHART_DEFAULTS.scales.y,stacked:true,max:100,ticks:{...CHART_DEFAULTS.scales.y.ticks,callback:v=>v+'%'}}}}
+  });
+}
+
+// ── TABLE ────────────────────────────────────────────────────────────────────
+function buildTable() {
+  const data = getData().map(d=>({...d, rpl:d.leads?Math.round(d.total/d.leads):0}));
+  const maxRev = Math.max(...data.map(d=>d.total));
+
+  data.sort((a,b)=>{
+    let av=a[sortKey], bv=b[sortKey];
+    if(sortKey==='month') { av=MONTHS.indexOf(a.month); bv=MONTHS.indexOf(b.month); }
+    return sortDir*(bv-av);
+  });
+
+  const avgRpl = data.reduce((s,d)=>s+d.rpl,0)/data.length;
+
+  document.getElementById('tableTitle').textContent = allYears ? 'All Years · Monthly Aggregate' : `${selectedYear} · Monthly Breakdown`;
+
+  const rows = data.map(d => {
+    const rplClass = d.rpl > avgRpl*1.2 ? 'strong' : d.rpl < avgRpl*0.7 ? 'weak' : '';
+    const pct = maxRev ? Math.round(d.total/maxRev*100) : 0;
+    const yearPrefix = allYears ? `<small style="color:var(--muted2);font-size:0.65rem">${d.year} </small>` : '';
+    return `<tr>
+      <td class="month-col">${yearPrefix}${d.month}</td>
+      <td><div class="bar-cell">${fmtFull$(d.total)}<div class="inline-bar"><div class="inline-fill" style="width:${pct}%"></div></div></div></td>
+      <td>${d.leads}</td>
+      <td class="${rplClass}">${fmtRpl(d.rpl)}</td>
+      <td>${fmtFull$(d.bbq)}</td>
+      <td>${d.slice>0?fmtFull$(d.slice):'<span style="color:var(--muted2)">—</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableBody').innerHTML = rows;
+
+  // Update sort headers
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  const keys=['month','total','leads','rpl','bbq','slice'];
+  const idx = keys.indexOf(sortKey);
+  if(idx>=0){
+    const ths = document.querySelectorAll('thead th');
+    ths[idx].classList.add('sorted');
+    ths[idx].querySelector('.sort-icon').textContent = sortDir===-1?'↓':'↑';
+  }
+}
+
+function sortTable(key) {
+  if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=-1; }
+  buildTable();
+}
+
+// ── INSIGHTS ─────────────────────────────────────────────────────────────────
+function buildInsights() {
+  const insights = [];
+
+  // 1. Strongest month across all years
+  const monthAvgs = MONTHS.map(m => {
+    const rows = RAW.filter(d=>d.month===m);
+    return { month:m, avg: rows.reduce((s,d)=>s+d.total,0)/rows.length };
+  });
+  monthAvgs.sort((a,b)=>b.avg-a.avg);
+  insights.push({ type:'positive', icon:'🏆', tag:'Peak Season', text:`<strong>${monthAvgs[0].month}</strong> is consistently the strongest revenue month across all years, averaging <strong>${fmt$(monthAvgs[0].avg)}</strong> per year.` });
+
+  // 2. Weakest Q1
+  const q1Avg = ['January','February','March'].reduce((s,m)=>{ const r=RAW.filter(d=>d.month===m); return s+r.reduce((a,d)=>a+d.total,0)/r.length; },0)/3;
+  const q2Avg = ['April','May','June'].reduce((s,m)=>{ const r=RAW.filter(d=>d.month===m); return s+r.reduce((a,d)=>a+d.total,0)/r.length; },0)/3;
+  insights.push({ type:'warning', icon:'📉', tag:'Seasonal Gap', text:`<strong>Q1 (Jan–Mar)</strong> averages <strong>${fmt$(q1Avg)}</strong>/month vs Q2's <strong>${fmt$(q2Avg)}</strong>/month — a ${Math.round((q2Avg-q1Avg)/q1Avg*100)}× jump. <strong>Marketing push in Feb–Mar</strong> could capture more spring bookings.` });
+
+  // 3. Slice growth
+  const slice2022 = RAW.filter(d=>d.year===2022).reduce((s,d)=>s+d.slice,0);
+  const slice2022total = RAW.filter(d=>d.year===2022).reduce((s,d)=>s+d.total,0);
+  const slice2025 = RAW.filter(d=>d.year===2025).reduce((s,d)=>s+d.slice,0);
+  const slice2025total = RAW.filter(d=>d.year===2025).reduce((s,d)=>s+d.total,0);
+  const pct22 = Math.round(slice2022/slice2022total*100);
+  const pct25 = Math.round(slice2025/slice2025total*100);
+  insights.push({ type:'positive', icon:'🍕', tag:'Slice Growth', text:`Slice revenue grew from <strong>${pct22}%</strong> of total in 2022 to <strong>${pct25}%</strong> in 2025. Slice is a meaningful and growing revenue stream.` });
+
+  // 4. High leads, low RPL months
+  const allRpl = RAW.filter(d=>d.leads>0).map(d=>d.total/d.leads);
+  const avgRplAll = allRpl.reduce((s,v)=>s+v,0)/allRpl.length;
+  const highLeadsLowRpl = RAW.filter(d=>d.leads>60 && d.leads>0 && d.total/d.leads < avgRplAll*0.7);
+  if(highLeadsLowRpl.length>0){
+    const ex = highLeadsLowRpl[0];
+    insights.push({ type:'negative', icon:'⚠️', tag:'Conversion Gap', text:`<strong>${ex.month} ${ex.year}</strong> had <strong>${ex.leads} leads</strong> but only <strong>${fmtRpl(ex.total/ex.leads)}</strong> revenue per lead — ${Math.round((1-ex.total/ex.leads/avgRplAll)*100)}% below average. High inquiry volume with low close rate suggests a pricing or follow-up issue.` });
+  }
+
+  // 5. 2026 vs 2025 pace
+  const data2026 = RAW.filter(d=>d.year===2026);
+  const months2026 = data2026.map(d=>d.month);
+  const data2025comp = RAW.filter(d=>d.year===2025&&months2026.includes(d.month));
+  const rev2026 = data2026.reduce((s,d)=>s+d.total,0);
+  const rev2025comp = data2025comp.reduce((s,d)=>s+d.total,0);
+  const pace = Math.round((rev2026-rev2025comp)/rev2025comp*100);
+  const paceType = pace>=0?'positive':'negative';
+  insights.push({ type:paceType, icon: pace>=0?'📈':'📊', tag:'2026 Pace', text:`Through ${data2026[data2026.length-1].month}, 2026 revenue is <strong>${fmtFull$(rev2026)}</strong> vs <strong>${fmtFull$(rev2025comp)}</strong> for the same period in 2025 — <strong>${Math.abs(pace)}% ${pace>=0?'ahead':'behind'}</strong>.` });
+
+  // 6. April 2025 anomaly
+  const apr2025 = RAW.find(d=>d.year===2025&&d.month==='April');
+  const apr2024 = RAW.find(d=>d.year===2024&&d.month==='April');
+  if(apr2025&&apr2024){
+    const drop = Math.round((apr2025.total-apr2024.total)/apr2024.total*100);
+    if(drop < -30){
+      insights.push({ type:'negative', icon:'🔍', tag:'Anomaly', text:`<strong>April 2025 revenue dropped ${Math.abs(drop)}%</strong> vs April 2024 ($${apr2025.total.toLocaleString()} vs $${apr2024.total.toLocaleString()}), despite more leads (${apr2025.leads} vs ${apr2024.leads}). Worth investigating — cancellations or pricing change?` });
+    }
+  }
+
+  // 7. Best RPL month
+  const byRpl = RAW.filter(d=>d.leads>5).map(d=>({...d,rpl:d.total/d.leads})).sort((a,b)=>b.rpl-a.rpl);
+  insights.push({ type:'positive', icon:'💰', tag:'Highest Efficiency', text:`Best revenue-per-lead ever: <strong>${byRpl[0].month} ${byRpl[0].year}</strong> at <strong>${fmtRpl(byRpl[0].rpl)}/lead</strong> with ${byRpl[0].leads} leads. This is the benchmark for closing efficiency.` });
+
+  // 8. June dominance
+  const juneRevs = RAW.filter(d=>d.month==='June'&&d.year>=2022);
+  const juneAvg = juneRevs.reduce((s,d)=>s+d.total,0)/juneRevs.length;
+  insights.push({ type:'neutral', icon:'☀️', tag:'June Dominance', text:`June has averaged <strong>${fmt$(juneAvg)}</strong> in revenue since 2022 — consistently the top month by a wide margin. Capacity and staffing should be planned months in advance.` });
+
+  const typeMap = { positive:'positive', negative:'negative', neutral:'neutral', warning:'warning' };
+  document.getElementById('insightsGrid').innerHTML = insights.map(ins=>`
+    <div class="insight-card">
+      <div class="insight-icon ${typeMap[ins.type]}">${ins.icon}</div>
+      <div class="insight-body">
+        <div class="insight-tag ${ins.type}">${ins.tag}</div>
+        <div class="insight-text">${ins.text}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  buildYearControls();
+  buildKPIs();
+  buildCharts();
+  buildTable();
+  buildInsights();
+}
+
+render();
+</script>
+</body>
+</html>
