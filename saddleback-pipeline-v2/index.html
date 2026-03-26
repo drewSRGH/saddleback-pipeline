@@ -3,204 +3,626 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Saddleback Catering Pipeline</title>
+  <title>Saddleback — Catering Pipeline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #0f0f0e;
+      --surface: #181817;
+      --surface2: #1f1f1d;
+      --border: #2a2a27;
+      --border2: #333330;
+      --text: #f0ede8;
+      --muted: #8a8780;
+      --muted2: #5a5855;
+      --accent: #e8772a;
+      --accent2: #f5a623;
+      --green: #4caf7d;
+      --red: #e05252;
+      --yellow: #f5a623;
+      --blue: #5b8dee;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    header {
-  <body>
-<nav style="display:flex;align-items:center;gap:0;padding:0 24px;background:#1a1a0a;border-bottom:2px solid #c8621a;height:48px;position:sticky;top:0;z-index:50;">
-  <span style="font-size:1rem;font-weight:700;color:#f5a623;margin-right:28px;">🔥 Saddleback SRG</span>
-  <a href="/" style="padding:0 14px;height:48px;display:flex;align-items:center;font-size:0.82rem;font-weight:600;color:#fff;text-decoration:none;border-bottom:2px solid #c8621a;">Pipeline</a>
-  <a href="/analytics.html" style="padding:0 14px;height:48px;display:flex;align-items:center;font-size:0.82rem;font-weight:500;color:#888;text-decoration:none;border-bottom:2px solid transparent;">Analytics</a>
-</nav>
-    header {
-      background: #2a1a0a;
-      border-bottom: 3px solid #c8621a;
-      padding: 16px 24px;
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── NAV ── */
+    nav {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 8px;
+      padding: 0 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    header h1 { font-size: 1.4rem; color: #f5a623; letter-spacing: 0.5px; }
-    header span { font-size: 0.8rem; color: #999; }
-    .controls {
-      padding: 16px 24px;
+    .nav-brand {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-right: 32px;
+      letter-spacing: -0.3px;
+      text-decoration: none;
+    }
+    .nav-tabs { display: flex; }
+    .nav-tab {
+      padding: 0 16px;
+      height: 52px;
       display: flex;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      text-decoration: none;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .nav-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
       gap: 12px;
-      flex-wrap: wrap;
-      align-items: center;
     }
-    .controls select, .controls input {
-      background: #2a2a2a;
-      border: 1px solid #444;
-      color: #f0f0f0;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
+    .nav-timestamp {
+      font-size: 0.72rem;
+      color: var(--muted2);
+      font-family: 'DM Mono', monospace;
     }
-    .controls button {
-      background: #c8621a;
+    .btn-refresh {
+      background: var(--accent);
       color: white;
       border: none;
-      padding: 8px 18px;
-      border-radius: 6px;
+      padding: 6px 14px;
+      border-radius: 7px;
       cursor: pointer;
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 600;
-    }
-    .controls button:hover { background: #e07020; }
-    #status-bar {
-      padding: 8px 24px;
-      font-size: 0.8rem;
-      color: #aaa;
-      min-height: 28px;
-    }
-    #status-bar.error { color: #ff6b6b; }
-    #status-bar.ok { color: #7fff7f; }
-    .summary-bar {
-      padding: 4px 24px 14px;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
       display: flex;
-      gap: 20px;
-      font-size: 0.8rem;
-      color: #aaa;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-refresh:hover { background: #f08030; }
+
+    /* ── PAGE ── */
+    .page { padding: 24px 28px; max-width: 1500px; margin: 0 auto; }
+
+    /* ── HEADER ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .page-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.4px;
+    }
+    .page-sub { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+
+    /* ── STATS ROW ── */
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
     }
-    .summary-bar span { color: #f0f0f0; font-weight: 700; }
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 120px;
+    }
+    .stat-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .stat-dot.overdue { background: var(--red); box-shadow: 0 0 6px var(--red); }
+    .stat-dot.pending { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+    .stat-dot.new { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .stat-dot.closed { background: var(--muted2); }
+    .stat-dot.total { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+    .stat-info {}
+    .stat-count {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--text);
+    }
+    .stat-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-bar select,
+    .filter-bar input {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .filter-bar select {
+      padding-right: 28px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a5855' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .filter-bar select:focus,
+    .filter-bar input:focus { border-color: var(--accent); }
+    .filter-bar input::placeholder { color: var(--muted2); }
+    .search-wrap { position: relative; }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted2);
+      font-size: 0.8rem;
+      pointer-events: none;
+    }
+    .filter-bar .search-wrap input { padding-left: 28px; width: 220px; }
+
+    /* ── STATUS BAR ── */
+    #status-bar {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 8px;
+      min-height: 20px;
+    }
+    #status-bar.error { color: var(--red); }
+    #status-bar.ok { color: var(--green); }
+    .page-info { font-size: 0.72rem; color: var(--muted2); margin-bottom: 16px; font-family: 'DM Mono', monospace; }
+
+    /* ── PIPELINE GRID ── */
     .pipeline {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
-      padding: 0 24px 32px;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 12px;
     }
+
+    /* ── CARD ── */
     .card {
-      background: #252525;
-      border: 1px solid #383838;
-      border-radius: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
       padding: 16px;
-      transition: border-color 0.2s;
+      transition: border-color 0.15s, transform 0.15s;
       position: relative;
+      overflow: hidden;
     }
-    .card:hover { border-color: #c8621a; }
-    .card.overdue  { border-left: 4px solid #ff4444; }
-    .card.pending  { border-left: 4px solid #f5a623; }
-    .card.new      { border-left: 4px solid #4caf50; }
-    .card.closed   { border-left: 4px solid #555; opacity: 0.7; }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 100%;
+      border-radius: 3px 0 0 3px;
+    }
+    .card.overdue::before { background: var(--red); }
+    .card.pending::before { background: var(--yellow); }
+    .card.new::before { background: var(--green); }
+    .card.closed::before { background: var(--muted2); }
+    .card:hover { border-color: var(--border2); transform: translateY(-1px); }
+    .card.closed { opacity: 0.6; }
+
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      gap: 8px;
     }
-    .card-name { font-weight: 700; font-size: 1rem; color: #fff; }
+    .card-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+    .card-company {
+      font-size: 0.73rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
     .badge {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: 20px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.06em;
       white-space: nowrap;
+      flex-shrink: 0;
     }
-    .badge.overdue { background: #ff4444; color: white; }
-    .badge.pending { background: #f5a623; color: #1a1a1a; }
-    .badge.new     { background: #4caf50; color: white; }
-    .badge.closed  { background: #555; color: #ccc; }
-    .card-detail { font-size: 0.8rem; color: #bbb; margin-bottom: 4px; }
-    .card-detail strong { color: #ddd; }
-    .card-actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-email {
-      background: #c8621a; color: white; border: none;
-      padding: 7px 14px; border-radius: 6px; cursor: pointer;
-      font-size: 0.78rem; font-weight: 600;
+    .badge.overdue { background: rgba(224,82,82,0.15); color: var(--red); border: 1px solid rgba(224,82,82,0.3); }
+    .badge.pending { background: rgba(245,166,35,0.15); color: var(--yellow); border: 1px solid rgba(245,166,35,0.3); }
+    .badge.new { background: rgba(76,175,125,0.15); color: var(--green); border: 1px solid rgba(76,175,125,0.3); }
+    .badge.closed { background: rgba(90,88,85,0.2); color: var(--muted); border: 1px solid var(--border); }
+
+    .card-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+      margin-bottom: 12px;
     }
-    .btn-email:hover { background: #e07020; }
-    .btn-email:disabled { background: #555; cursor: not-allowed; }
-    .btn-ts {
-      background: transparent; color: #f5a623;
-      border: 1px solid #f5a623; padding: 7px 14px;
-      border-radius: 6px; cursor: pointer; font-size: 0.78rem;
-      font-weight: 600; text-decoration: none; display: inline-block;
+    .meta-item {}
+    .meta-label {
+      font-size: 0.63rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted2);
+      font-weight: 600;
+      margin-bottom: 1px;
     }
-    .btn-ts:hover { background: #f5a6231a; }
-    /* Modal */
+    .meta-value {
+      font-size: 0.78rem;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .meta-item.full { grid-column: 1 / -1; }
+
+    .card-event {
+      background: var(--surface2);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      font-style: italic;
+      line-height: 1.4;
+      border-left: 2px solid var(--border2);
+    }
+
+    .card-turned-down {
+      background: rgba(224,82,82,0.08);
+      border: 1px solid rgba(224,82,82,0.2);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.73rem;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+    .card-time {
+      font-size: 0.68rem;
+      color: var(--muted2);
+      font-family: 'DM Mono', monospace;
+    }
+    .card-actions { display: flex; gap: 6px; }
+
+    .btn-ai {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.73rem;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-ai:hover { background: #f08030; }
+    .btn-ai:disabled { background: var(--border2); color: var(--muted2); cursor: not-allowed; }
+
+    .btn-link {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border2);
+      padding: 6px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.73rem;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-link:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--muted2);
+    }
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state h2 { font-size: 1rem; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+    .empty-state p { font-size: 0.8rem; }
+
+    /* ── MODAL ── */
     #modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75); z-index: 100;
-      justify-content: center; align-items: center;
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
     #modal-overlay.open { display: flex; }
     #modal {
-      background: #252525; border: 1px solid #444;
-      border-radius: 12px; padding: 24px;
-      width: 90%; max-width: 580px; max-height: 80vh; overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 0;
+      width: 100%;
+      max-width: 600px;
+      max-height: 85vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
     }
-    #modal h2 { color: #f5a623; margin-bottom: 16px; font-size: 1.1rem; }
-    #modal textarea {
-      width: 100%; min-height: 220px; background: #1a1a1a;
-      border: 1px solid #444; border-radius: 6px; color: #f0f0f0;
-      padding: 12px; font-size: 0.85rem; line-height: 1.5; resize: vertical;
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .modal-actions { margin-top: 14px; display: flex; gap: 10px; justify-content: flex-end; }
-    .modal-actions button {
-      padding: 8px 18px; border-radius: 6px;
-      font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none;
+    .modal-header h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
     }
-    #btn-copy { background: #c8621a; color: white; }
-    #btn-copy:hover { background: #e07020; }
-    #btn-close-modal { background: #444; color: #ccc; }
-    #btn-close-modal:hover { background: #555; }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 16px 24px; flex: 1; overflow-y: auto; }
+    #modal-email {
+      width: 100%;
+      min-height: 260px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 14px;
+      font-size: 0.83rem;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #modal-email:focus { border-color: var(--accent); }
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .modal-footer button {
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+    #btn-copy { background: var(--accent); color: white; }
+    #btn-copy:hover { background: #f08030; }
+    #btn-close-modal { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); }
+    #btn-close-modal:hover { color: var(--text); }
+
+    /* ── SPINNER ── */
     .spinner {
-      display: inline-block; width: 14px; height: 14px;
-      border: 2px solid #fff4; border-top-color: #fff;
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-      vertical-align: middle; margin-right: 6px;
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 24px; color: #666; }
-    .empty-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
-    .page-info { padding: 0 24px 8px; font-size: 0.75rem; color: #666; }
+
+    /* ── LOADING SKELETON ── */
+    .skeleton {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .skel-line {
+      height: 10px;
+      background: var(--surface2);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .skel-line.short { width: 40%; }
+    .skel-line.medium { width: 65%; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>🔥 Saddleback Catering Pipeline</h1>
-  <span id="last-updated"></span>
-</header>
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="/">🔥 Saddleback SRG</a>
+  <div class="nav-tabs">
+    <a href="/" class="nav-tab active">Pipeline</a>
+    <a href="/analytics.html" class="nav-tab">Analytics</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-timestamp" id="last-updated"></span>
+    <button class="btn-refresh" onclick="loadLeads()">
+      <span>↻</span> Refresh
+    </button>
+  </div>
+</nav>
 
-<div class="controls">
-  <select id="filter-status">
-    <option value="all">All Statuses</option>
-    <option value="new">New</option>
-    <option value="pending">Pending</option>
-    <option value="overdue">Overdue</option>
-    <option value="closed">Closed / Turned Down</option>
-  </select>
-  <select id="filter-location">
-    <option value="all">All Locations</option>
-    <option value="Saddleback BBQ Lansing">Saddleback BBQ Lansing</option>
-    <option value="Saddleback BBQ Okemos">Saddleback BBQ Okemos</option>
-  </select>
-  <input type="text" id="search-input" placeholder="Search name, company, event…" style="width:220px" />
-  <button onclick="loadLeads()">↻ Refresh</button>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Catering Pipeline</div>
+      <div class="page-sub">Live leads from Tripleseat · most recently updated first</div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-pill">
+      <div class="stat-dot total"></div>
+      <div class="stat-info">
+        <div class="stat-count" id="stat-total">—</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-dot overdue"></div>
+      <div class="stat-info">
+        <div class="stat-count" id="stat-overdue">—</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-dot pending"></div>
+      <div class="stat-info">
+        <div class="stat-count" id="stat-pending">—</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-dot new"></div>
+      <div class="stat-info">
+        <div class="stat-count" id="stat-new">—</div>
+        <div class="stat-label">New</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-dot closed"></div>
+      <div class="stat-info">
+        <div class="stat-count" id="stat-closed">—</div>
+        <div class="stat-label">Closed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <select id="filter-status">
+      <option value="all">All Statuses</option>
+      <option value="new">New</option>
+      <option value="pending">Pending</option>
+      <option value="overdue">Overdue</option>
+      <option value="closed">Closed / Turned Down</option>
+    </select>
+    <select id="filter-location">
+      <option value="all">All Locations</option>
+      <option value="Saddleback BBQ Lansing">Saddleback BBQ Lansing</option>
+      <option value="Saddleback BBQ Okemos">Saddleback BBQ Okemos</option>
+    </select>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="search-input" placeholder="Search name, company, event…" />
+    </div>
+  </div>
+
+  <div id="status-bar"></div>
+  <div class="page-info" id="page-info"></div>
+
+  <!-- PIPELINE -->
+  <div class="pipeline" id="pipeline">
+    <!-- skeletons while loading -->
+    ${[...Array(6)].map(()=>`<div class="skeleton"><div class="skel-line medium"></div><div class="skel-line short"></div><div class="skel-line"></div><div class="skel-line medium"></div></div>`).join('')}
+  </div>
+
 </div>
 
-<div id="status-bar">Loading leads…</div>
-<div class="summary-bar" id="summary-bar"></div>
-<div class="page-info" id="page-info"></div>
-
-<div class="pipeline" id="pipeline"></div>
-
-<!-- Email Modal -->
+<!-- EMAIL MODAL -->
 <div id="modal-overlay">
   <div id="modal">
-    <h2 id="modal-title">AI Follow-Up Email</h2>
-    <textarea id="modal-email" placeholder="Generating…"></textarea>
-    <div class="modal-actions">
-      <button id="btn-copy" onclick="copyEmail()">Copy Email</button>
-      <button id="btn-close-modal" onclick="closeModal()">Close</button>
+    <div class="modal-header">
+      <h2 id="modal-title">AI Follow-Up Email</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="modal-email" placeholder="Generating email…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-close-modal" onclick="closeModal()">Cancel</button>
+      <button id="btn-copy" onclick="copyEmail()">Copy to Clipboard</button>
     </div>
   </div>
 </div>
@@ -208,7 +630,6 @@
 <script>
 const API_BASE   = '/.netlify/functions/tripleseat';
 const TS_ACCOUNT = 'saddlebackbbq.tripleseat.com';
-
 let allLeads = [];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -232,8 +653,15 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function timeAgo(dateStr) {
+  const days = daysSince(dateStr);
+  if (days === null) return '';
+  if (days === 0) return 'today';
+  if (days === 1) return '1d ago';
+  return `${days}d ago`;
+}
+
 function leadStatus(lead) {
-  // Only turned_down_at means truly closed — converted_at just means processed
   if (lead.turned_down_at) return 'closed';
   const days = daysSince(lead.updated_at || lead.created_at);
   if (days === null) return 'new';
@@ -241,7 +669,7 @@ function leadStatus(lead) {
   if (days >= 2) return 'pending';
   return 'new';
 }
-  
+
 function escHtml(str) {
   return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
@@ -250,45 +678,36 @@ function escHtml(str) {
 
 // ── Load Leads ────────────────────────────────────────────────────────────────
 async function loadLeads() {
-  setStatus('Fetching leads from Tripleseat…');
-  document.getElementById('pipeline').innerHTML = '';
-  document.getElementById('summary-bar').innerHTML = '';
-  document.getElementById('page-info').innerHTML = '';
+  setStatus('Fetching from Tripleseat…');
+  document.getElementById('pipeline').innerHTML = Array(6).fill(`
+    <div class="skeleton">
+      <div class="skel-line medium"></div>
+      <div class="skel-line short"></div>
+      <div class="skel-line"></div>
+      <div class="skel-line medium"></div>
+    </div>`).join('');
 
   try {
-    // Fetch page 1, sorted newest-updated first
-    const url = `${API_BASE}?endpoint=leads&page=1&limit=100&sort_direction=desc&order=updated_at`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      const txt = await res.text();
-      throw new Error(`HTTP ${res.status}: ${txt.slice(0, 300)}`);
-    }
-
+    const res = await fetch(`${API_BASE}?endpoint=leads&page=1&limit=100`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.json();
-
-    // Tripleseat returns: { "total_pages": N, "results": [ {...}, {...} ] }
     const totalPages = raw.total_pages || 1;
-    const leads = raw.results || [];
-
-    allLeads = leads;
+    allLeads = raw.results || [];
 
     document.getElementById('last-updated').textContent =
-      `Updated ${new Date().toLocaleTimeString()}`;
-
+      `Updated ${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}`;
     document.getElementById('page-info').textContent =
-      `Showing page 1 of ${totalPages} (${leads.length} leads loaded). Most recently updated first.` +
-      (totalPages > 1 ? ` You have ~${totalPages * 100} total leads in Tripleseat.` : '');
+      `Showing ${allLeads.length} most recent leads · ${totalPages * 100}+ total in Tripleseat`;
 
     renderPipeline();
-    setStatus(`Loaded ${leads.length} leads`, 'ok');
-
+    setStatus('', '');
   } catch (err) {
-    console.error(err);
     setStatus(`Error: ${err.message}`, 'error');
     document.getElementById('pipeline').innerHTML = `
       <div class="empty-state">
-        <h2>⚠️ Could not load leads</h2>
-        <p style="margin-top:8px;color:#888">${escHtml(err.message)}</p>
+        <div class="empty-state-icon">⚠️</div>
+        <h2>Could not load leads</h2>
+        <p>${escHtml(err.message)}</p>
       </div>`;
   }
 }
@@ -300,95 +719,112 @@ function renderPipeline() {
   const search       = document.getElementById('search-input').value.toLowerCase().trim();
 
   let leads = allLeads.filter(lead => {
-    // Status filter
     const status = leadStatus(lead);
     if (filterStatus !== 'all' && status !== filterStatus) return false;
-
-    // Location filter — location is nested: lead.location.name
     if (filterLoc !== 'all') {
-      const loc = (lead.location?.name || '').trim();
-      if (loc !== filterLoc) return false;
+      if ((lead.location?.name || '').trim() !== filterLoc) return false;
     }
-
-    // Search filter
     if (search) {
-      const hay = [
-        lead.first_name, lead.last_name, lead.company,
-        lead.email_address, lead.event_description,
-        lead.location?.name
+      const hay = [lead.first_name, lead.last_name, lead.company,
+        lead.email_address, lead.event_description, lead.location?.name
       ].join(' ').toLowerCase();
       if (!hay.includes(search)) return false;
     }
-
     return true;
   });
 
-  // Sort: overdue → pending → new → closed
-  const order = { overdue: 0, pending: 1, new: 2, closed: 3 };
-  leads.sort((a, b) => (order[leadStatus(a)] ?? 9) - (order[leadStatus(b)] ?? 9));
+  const order = { overdue:0, pending:1, new:2, closed:3 };
+  leads.sort((a,b) => (order[leadStatus(a)]??9) - (order[leadStatus(b)]??9));
 
-  // Summary counts
-  const counts = { overdue: 0, pending: 0, new: 0, closed: 0 };
-  leads.forEach(l => { counts[leadStatus(l)]++; });
+  const counts = { overdue:0, pending:0, new:0, closed:0 };
+  leads.forEach(l => counts[leadStatus(l)]++);
 
-  document.getElementById('summary-bar').innerHTML =
-    `<div>Showing <span>${leads.length}</span> of <span>${allLeads.length}</span> leads</div>` +
-    `<div>🔴 Overdue: <span>${counts.overdue}</span></div>` +
-    `<div>🟡 Pending: <span>${counts.pending}</span></div>` +
-    `<div>🟢 New: <span>${counts.new}</span></div>` +
-    `<div>⚫ Closed: <span>${counts.closed}</span></div>`;
-
-  const pipeline = document.getElementById('pipeline');
+  document.getElementById('stat-total').textContent = leads.length;
+  document.getElementById('stat-overdue').textContent = counts.overdue;
+  document.getElementById('stat-pending').textContent = counts.pending;
+  document.getElementById('stat-new').textContent = counts.new;
+  document.getElementById('stat-closed').textContent = counts.closed;
 
   if (!leads.length) {
-    pipeline.innerHTML = `<div class="empty-state">
-      <h2>No leads match your filters</h2>
-      <p>Try adjusting the filters above or click Refresh.</p>
-    </div>`;
+    document.getElementById('pipeline').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2>No leads match your filters</h2>
+        <p>Try adjusting the filters or click Refresh.</p>
+      </div>`;
     return;
   }
 
-  pipeline.innerHTML = leads.map(lead => cardHTML(lead)).join('');
+  document.getElementById('pipeline').innerHTML = leads.map(lead => cardHTML(lead)).join('');
 }
 
 function cardHTML(lead) {
-  const status      = leadStatus(lead);
-  const name        = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Unknown';
-  const company     = lead.company || '';
-  const location    = lead.location?.name || '—';   // ← THE KEY FIX: nested location
-  const eventDate   = formatDate(lead.event_date);
-  const guests      = lead.guest_count || '—';
-  const lastUpdated = formatDate(lead.updated_at);
-  const daysAgo     = daysSince(lead.updated_at);
-  const notes       = lead.event_description || lead.additional_information || '';
-  const tsLink      = `https://${TS_ACCOUNT}/leads/${lead.id}`;
+  const status    = leadStatus(lead);
+  const name      = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Unknown';
+  const company   = lead.company || '';
+  const location  = lead.location?.name || '—';
+  const eventDate = formatDate(lead.event_date);
+  const guests    = lead.guest_count ? lead.guest_count.toLocaleString() : '—';
+  const ago       = timeAgo(lead.updated_at);
+  const tsLink    = `https://${TS_ACCOUNT}/leads/${lead.id}`;
+  const style     = lead.event_style ? `<span style="background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:1px 6px;font-size:0.65rem;color:var(--muted);text-transform:capitalize">${lead.event_style}</span>` : '';
 
-  const turnedDown  = lead.turned_down_at
-    ? `<div class="card-detail" style="color:#ff6b6b"><strong>Turned Down:</strong> ${lead.turned_down_reason || 'Yes'}</div>`
+  const notes = lead.additional_information
+    ? `<div class="card-event">${escHtml(String(lead.additional_information).slice(0,140))}${lead.additional_information.length>140?'…':''}</div>`
+    : '';
+
+  const turnedDown = lead.turned_down_at
+    ? `<div class="card-turned-down">✗ Turned down${lead.turned_down_reason ? ': ' + escHtml(lead.turned_down_reason) : ''}</div>`
     : '';
 
   return `
   <div class="card ${status}" data-id="${lead.id}">
     <div class="card-header">
-      <div class="card-name">${escHtml(name)}</div>
+      <div>
+        <div class="card-name">${escHtml(name)} ${style}</div>
+        ${company ? `<div class="card-company">${escHtml(company)}</div>` : ''}
+      </div>
       <span class="badge ${status}">${status}</span>
     </div>
-    ${company ? `<div class="card-detail"><strong>Company:</strong> ${escHtml(company)}</div>` : ''}
-    <div class="card-detail"><strong>Event:</strong> ${escHtml(lead.event_description || '—')}</div>
-    <div class="card-detail"><strong>Date:</strong> ${eventDate} &nbsp;|&nbsp; <strong>Guests:</strong> ${guests}</div>
-    <div class="card-detail"><strong>Location:</strong> ${escHtml(location)}</div>
-    <div class="card-detail"><strong>Updated:</strong> ${lastUpdated}${daysAgo !== null ? ` <em style="color:#777">(${daysAgo}d ago)</em>` : ''}</div>
-    ${lead.email_address ? `<div class="card-detail"><strong>Email:</strong> ${escHtml(lead.email_address)}</div>` : ''}
+
+    <div class="card-meta">
+      <div class="meta-item">
+        <div class="meta-label">Event</div>
+        <div class="meta-value">${escHtml(lead.event_description || '—')}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Date</div>
+        <div class="meta-value">${eventDate}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Guests</div>
+        <div class="meta-value">${guests}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Location</div>
+        <div class="meta-value">${escHtml(location)}</div>
+      </div>
+      ${lead.email_address ? `
+      <div class="meta-item full">
+        <div class="meta-label">Email</div>
+        <div class="meta-value">${escHtml(lead.email_address)}</div>
+      </div>` : ''}
+    </div>
+
     ${turnedDown}
-    ${notes && notes !== lead.event_description ? `<div class="card-detail" style="margin-top:6px;color:#888;font-size:0.75rem;font-style:italic">${escHtml(String(notes).slice(0,120))}${notes.length>120?'…':''}</div>` : ''}
-    <div class="card-actions">
-      <button class="btn-email" onclick="generateEmail(${lead.id})">✉ AI Follow-Up</button>
-      <a class="btn-ts" href="${tsLink}" target="_blank">Open in TS →</a>
+    ${notes}
+
+    <div class="card-footer">
+      <span class="card-time">Updated ${ago}</span>
+      <div class="card-actions">
+        <button class="btn-ai" onclick="generateEmail(${lead.id})">✉ AI Email</button>
+        <a class="btn-link" href="${tsLink}" target="_blank">TS ↗</a>
+      </div>
     </div>
   </div>`;
 }
 
-// ── Filter listeners ──────────────────────────────────────────────────────────
+// ── Filters ───────────────────────────────────────────────────────────────────
 document.getElementById('filter-status').addEventListener('change', renderPipeline);
 document.getElementById('filter-location').addEventListener('change', renderPipeline);
 document.getElementById('search-input').addEventListener('input', renderPipeline);
@@ -398,11 +834,11 @@ async function generateEmail(leadId) {
   const lead = allLeads.find(l => String(l.id) === String(leadId));
   if (!lead) return;
 
-  const btn = document.querySelector(`.card[data-id="${leadId}"] .btn-email`);
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Generating…'; }
+  const btn = document.querySelector(`.card[data-id="${leadId}"] .btn-ai`);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generating…'; }
 
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(' ');
-  openModal(`Follow-Up: ${name}`, 'Generating email with AI…');
+  openModal(`Follow-Up · ${name}`, 'Generating email with AI…');
 
   const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan.
 Write a warm, professional follow-up email for this catering lead.
@@ -414,9 +850,10 @@ Event: ${lead.event_description || 'General catering inquiry'}
 Event Date: ${lead.event_date || 'TBD'}
 Guest Count: ${lead.guest_count || 'TBD'}
 Location: ${lead.location?.name || 'Saddleback BBQ'}
+Service Style: ${lead.event_style || 'TBD'}
 Notes: ${lead.additional_information || 'None'}
 
-Write a 3–4 paragraph follow-up email. Be friendly and personal, reference their specific event type, mention our award-winning BBQ and full-service catering. Include a clear call to action to schedule a tasting or a quick call to confirm details. Sign as Ryan, Catering Director, Saddleback Restaurant Group.`;
+Write a 3–4 paragraph follow-up email. Be warm and personal, reference their specific event. Mention our award-winning BBQ and full-service catering. Include a clear call to action to schedule a tasting or call. Sign as Ryan, Catering Director, Saddleback Restaurant Group.`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -435,7 +872,7 @@ Write a 3–4 paragraph follow-up email. Be friendly and personal, reference the
     document.getElementById('modal-email').value = `Error: ${err.message}`;
   }
 
-  if (btn) { btn.disabled = false; btn.innerHTML = '✉ AI Follow-Up'; }
+  if (btn) { btn.disabled = false; btn.innerHTML = '✉ AI Email'; }
 }
 
 function openModal(title, body) {
@@ -451,14 +888,13 @@ function copyEmail() {
   navigator.clipboard.writeText(txt).then(() => {
     const btn = document.getElementById('btn-copy');
     btn.textContent = '✓ Copied!';
-    setTimeout(() => { btn.textContent = 'Copy Email'; }, 2000);
+    setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
   });
 }
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
 });
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
 loadLeads();
 </script>
 </body>
