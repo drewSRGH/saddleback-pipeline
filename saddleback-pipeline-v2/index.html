@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saddleback Catering Pipeline</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a1a;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+    header {
+      background: #2a1a0a;
+      border-bottom: 3px solid #c8621a;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 1.4rem;
+      color: #f5a623;
+      letter-spacing: 0.5px;
+    }
+    header span {
+      font-size: 0.8rem;
+      color: #999;
+    }
+    #debug-panel {
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      margin: 16px 24px;
+      padding: 12px 16px;
+      font-size: 0.75rem;
+      font-family: monospace;
+      color: #7fff7f;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    #debug-panel h3 { color: #f5a623; margin-bottom: 6px; font-size: 0.8rem; }
+    .controls {
+      padding: 16px 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .controls select, .controls input {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      color: #f0f0f0;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .controls button {
+      background: #c8621a;
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .controls button:hover { background: #e07020; }
+    #status-bar {
+      padding: 8px 24px;
+      font-size: 0.8rem;
+      color: #aaa;
+      min-height: 28px;
+    }
+    #status-bar.error { color: #ff6b6b; }
+    #status-bar.ok { color: #7fff7f; }
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      padding: 0 24px 32px;
+    }
+    .card {
+      background: #252525;
+      border: 1px solid #383838;
+      border-radius: 10px;
+      padding: 16px;
+      transition: border-color 0.2s;
+      position: relative;
+    }
+    .card:hover { border-color: #c8621a; }
+    .card.overdue { border-left: 4px solid #ff4444; }
+    .card.pending { border-left: 4px solid #f5a623; }
+    .card.new { border-left: 4px solid #4caf50; }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .card-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge.overdue { background: #ff4444; color: white; }
+    .badge.pending { background: #f5a623; color: #1a1a1a; }
+    .badge.new { background: #4caf50; color: white; }
+    .badge.closed { background: #555; color: #ccc; }
+    .card-detail {
+      font-size: 0.8rem;
+      color: #bbb;
+      margin-bottom: 4px;
+    }
+    .card-detail strong { color: #ddd; }
+    .card-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-email {
+      background: #c8621a;
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+    .btn-email:hover { background: #e07020; }
+    .btn-email:disabled { background: #555; cursor: not-allowed; }
+    .btn-ts {
+      background: transparent;
+      color: #f5a623;
+      border: 1px solid #f5a623;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ts:hover { background: #f5a6231a; }
+    /* Modal */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal {
+      background: #252525;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 580px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    #modal h2 { color: #f5a623; margin-bottom: 16px; font-size: 1.1rem; }
+    #modal textarea {
+      width: 100%;
+      min-height: 220px;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #f0f0f0;
+      padding: 12px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      resize: vertical;
+    }
+    .modal-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .modal-actions button {
+      padding: 8px 18px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    #btn-copy { background: #c8621a; color: white; }
+    #btn-copy:hover { background: #e07020; }
+    #btn-close-modal { background: #444; color: #ccc; }
+    #btn-close-modal:hover { background: #555; }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid #fff4;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 24px;
+      color: #666;
+    }
+    .empty-state h2 { font-size: 1.2rem; margin-bottom: 8px; }
+    .summary-bar {
+      padding: 8px 24px 16px;
+      display: flex;
+      gap: 20px;
+      font-size: 0.8rem;
+      color: #aaa;
+      flex-wrap: wrap;
+    }
+    .summary-bar span { color: #f0f0f0; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🔥 Saddleback Catering Pipeline</h1>
+  <span id="last-updated"></span>
+</header>
+
+<div id="debug-panel" style="display:none">
+  <h3>🔍 API Debug (auto-hides in 15s)</h3>
+  <div id="debug-content"></div>
+</div>
+
+<div class="controls">
+  <select id="filter-status">
+    <option value="all">All Statuses</option>
+    <option value="new">New</option>
+    <option value="pending">Pending</option>
+    <option value="overdue">Overdue</option>
+    <option value="closed">Closed</option>
+  </select>
+  <select id="filter-location">
+    <option value="all">All Locations</option>
+    <option value="saddleback">Saddleback BBQ</option>
+    <option value="slice">Slice by Saddleback</option>
+    <option value="reo">REO Town</option>
+    <option value="okemos">Okemos</option>
+    <option value="coaches">Coach's Bar & Grill</option>
+  </select>
+  <input type="text" id="search-input" placeholder="Search name, company…" style="width:200px" />
+  <button onclick="loadLeads()">↻ Refresh</button>
+</div>
+
+<div id="status-bar">Loading leads…</div>
+<div class="summary-bar" id="summary-bar"></div>
+
+<div class="pipeline" id="pipeline"></div>
+
+<!-- Email Modal -->
+<div id="modal-overlay">
+  <div id="modal">
+    <h2 id="modal-title">AI Follow-Up Email</h2>
+    <textarea id="modal-email" placeholder="Generating…"></textarea>
+    <div class="modal-actions">
+      <button id="btn-copy" onclick="copyEmail()">Copy Email</button>
+      <button id="btn-close-modal" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Config ────────────────────────────────────────────────────────────────
+const API_BASE = '/.netlify/functions/tripleseat';
+const TS_ACCOUNT = 'saddlebackbbq.tripleseat.com';
+
+// ─── State ─────────────────────────────────────────────────────────────────
+let allLeads = [];
+let debugShown = false;
+
+// ─── Helpers ───────────────────────────────────────────────────────────────
+function setStatus(msg, type = '') {
+  const el = document.getElementById('status-bar');
+  el.textContent = msg;
+  el.className = type;
+}
+
+function showDebug(data) {
+  if (debugShown) return;
+  debugShown = true;
+  const panel = document.getElementById('debug-panel');
+  const content = document.getElementById('debug-content');
+  panel.style.display = 'block';
+  content.textContent = JSON.stringify(data, null, 2).slice(0, 3000);
+  setTimeout(() => { panel.style.display = 'none'; }, 15000);
+}
+
+function daysSince(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d)) return null;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function leadStatus(lead) {
+  const raw = (lead.status || '').toLowerCase();
+  if (raw === 'closed' || raw === 'won' || raw === 'lost') return 'closed';
+  const days = daysSince(lead.updated_at || lead.created_at);
+  if (days === null) return 'new';
+  if (days > 5) return 'overdue';
+  if (days >= 2) return 'pending';
+  return 'new';
+}
+
+// ─── Tripleseat JSON unwrapper ─────────────────────────────────────────────
+// Tripleseat wraps: { "leads": [ { "lead": { ...fields... } }, ... ] }
+// We normalize each item to a flat object.
+function unwrapCollection(data, collectionKey, itemKey) {
+  // Handle both { leads: [...] } and bare arrays
+  let arr = Array.isArray(data) ? data : (data[collectionKey] || []);
+  return arr.map(item => {
+    // Each item may be wrapped: { lead: { ... } } or already flat
+    if (itemKey && item[itemKey]) return item[itemKey];
+    return item;
+  });
+}
+
+// ─── Load Leads ────────────────────────────────────────────────────────────
+async function loadLeads() {
+  setStatus('Fetching leads from Tripleseat…');
+  document.getElementById('pipeline').innerHTML = '';
+
+  try {
+    const res = await fetch(`${API_BASE}?endpoint=leads`);
+    if (!res.ok) {
+      const txt = await res.text();
+      throw new Error(`HTTP ${res.status}: ${txt.slice(0, 200)}`);
+    }
+
+    const raw = await res.json();
+
+    // Show the raw structure in debug panel on first load
+    showDebug(raw);
+
+    // ── Unwrap based on Tripleseat's envelope pattern ──
+    // Try known patterns gracefully
+    let leads = [];
+
+    if (Array.isArray(raw)) {
+      // Bare array — each item might be { lead: {...} } or flat
+      leads = raw.map(item => item.lead || item);
+    } else if (raw.leads) {
+      // { leads: [ { lead: {...} }, ... ] }
+      leads = raw.leads.map(item => item.lead || item);
+    } else if (raw.lead) {
+      // Single lead object
+      leads = [raw.lead];
+    } else {
+      // Unknown structure — log keys and show debug
+      console.warn('Unexpected Tripleseat response shape. Keys:', Object.keys(raw));
+      showDebug(raw);
+      leads = [];
+    }
+
+    allLeads = leads;
+
+    document.getElementById('last-updated').textContent =
+      `Updated ${new Date().toLocaleTimeString()}`;
+
+    renderPipeline();
+    setStatus(`Loaded ${leads.length} leads`, 'ok');
+  } catch (err) {
+    console.error(err);
+    setStatus(`Error loading leads: ${err.message}`, 'error');
+    document.getElementById('pipeline').innerHTML = `
+      <div class="empty-state">
+        <h2>⚠️ Could not load leads</h2>
+        <p style="margin-top:8px;color:#888">${err.message}</p>
+        <p style="margin-top:8px;color:#666;font-size:0.8rem">Check browser console for details.</p>
+      </div>`;
+  }
+}
+
+// ─── Render ────────────────────────────────────────────────────────────────
+function renderPipeline() {
+  const filterStatus = document.getElementById('filter-status').value;
+  const filterLoc = document.getElementById('filter-location').value;
+  const search = document.getElementById('search-input').value.toLowerCase();
+
+  let leads = allLeads.filter(lead => {
+    const status = leadStatus(lead);
+    if (filterStatus !== 'all' && status !== filterStatus) return false;
+    if (filterLoc !== 'all') {
+      const loc = (lead.location_name || lead.site_name || '').toLowerCase();
+      if (!loc.includes(filterLoc)) return false;
+    }
+    if (search) {
+      const hay = [
+        lead.first_name, lead.last_name, lead.company_name,
+        lead.account_name, lead.event_description, lead.email_address
+      ].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // Sort: overdue first, then pending, then new, then closed
+  const order = { overdue: 0, pending: 1, new: 2, closed: 3 };
+  leads.sort((a, b) => (order[leadStatus(a)] ?? 9) - (order[leadStatus(b)] ?? 9));
+
+  // Summary
+  const counts = { overdue: 0, pending: 0, new: 0, closed: 0 };
+  leads.forEach(l => counts[leadStatus(l)]++);
+  document.getElementById('summary-bar').innerHTML =
+    `<div>Showing <span>${leads.length}</span> of <span>${allLeads.length}</span> leads</div>` +
+    `<div>🔴 Overdue: <span>${counts.overdue}</span></div>` +
+    `<div>🟡 Pending: <span>${counts.pending}</span></div>` +
+    `<div>🟢 New: <span>${counts.new}</span></div>` +
+    `<div>⚫ Closed: <span>${counts.closed}</span></div>`;
+
+  const pipeline = document.getElementById('pipeline');
+
+  if (!leads.length) {
+    pipeline.innerHTML = `<div class="empty-state">
+      <h2>No leads match your filters</h2>
+      <p>Try adjusting the filters above or click Refresh.</p>
+    </div>`;
+    return;
+  }
+
+  pipeline.innerHTML = leads.map(lead => cardHTML(lead)).join('');
+}
+
+function cardHTML(lead) {
+  const status = leadStatus(lead);
+  const name = [lead.first_name, lead.last_name].filter(Boolean).join(' ') || 'Unknown Contact';
+  const company = lead.company_name || lead.account_name || '';
+  const eventDate = formatDate(lead.event_date || lead.start_date);
+  const guestCount = lead.guest_count || lead.number_of_guests || '—';
+  const location = lead.location_name || lead.site_name || '—';
+  const lastContact = formatDate(lead.updated_at || lead.last_activity_at);
+  const daysAgo = daysSince(lead.updated_at || lead.created_at);
+  const tsLink = `https://${TS_ACCOUNT}/leads/${lead.id}`;
+
+  return `
+  <div class="card ${status}" data-id="${lead.id}">
+    <div class="card-header">
+      <div class="card-name">${escHtml(name)}</div>
+      <span class="badge ${status}">${status}</span>
+    </div>
+    ${company ? `<div class="card-detail"><strong>Company:</strong> ${escHtml(company)}</div>` : ''}
+    <div class="card-detail"><strong>Event Date:</strong> ${eventDate}</div>
+    <div class="card-detail"><strong>Guests:</strong> ${guestCount}</div>
+    <div class="card-detail"><strong>Location:</strong> ${escHtml(location)}</div>
+    <div class="card-detail"><strong>Last Updated:</strong> ${lastContact}${daysAgo !== null ? ` <em style="color:#888">(${daysAgo}d ago)</em>` : ''}</div>
+    ${lead.event_description ? `<div class="card-detail" style="margin-top:6px;color:#999;font-style:italic;font-size:0.75rem">${escHtml(String(lead.event_description).slice(0, 120))}${lead.event_description.length > 120 ? '…' : ''}</div>` : ''}
+    <div class="card-actions">
+      <button class="btn-email" onclick="generateEmail(${lead.id})">✉ AI Follow-Up</button>
+      <a class="btn-ts" href="${tsLink}" target="_blank">Open in TS →</a>
+    </div>
+  </div>`;
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ─── Filter Events ─────────────────────────────────────────────────────────
+document.getElementById('filter-status').addEventListener('change', renderPipeline);
+document.getElementById('filter-location').addEventListener('change', renderPipeline);
+document.getElementById('search-input').addEventListener('input', renderPipeline);
+
+// ─── AI Email Generation ───────────────────────────────────────────────────
+async function generateEmail(leadId) {
+  const lead = allLeads.find(l => String(l.id) === String(leadId));
+  if (!lead) return;
+
+  const btn = document.querySelector(`.card[data-id="${leadId}"] .btn-email`);
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generating…';
+  }
+
+  openModal(`Follow-Up: ${[lead.first_name, lead.last_name].filter(Boolean).join(' ')}`, 'Generating email with AI…');
+
+  const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan. 
+Write a warm, professional follow-up email for this catering lead.
+
+Contact: ${[lead.first_name, lead.last_name].filter(Boolean).join(' ')}
+${lead.company_name ? `Company: ${lead.company_name}` : ''}
+${lead.email_address ? `Email: ${lead.email_address}` : ''}
+Event Date: ${lead.event_date || lead.start_date || 'TBD'}
+Guest Count: ${lead.guest_count || lead.number_of_guests || 'TBD'}
+Location: ${lead.location_name || lead.site_name || 'Saddleback BBQ'}
+Event Type/Notes: ${lead.event_description || lead.description || 'General catering inquiry'}
+Last Updated: ${lead.updated_at || 'Recently'}
+
+Write a 3–4 paragraph email. Be friendly, mention our award-winning BBQ, and include a clear call to action to schedule a tasting or confirm details. Sign off as Ryan.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b => b.text || '').join('') || 'Error generating email.';
+    document.getElementById('modal-email').value = text;
+  } catch (err) {
+    document.getElementById('modal-email').value = `Error: ${err.message}`;
+  }
+
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = '✉ AI Follow-Up';
+  }
+}
+
+function openModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-email').value = body;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function copyEmail() {
+  const txt = document.getElementById('modal-email').value;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Email'; }, 2000);
+  });
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── Boot ──────────────────────────────────────────────────────────────────
+loadLeads();
+</script>
+</body>
+</html>
