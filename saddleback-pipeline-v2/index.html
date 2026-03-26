@@ -232,17 +232,15 @@ function formatDate(dateStr) {
 }
 
 function leadStatus(lead) {
-  // Turned down = closed
+  // Only turned_down_at means truly closed — converted_at just means processed
   if (lead.turned_down_at) return 'closed';
-  // Converted = closed
-  if (lead.converted_at) return 'closed';
   const days = daysSince(lead.updated_at || lead.created_at);
   if (days === null) return 'new';
   if (days > 5)  return 'overdue';
   if (days >= 2) return 'pending';
   return 'new';
 }
-
+  
 function escHtml(str) {
   return String(str || '')
     .replace(/&/g,'&amp;').replace(/</g,'&lt;')
