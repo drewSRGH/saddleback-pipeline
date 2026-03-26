@@ -68,7 +68,7 @@ exports.handler = async (event) => {
     // Use the correct search endpoints per Tripleseat docs
     const pathMap = {
       events:    `/v1/events/search.json?page=${page}&limit=${limit}&sort_direction=desc&order=updated_at`,
-      leads:     `/v1/leads.json?page=${page}&limit=${limit}`,
+      leads:     `/v1/leads.json?page=${page}&limit=${limit}&sort_direction=desc&order=updated_at`,
       bookings:  `/v1/bookings/search.json?page=${page}&limit=${limit}`,
       contacts:  `/v1/contacts.json?page=${page}&limit=${limit}`,
       locations: `/v1/locations.json`,
