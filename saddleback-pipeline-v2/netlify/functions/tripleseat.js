@@ -62,13 +62,12 @@ exports.handler = async (event) => {
   try {
     const token = await getToken();
 
+    // ── LEADS: fetch last 2 pages (most recent) ──────────────────────────────
     if (ep === 'leads') {
-      // Step 1: fetch page 1 just to get total_pages
       const firstRes  = await tsGet(`/v1/leads.json?page=1&limit=${limit}`, token);
       const firstData = JSON.parse(firstRes.body);
       const totalPages = firstData.total_pages || 1;
 
-      // Step 2: fetch the last 2 pages so we get ~200 most recent leads
       const pagesToFetch = [];
       if (totalPages > 1) pagesToFetch.push(totalPages - 1);
       pagesToFetch.push(totalPages);
@@ -79,21 +78,55 @@ exports.handler = async (event) => {
         const d = JSON.parse(r.body);
         allResults.push(...(d.results || []));
       }
-
-      // Sort newest updated_at first
       allResults.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
 
       return {
-        statusCode: 200,
-        headers: CORS,
+        statusCode: 200, headers: CORS,
         body: JSON.stringify({ total_pages: totalPages, results: allResults }),
       };
     }
 
-    // Other endpoints pass through normally
+    // ── BOOKINGS: fetch ALL future prospect/tentative bookings ───────────────
+    if (ep === 'bookings') {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Page 1 to get total
+      const firstRes  = await tsGet(`/v1/bookings.json?page=1&limit=${limit}`, token);
+      const firstData = JSON.parse(firstRes.body);
+      const totalPages = firstData.total_pages || 1;
+
+      // Fetch last 4 pages to capture all upcoming/recent bookings
+      const pagesToFetch = [];
+      for (let p = Math.max(1, totalPages - 3); p <= totalPages; p++) {
+        pagesToFetch.push(p);
+      }
+
+      const allResults = [];
+      for (const p of pagesToFetch) {
+        const r = await tsGet(`/v1/bookings.json?page=${p}&limit=${limit}`, token);
+        const d = JSON.parse(r.body);
+        allResults.push(...(d.results || []));
+      }
+
+      // Filter: future events, prospect or tentative status, not deleted
+      const filtered = allResults.filter(b => {
+        if (b.deleted_at) return false;
+        if (!['PROSPECT', 'TENTATIVE'].includes(b.status)) return false;
+        const startDate = b.start_date || '';
+        return startDate >= today;
+      });
+
+      filtered.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+      return {
+        statusCode: 200, headers: CORS,
+        body: JSON.stringify({ total_pages: totalPages, results: filtered }),
+      };
+    }
+
+    // ── OTHER ENDPOINTS ──────────────────────────────────────────────────────
     const pathMap = {
       events:    `/v1/events/search.json?page=1&limit=${limit}&sort_direction=desc&order=updated_at`,
-      bookings:  `/v1/bookings/search.json?page=1&limit=${limit}`,
       contacts:  `/v1/contacts.json?page=1&limit=${limit}`,
       locations: `/v1/locations.json`,
     };
@@ -105,8 +138,7 @@ exports.handler = async (event) => {
   } catch (err) {
     console.error('Error:', err.message);
     return {
-      statusCode: 500,
-      headers: CORS,
+      statusCode: 500, headers: CORS,
       body: JSON.stringify({ error: err.message, results: [] }),
     };
   }
