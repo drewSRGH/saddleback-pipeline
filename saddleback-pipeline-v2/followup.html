@@ -1,1 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Saddleback — Follow-Up Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f0f0e;
+  --surface: #181817;
+  --surface2: #1f1f1d;
+  --border: #2a2a27;
+  --border2: #333330;
+  --text: #f0ede8;
+  --muted: #8a8780;
+  --muted2: #5a5855;
+  --accent: #e8772a;
+  --accent2: #f5a623;
+  --green: #4caf7d;
+  --yellow: #f5a623;
+  --orange: #e8772a;
+  --red: #e05252;
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+}
 
+/* ── NAV ── */
+nav {
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 52px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.nav-brand {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent2);
+  margin-right: 32px;
+  text-decoration: none;
+}
+.nav-tabs { display: flex; }
+.nav-tab {
+  padding: 0 16px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+.nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.nav-ts { font-size: 0.72rem; color: var(--muted2); font-family: 'DM Mono', monospace; }
+.btn-refresh {
+  background: var(--accent); color: white; border: none;
+  padding: 6px 14px; border-radius: 7px; cursor: pointer;
+  font-size: 0.78rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s;
+}
+.btn-refresh:hover { background: #f08030; }
+
+/* ── PAGE ── */
+.page { padding: 24px 28px; max-width: 1500px; margin: 0 auto; }
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+.page-sub { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.73rem;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.legend-dot.cool { background: var(--muted2); }
+.legend-dot.warm { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+.legend-dot.hot  { background: var(--orange); box-shadow: 0 0 8px var(--orange); }
+.legend-dot.fire { background: var(--red); box-shadow: 0 0 10px var(--red); animation: pulse-red 1.5s ease-in-out infinite; }
+@keyframes pulse-red { 0%,100%{box-shadow:0 0 6px var(--red)} 50%{box-shadow:0 0 16px var(--red)} }
+
+/* ── STATS ── */
+.stats-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.stat-pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 120px;
+}
+.stat-count {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-top: 2px; }
+.stat-count.fire { color: var(--red); }
+.stat-count.hot  { color: var(--orange); }
+.stat-count.warm { color: var(--yellow); }
+.stat-count.cool { color: var(--green); }
+
+/* ── CONTROLS ── */
+.controls-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.view-toggle {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.view-btn {
+  padding: 7px 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.view-btn.active { background: var(--surface2); color: var(--text); }
+.view-btn:hover:not(.active) { color: var(--text); }
+select.filter-sel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 7px 28px 7px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235a5855' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+}
+#status-bar {
+  font-size: 0.75rem;
+  color: var(--muted2);
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 12px;
+  min-height: 18px;
+}
+#status-bar.error { color: var(--red); }
+
+/* ── LIST VIEW ── */
+.list-view { display: flex; flex-direction: column; gap: 8px; }
+
+.booking-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: border-color 0.15s, transform 0.1s;
+  position: relative;
+  overflow: hidden;
+}
+.booking-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+.booking-card.urgency-0::before { background: var(--muted2); }
+.booking-card.urgency-1::before { background: var(--yellow); }
+.booking-card.urgency-2::before { background: var(--orange); }
+.booking-card.urgency-3::before { background: var(--red); }
+.booking-card.urgency-3 { animation: card-pulse 2s ease-in-out infinite; }
+@keyframes card-pulse {
+  0%,100% { border-color: var(--border); }
+  50% { border-color: rgba(224,82,82,0.4); }
+}
+.booking-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+
+/* urgency indicator */
+.urgency-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: 'Fraunces', serif;
+}
+.urgency-badge .days {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.urgency-badge .days-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'DM Sans', sans-serif;
+}
+.urgency-0 .urgency-badge { background: rgba(90,88,85,0.2); color: var(--muted); }
+.urgency-1 .urgency-badge { background: rgba(245,166,35,0.15); color: var(--yellow); }
+.urgency-2 .urgency-badge { background: rgba(232,119,42,0.15); color: var(--orange); }
+.urgency-3 .urgency-badge { background: rgba(224,82,82,0.15); color: var(--red); }
+
+.booking-main { flex: 1; min-width: 0; }
+.booking-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.booking-contact {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.booking-meta {
+  display: flex;
+  gap: 20px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.meta-block {}
+.meta-block .label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted2);
+  font-weight: 600;
+}
+.meta-block .value {
+  font-size: 0.78rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-top: 1px;
+  font-family: 'DM Mono', monospace;
+}
+.meta-block .value.money { color: var(--green); }
+
+.booking-status-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.status-PROSPECT { background: rgba(91,141,238,0.15); color: #5b8dee; border: 1px solid rgba(91,141,238,0.3); }
+.status-TENTATIVE { background: rgba(245,166,35,0.15); color: var(--yellow); border: 1px solid rgba(245,166,35,0.3); }
+
+.booking-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-ai {
+  background: var(--accent); color: white; border: none;
+  padding: 6px 12px; border-radius: 7px; cursor: pointer;
+  font-size: 0.73rem; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  transition: background 0.15s; white-space: nowrap;
+}
+.btn-ai:hover { background: #f08030; }
+.btn-ai:disabled { background: var(--border2); color: var(--muted2); cursor: not-allowed; }
+.btn-link {
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--border2); padding: 6px 10px;
+  border-radius: 7px; cursor: pointer; font-size: 0.73rem;
+  font-weight: 500; font-family: 'DM Sans', sans-serif;
+  text-decoration: none; display: flex; align-items: center;
+  transition: color 0.15s, border-color 0.15s; white-space: nowrap;
+}
+.btn-link:hover { color: var(--text); border-color: var(--muted); }
+
+/* ── CALENDAR VIEW ── */
+.calendar-view { display: none; }
+.calendar-view.active { display: block; }
+.list-view.active { display: flex; }
+
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cal-nav button {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+}
+.cal-nav button:hover { border-color: var(--accent); }
+.cal-month-label {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  min-width: 160px;
+  text-align: center;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.cal-dow {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted2);
+  padding: 6px 0;
+}
+.cal-day {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 90px;
+  padding: 8px;
+  position: relative;
+  transition: border-color 0.15s;
+}
+.cal-day.other-month { opacity: 0.3; }
+.cal-day.today { border-color: var(--accent2); }
+.cal-day-num {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+  font-family: 'DM Mono', monospace;
+}
+.cal-day.today .cal-day-num { color: var(--accent2); }
+.cal-event {
+  border-radius: 5px;
+  padding: 3px 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  margin-bottom: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.15s;
+  border-left: 2px solid transparent;
+}
+.cal-event:hover { opacity: 0.85; }
+.cal-event.urgency-0 { background: rgba(90,88,85,0.25); color: var(--muted); border-left-color: var(--muted2); }
+.cal-event.urgency-1 { background: rgba(245,166,35,0.15); color: var(--yellow); border-left-color: var(--yellow); }
+.cal-event.urgency-2 { background: rgba(232,119,42,0.2); color: var(--orange); border-left-color: var(--orange); }
+.cal-event.urgency-3 { background: rgba(224,82,82,0.2); color: var(--red); border-left-color: var(--red); animation: cal-pulse 1.5s ease-in-out infinite; }
+@keyframes cal-pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+
+/* ── EMPTY ── */
+.empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  color: var(--muted2);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 16px; opacity: 0.5; }
+.empty-state h2 { font-size: 1rem; color: var(--muted); margin-bottom: 6px; }
+
+/* ── MODAL ── */
+#modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  z-index: 100; justify-content: center; align-items: center; padding: 20px;
+}
+#modal-overlay.open { display: flex; }
+#modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 16px; width: 100%; max-width: 600px;
+  max-height: 85vh; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.modal-header {
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h2 { font-family: 'Fraunces', serif; font-size: 1rem; font-weight: 600; }
+.modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.2rem; padding: 4px; border-radius: 4px; }
+.modal-close:hover { color: var(--text); }
+.modal-body { padding: 16px 24px; flex: 1; overflow-y: auto; }
+#modal-email {
+  width: 100%; min-height: 260px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  padding: 14px; font-size: 0.83rem; line-height: 1.6; resize: vertical;
+  font-family: 'DM Sans', sans-serif; outline: none;
+}
+#modal-email:focus { border-color: var(--accent); }
+.modal-footer {
+  padding: 14px 24px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; justify-content: flex-end;
+}
+.modal-footer button {
+  padding: 8px 18px; border-radius: 8px; font-size: 0.82rem;
+  font-weight: 600; cursor: pointer; border: none;
+  font-family: 'DM Sans', sans-serif; transition: background 0.15s;
+}
+#btn-copy { background: var(--accent); color: white; }
+#btn-copy:hover { background: #f08030; }
+#btn-close-modal { background: var(--surface2); color: var(--muted); border: 1px solid var(--border2); }
+
+/* Spinner */
+.spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: white;
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Skeleton */
+.skeleton {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px; height: 72px;
+  animation: skelpulse 1.5s ease-in-out infinite;
+}
+@keyframes skelpulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">🔥 Saddleback SRG</a>
+  <div class="nav-tabs">
+    <a href="/" class="nav-tab">Pipeline</a>
+    <a href="/analytics.html" class="nav-tab">Analytics</a>
+    <a href="/followup.html" class="nav-tab active">Follow-Up</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-ts" id="last-updated"></span>
+    <button class="btn-refresh" onclick="loadBookings()">↻ Refresh</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Follow-Up Tracker</div>
+      <div class="page-sub">Upcoming leads that need contact · sorted by urgency</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot cool"></div> Fresh (0–2d)</div>
+      <div class="legend-item"><div class="legend-dot warm"></div> Warm (3–5d)</div>
+      <div class="legend-item"><div class="legend-dot hot"></div> Hot (6–10d)</div>
+      <div class="legend-item"><div class="legend-dot fire"></div> 🚨 Act Now (10d+)</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-pill">
+      <div>
+        <div class="stat-count fire" id="stat-fire">—</div>
+        <div class="stat-label">🚨 Act Now</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div>
+        <div class="stat-count hot" id="stat-hot">—</div>
+        <div class="stat-label">🔥 Hot</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div>
+        <div class="stat-count warm" id="stat-warm">—</div>
+        <div class="stat-label">⚡ Warm</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div>
+        <div class="stat-count cool" id="stat-cool">—</div>
+        <div class="stat-label">✓ Fresh</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div>
+        <div class="stat-count" id="stat-total">—</div>
+        <div class="stat-label">Total Open</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls-row">
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-list" onclick="setView('list')">☰ List</button>
+      <button class="view-btn" id="btn-cal" onclick="setView('calendar')">📅 Calendar</button>
+    </div>
+    <select class="filter-sel" id="filter-urgency" onchange="render()">
+      <option value="all">All Urgency</option>
+      <option value="3">🚨 Act Now only</option>
+      <option value="2">🔥 Hot + above</option>
+      <option value="1">⚡ Warm + above</option>
+    </select>
+    <select class="filter-sel" id="filter-location" onchange="render()">
+      <option value="all">All Locations</option>
+      <option value="Saddleback BBQ Lansing">Saddleback BBQ Lansing</option>
+      <option value="Saddleback BBQ Okemos">Saddleback BBQ Okemos</option>
+    </select>
+    <select class="filter-sel" id="filter-status-ts" onchange="render()">
+      <option value="all">Prospect + Tentative</option>
+      <option value="PROSPECT">Prospect only</option>
+      <option value="TENTATIVE">Tentative only</option>
+    </select>
+  </div>
+
+  <div id="status-bar">Loading bookings…</div>
+
+  <!-- LIST VIEW -->
+  <div class="list-view active" id="list-view"></div>
+
+  <!-- CALENDAR VIEW -->
+  <div class="calendar-view" id="calendar-view">
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button onclick="changeMonth(-1)">←</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button onclick="changeMonth(1)">→</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">AI Follow-Up Email</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="modal-email" placeholder="Generating…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-close-modal" onclick="closeModal()">Cancel</button>
+      <button id="btn-copy" onclick="copyEmail()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE   = '/.netlify/functions/tripleseat';
+const TS_ACCOUNT = 'saddlebackbbq.tripleseat.com';
+let allBookings  = [];
+let currentView  = 'list';
+let calYear      = new Date().getFullYear();
+let calMonth     = new Date().getMonth();
+
+// ── Urgency ───────────────────────────────────────────────────────────────────
+function daysSince(dateStr) {
+  if (!dateStr) return 0;
+  const d = new Date(dateStr);
+  if (isNaN(d)) return 0;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+function urgencyLevel(booking) {
+  const days = daysSince(booking.updated_at);
+  if (days >= 10) return 3; // 🚨 fire
+  if (days >= 6)  return 2; // 🔥 hot
+  if (days >= 3)  return 1; // ⚡ warm
+  return 0;                  // ✓ cool
+}
+
+function urgencyLabel(level) {
+  return ['Fresh','Warm','Hot','Act Now'][level];
+}
+
+function urgencyEmoji(level) {
+  return ['✓','⚡','🔥','🚨'][level];
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
+function fmtMoney(val) {
+  const n = parseFloat(val) || 0;
+  if (!n) return '—';
+  return '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+}
+
+function escHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+async function loadBookings() {
+  document.getElementById('status-bar').textContent = 'Fetching upcoming bookings…';
+  document.getElementById('status-bar').className = '';
+  document.getElementById('list-view').innerHTML = Array(5).fill(
+    '<div class="skeleton"></div>'
+  ).join('');
+
+  try {
+    const res = await fetch(`${API_BASE}?endpoint=bookings&limit=100`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    allBookings = raw.results || [];
+
+    document.getElementById('last-updated').textContent =
+      `Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('status-bar').textContent =
+      `${allBookings.length} open upcoming bookings loaded`;
+
+    render();
+  } catch (err) {
+    document.getElementById('status-bar').textContent = `Error: ${err.message}`;
+    document.getElementById('status-bar').className = 'error';
+    document.getElementById('list-view').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <h2>Could not load bookings</h2>
+        <p>${escHtml(err.message)}</p>
+      </div>`;
+  }
+}
+
+// ── Filter ────────────────────────────────────────────────────────────────────
+function getFiltered() {
+  const urgencyMin = document.getElementById('filter-urgency').value;
+  const locFilter  = document.getElementById('filter-location').value;
+  const statusFilt = document.getElementById('filter-status-ts').value;
+
+  return allBookings.filter(b => {
+    if (urgencyMin !== 'all' && urgencyLevel(b) < parseInt(urgencyMin)) return false;
+    if (locFilter !== 'all' && (b.location?.name||'') !== locFilter) return false;
+    if (statusFilt !== 'all' && b.status !== statusFilt) return false;
+    return true;
+  });
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const bookings = getFiltered();
+
+  // Sort: urgency desc, then event date asc
+  bookings.sort((a, b) => {
+    const ud = urgencyLevel(b) - urgencyLevel(a);
+    if (ud !== 0) return ud;
+    return new Date(a.start_date) - new Date(b.start_date);
+  });
+
+  // Stats
+  const counts = [0,0,0,0];
+  allBookings.forEach(b => counts[urgencyLevel(b)]++);
+  document.getElementById('stat-cool').textContent  = counts[0];
+  document.getElementById('stat-warm').textContent  = counts[1];
+  document.getElementById('stat-hot').textContent   = counts[2];
+  document.getElementById('stat-fire').textContent  = counts[3];
+  document.getElementById('stat-total').textContent = allBookings.length;
+
+  if (currentView === 'list') renderList(bookings);
+  else renderCalendar(bookings);
+}
+
+function renderList(bookings) {
+  if (!bookings.length) {
+    document.getElementById('list-view').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <h2>All clear!</h2>
+        <p>No bookings match your filters.</p>
+      </div>`;
+    return;
+  }
+
+  document.getElementById('list-view').innerHTML = bookings.map(b => {
+    const ul  = urgencyLevel(b);
+    const days = daysSince(b.updated_at);
+    const contactName = b.contact
+      ? `${b.contact.first_name||''} ${b.contact.last_name||''}`.trim()
+      : 'No contact';
+    const contactEmail = b.contact?.email_addresses?.[0]?.address || '';
+    const value = fmtMoney(b.total_grand_total);
+    const tsLink = `https://${TS_ACCOUNT}/bookings/${b.id}`;
+
+    return `
+    <div class="booking-card urgency-${ul}" data-id="${b.id}">
+      <div class="urgency-badge">
+        <div class="days">${days}</div>
+        <div class="days-label">days</div>
+      </div>
+      <div class="booking-main">
+        <div class="booking-name">${escHtml(b.name || 'Unnamed Booking')}</div>
+        <div class="booking-contact">${escHtml(contactName)}${contactEmail ? ' · ' + escHtml(contactEmail) : ''}</div>
+      </div>
+      <div class="booking-meta">
+        <div class="meta-block">
+          <div class="label">Event Date</div>
+          <div class="value">${fmtDate(b.start_date)}</div>
+        </div>
+        <div class="meta-block">
+          <div class="label">Location</div>
+          <div class="value">${escHtml(b.location?.name?.replace('Saddleback BBQ ','') || '—')}</div>
+        </div>
+        <div class="meta-block">
+          <div class="label">Value</div>
+          <div class="value money">${value}</div>
+        </div>
+        <div class="meta-block">
+          <div class="label">Last Contact</div>
+          <div class="value">${fmtDate(b.updated_at?.split('T')[0])}</div>
+        </div>
+      </div>
+      <span class="booking-status-badge status-${b.status}">${b.status}</span>
+      <div class="booking-actions">
+        <button class="btn-ai" onclick="generateEmail('${b.id}')">✉ AI Email</button>
+        <a class="btn-link" href="${tsLink}" target="_blank">TS ↗</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Calendar ──────────────────────────────────────────────────────────────────
+function setView(v) {
+  currentView = v;
+  document.getElementById('list-view').classList.toggle('active', v==='list');
+  document.getElementById('calendar-view').classList.toggle('active', v==='calendar');
+  document.getElementById('btn-list').classList.toggle('active', v==='list');
+  document.getElementById('btn-cal').classList.toggle('active', v==='calendar');
+  render();
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  render();
+}
+
+function renderCalendar(bookings) {
+  const DOWS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  document.getElementById('cal-month-label').textContent = `${months[calMonth]} ${calYear}`;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+
+  // Build a map of date → bookings
+  const byDate = {};
+  bookings.forEach(b => {
+    const key = b.start_date;
+    if (!key) return;
+    const d = new Date(key + 'T12:00:00');
+    if (d.getFullYear() === calYear && d.getMonth() === calMonth) {
+      if (!byDate[key]) byDate[key] = [];
+      byDate[key].push(b);
+    }
+  });
+
+  let html = DOWS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  // Blank cells before first day
+  for (let i=0; i<firstDay; i++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num"></div></div>`;
+  }
+
+  for (let d=1; d<=daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = d===today.getDate() && calMonth===today.getMonth() && calYear===today.getFullYear();
+    const dayBookings = byDate[dateStr] || [];
+
+    const eventsHtml = dayBookings.slice(0,3).map(b => {
+      const ul = urgencyLevel(b);
+      const short = (b.name||'').split(' ').slice(0,3).join(' ');
+      return `<div class="cal-event urgency-${ul}" onclick="generateEmail('${b.id}')" title="${escHtml(b.name)}">${urgencyEmoji(ul)} ${escHtml(short)}</div>`;
+    }).join('');
+
+    const more = dayBookings.length > 3 ? `<div style="font-size:0.6rem;color:var(--muted2)">+${dayBookings.length-3} more</div>` : '';
+
+    html += `<div class="cal-day${isToday?' today':''}">
+      <div class="cal-day-num">${d}</div>
+      ${eventsHtml}${more}
+    </div>`;
+  }
+
+  // Fill remaining cells
+  const total = firstDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i=0; i<remaining; i++) {
+    html += `<div class="cal-day other-month"></div>`;
+  }
+
+  document.getElementById('cal-grid').innerHTML = html;
+}
+
+// ── AI Email ──────────────────────────────────────────────────────────────────
+async function generateEmail(bookingId) {
+  const booking = allBookings.find(b => String(b.id) === String(bookingId));
+  if (!booking) return;
+
+  const btn = document.querySelector(`.booking-card[data-id="${bookingId}"] .btn-ai`);
+  if (btn) { btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Generating…'; }
+
+  const contactName = booking.contact
+    ? `${booking.contact.first_name||''} ${booking.contact.last_name||''}`.trim()
+    : 'there';
+  const contactEmail = booking.contact?.email_addresses?.[0]?.address || '';
+  const days = daysSince(booking.updated_at);
+
+  openModal(`Follow-Up · ${contactName}`, 'Generating email…');
+
+  const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan.
+Write a warm, professional follow-up email for this booking.
+
+Booking: ${booking.name || 'Catering Inquiry'}
+Contact: ${contactName}
+Email: ${contactEmail || 'N/A'}
+Event Date: ${fmtDate(booking.start_date)}
+Location: ${booking.location?.name || 'Saddleback BBQ'}
+Status: ${booking.status}
+Booking Value: ${fmtMoney(booking.total_grand_total)}
+Days Since Last Contact: ${days}
+
+This lead has been ${days >= 10 ? 'VERY cold — be warm and re-engage urgently' : days >= 6 ? 'getting cold — be warm and create some urgency' : days >= 3 ? 'waiting a few days' : 'recently contacted'}.
+
+Write a 3–4 paragraph follow-up email. Be warm and personal. Reference the event date and how soon it is. Mention our award-winning BBQ catering. Include a clear call to action. Sign as Ryan, Catering Director, Saddleback Restaurant Group.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b=>b.text||'').join('') || 'Error generating.';
+    document.getElementById('modal-email').value = text;
+  } catch (err) {
+    document.getElementById('modal-email').value = `Error: ${err.message}`;
+  }
+
+  if (btn) { btn.disabled=false; btn.innerHTML='✉ AI Email'; }
+}
+
+function openModal(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-email').value = body;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+function copyEmail() {
+  navigator.clipboard.writeText(document.getElementById('modal-email').value).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = '✓ Copied!';
+    setTimeout(()=>{ btn.textContent='Copy to Clipboard'; }, 2000);
+  });
+}
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target===this) closeModal();
+});
+
+loadBookings();
+</script>
+</body>
+</html>
