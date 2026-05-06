@@ -656,10 +656,7 @@ function showTab(tab) {
 // ── PERSISTENCE ───────────────────────────────────────────────────────────────
 async function saveQueue() {
   try {
-    await fetch(`${API_STORE}?action=save-queue`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({queue:emailQueue})
-    });
+    localStorage.setItem('srg-queue', JSON.stringify(emailQueue));
   } catch(e){ console.warn('Could not save queue:', e.message); }
 }
 
@@ -667,35 +664,45 @@ async function loadFromCache() {
   const btn=document.getElementById('btn-load-cache');
   btn.disabled=true; btn.textContent='Loading…';
   document.getElementById('page-sub').textContent='Loading saved contacts…';
+
   try {
-    // Load contacts
-    const r1=await fetch(`${API_STORE}?action=get-contacts`);
-    const d1=await r1.json();
-    if(d1.contacts && d1.contacts.length>0){
-      contacts=d1.contacts.map(tagContact);
-      lastSyncDate=d1.lastSync;
-      updateStats(); renderContacts();
-      document.getElementById('page-sub').textContent=`${contacts.length.toLocaleString()} contacts loaded from cache · last synced ${new Date(d1.lastSync).toLocaleDateString()}`;
-      document.getElementById('last-updated').textContent=`Cached ${new Date(d1.lastSync).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
-      // Show sync banner if cache is old
-      const daysSinceSync=Math.floor((Date.now()-new Date(d1.lastSync))/86400000);
-      if(daysSinceSync>3){
-        document.getElementById('sync-banner-text').textContent=`Contact data is ${daysSinceSync} days old. Consider syncing from Tripleseat for latest data.`;
-        document.getElementById('sync-banner').style.display='flex';
+    // Try localStorage first — fast, no server needed
+    const cached = localStorage.getItem('srg-contacts');
+    const cachedQueue = localStorage.getItem('srg-queue');
+    const cachedSync = localStorage.getItem('srg-lastsync');
+
+    if(cached) {
+      const parsed = JSON.parse(cached);
+      contacts = parsed.map(tagContact);
+      lastSyncDate = cachedSync;
+      if(cachedQueue) emailQueue = JSON.parse(cachedQueue);
+      updateStats(); renderContacts(); renderQueue();
+      const syncDate = cachedSync ? new Date(cachedSync) : null;
+      const syncStr = syncDate ? syncDate.toLocaleDateString() : 'unknown';
+      document.getElementById('page-sub').textContent = `${contacts.length.toLocaleString()} contacts loaded · last synced ${syncStr}`;
+      document.getElementById('last-updated').textContent = `Cached ${syncDate ? syncDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}`;
+
+      // Show sync banner if cache is old (3+ days)
+      if(syncDate) {
+        const daysSince = Math.floor((Date.now()-syncDate.getTime())/86400000);
+        if(daysSince >= 3) {
+          document.getElementById('sync-banner-text').textContent = `Contact data is ${daysSince} days old. Sync for latest Tripleseat data.`;
+          document.getElementById('sync-banner').style.display = 'flex';
+        }
       }
     } else {
-      document.getElementById('page-sub').textContent='No cached contacts found — syncing from Tripleseat now…';
+      // No cache — sync from Tripleseat
+      document.getElementById('page-sub').textContent = 'No cached data found — syncing from Tripleseat…';
+      btn.disabled=false; btn.textContent='↓ Load saved contacts';
       await syncFromTripleseat();
-      btn.disabled=false; btn.textContent='↓ Load saved contacts'; return;
+      return;
     }
-    // Load queue
-    const r2=await fetch(`${API_STORE}?action=get-queue`);
-    const d2=await r2.json();
-    if(d2.queue) emailQueue=d2.queue;
-    updateStats(); renderQueue();
-  } catch(e){
-    document.getElementById('page-sub').textContent=`Error loading cache: ${e.message} — syncing from Tripleseat…`;
+  } catch(e) {
+    console.warn('Cache load error:', e.message);
+    document.getElementById('page-sub').textContent = 'Syncing from Tripleseat…';
+    btn.disabled=false; btn.textContent='↓ Load saved contacts';
     await syncFromTripleseat();
+    return;
   }
   btn.disabled=false; btn.textContent='↓ Load saved contacts';
 }
@@ -727,13 +734,13 @@ async function syncFromTripleseat() {
     document.getElementById('page-sub').textContent=`${contacts.length.toLocaleString()} contacts · ${contacts.filter(c=>c._tags.includes('gone-quiet-6mo')).length.toLocaleString()} gone quiet · ${contacts.filter(c=>c._tags.includes('anniversary')).length} anniversaries · ${contacts.filter(c=>c._tags.includes('corporate')).length.toLocaleString()} corporate`;
     document.getElementById('last-updated').textContent=`Synced ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
 
-    // Save to persistent store
-    document.getElementById('progress-label').textContent=`Saving ${contacts.length.toLocaleString()} contacts to cache…`;
-    await fetch(`${API_STORE}?action=save-contacts`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contacts:allC, totalPages})
-    });
-    document.getElementById('progress-label').textContent=`✓ Saved to cache — contacts will load instantly next time`;
+    // Save to localStorage for instant load next time
+    document.getElementById('progress-label').textContent=`Saving ${contacts.length.toLocaleString()} contacts to local cache…`;
+    try {
+      localStorage.setItem('srg-contacts', JSON.stringify(allC));
+      localStorage.setItem('srg-lastsync', new Date().toISOString());
+    } catch(e){ console.warn('localStorage save failed (may be full):', e.message); }
+    document.getElementById('progress-label').textContent=`✓ Saved — contacts load instantly next visit`;
     setTimeout(()=>document.getElementById('progress-wrap').style.display='none',4000);
   } catch(err){
     document.getElementById('progress-label').textContent=`Error: ${err.message}`;
