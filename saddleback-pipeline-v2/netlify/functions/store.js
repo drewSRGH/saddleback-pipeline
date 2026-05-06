@@ -1,7 +1,3 @@
-// Netlify function — simple in-memory store with no external dependencies
-// Uses Netlify's built-in process.env for lightweight key-value storage
-// For full persistence, upgrade to a database later
-
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
