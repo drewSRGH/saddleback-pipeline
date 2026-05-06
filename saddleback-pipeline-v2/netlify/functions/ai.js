@@ -1,6 +1,3 @@
-// Netlify function — proxies Claude API calls from the browser
-// This is needed because the Anthropic API key cannot be exposed in browser JS
-
 exports.handler = async (event) => {
   const CORS = {
     'Access-Control-Allow-Origin': '*',
