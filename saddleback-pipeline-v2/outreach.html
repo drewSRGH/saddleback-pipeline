@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Saddleback — Outreach</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,133 +13,128 @@
       --text:#f0ede8; --muted:#8a8780; --muted2:#5a5855;
       --accent:#e8772a; --accent2:#f5a623;
       --green:#4caf7d; --red:#e05252; --yellow:#f5a623;
-      --blue:#5b8dee; --purple:#9b7edb;
-      --radius:10px; --radius-lg:14px;
+      --blue:#5b8dee; --purple:#9b7edb; --teal:#3dbdb0;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
     nav{display:flex;align-items:center;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--border);height:52px;position:sticky;top:0;z-index:50}
-    .nav-brand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent2);margin-right:32px;letter-spacing:-0.3px;text-decoration:none}
+    .nav-brand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent2);margin-right:32px;text-decoration:none}
     .nav-tabs{display:flex}
-    .nav-tab{padding:0 16px;height:52px;display:flex;align-items:center;font-size:0.82rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.15s,border-color 0.15s;text-decoration:none}
+    .nav-tab{padding:0 16px;height:52px;display:flex;align-items:center;font-size:0.82rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;text-decoration:none}
     .nav-tab:hover{color:var(--text)}
     .nav-tab.active{color:var(--text);border-bottom-color:var(--accent)}
     .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-    .nav-timestamp{font-size:0.72rem;color:var(--muted2);font-family:'DM Mono',monospace}
-    .page{padding:24px 28px;max-width:1400px;margin:0 auto}
-    .page-title{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:600;color:var(--text);letter-spacing:-0.4px}
-    .page-sub{font-size:0.78rem;color:var(--muted);margin-top:3px}
-    .page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px}
+    .page{padding:20px 28px;max-width:1400px;margin:0 auto}
+
+    /* TABS */
+    .main-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px}
+    .main-tab{padding:11px 20px;font-size:0.85rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;transition:color .15s,border-color .15s}
+    .main-tab:hover{color:var(--text)}
+    .main-tab.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
+    .badge{display:inline-block;background:rgba(232,119,42,0.15);color:var(--accent);border-radius:20px;padding:1px 7px;font-size:0.68rem;font-family:'DM Mono',monospace;margin-left:5px}
+    .badge.green{background:rgba(76,175,125,0.15);color:var(--green)}
+
+    /* STATS GRID */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:24px}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:border-color .15s}
+    .stat-card:hover{border-color:var(--border2)}
+    .stat-card.active{border-color:var(--accent)}
+    .stat-num{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--text);line-height:1}
+    .stat-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0}
+    .stat-lbl{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:4px;display:flex;align-items:center}
 
     /* PROGRESS */
     .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:20px}
     .progress-label{font-size:0.78rem;color:var(--muted);margin-bottom:8px;font-family:'DM Mono',monospace}
-    .progress-bar-bg{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
-    .progress-bar-fill{height:100%;background:var(--accent);border-radius:4px;transition:width 0.3s}
-
-    /* STATS */
-    .stats-row{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
-    .stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;flex:1;min-width:130px;cursor:pointer;transition:border-color 0.15s}
-    .stat-pill:hover{border-color:var(--border2)}
-    .stat-pill.active{border-color:var(--accent)}
-    .stat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-    .stat-count{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;line-height:1;color:var(--text)}
-    .stat-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;font-weight:600;margin-top:2px}
-
-    /* INNER TABS */
-    .inner-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px}
-    .inner-tab{padding:10px 16px;font-size:0.82rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.15s,border-color 0.15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif}
-    .inner-tab:hover{color:var(--text)}
-    .inner-tab.active{color:var(--text);border-bottom-color:var(--accent)}
-
-    /* FILTER BAR */
-    .filter-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
-    .filter-bar select,.filter-bar input{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;appearance:none;-webkit-appearance:none}
-    .filter-bar select:focus,.filter-bar input:focus{border-color:var(--accent)}
-    .filter-bar input::placeholder{color:var(--muted2)}
-
-    /* CONTACT ROW */
-    .contact-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:14px;transition:border-color 0.15s}
-    .contact-row:hover{border-color:var(--border2)}
-    .contact-row.queued{border-color:rgba(76,175,125,0.4);background:rgba(76,175,125,0.04)}
-    .contact-main{flex:1;min-width:0}
-    .contact-name{font-weight:600;font-size:0.9rem;color:var(--text)}
-    .contact-company{font-size:0.73rem;color:var(--muted);margin-top:1px}
-    .contact-meta{display:flex;gap:14px;margin-top:6px;flex-wrap:wrap}
-    .cmeta{font-size:0.72rem;color:var(--muted2);font-family:'DM Mono',monospace}
-    .cmeta span{color:var(--muted)}
-    .contact-tags{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
-    .tag{font-size:0.62rem;font-weight:600;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:0.05em}
-    .tag.corporate{background:rgba(91,141,238,0.12);color:var(--blue)}
-    .tag.repeat{background:rgba(76,175,125,0.12);color:var(--green)}
-    .tag.high-value{background:rgba(245,166,35,0.12);color:var(--yellow)}
-    .tag.gone-quiet-6mo,.tag.gone-quiet-12mo,.tag.gone-quiet-18mo{background:rgba(224,82,82,0.12);color:var(--red)}
-    .tag.anniversary{background:rgba(155,126,219,0.12);color:var(--purple)}
-    .tag.no-booking{background:rgba(90,88,85,0.2);color:var(--muted)}
-    .contact-actions{display:flex;gap:6px;flex-shrink:0;align-items:flex-start}
+    .progress-bg{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
+    .progress-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
 
     /* BUTTONS */
-    .btn-primary{background:var(--accent);color:white;border:none;padding:8px 18px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:background 0.15s;display:flex;align-items:center;gap:6px}
-    .btn-primary:hover{background:#f08030}
-    .btn-primary:disabled{background:var(--border2);color:var(--muted2);cursor:not-allowed}
-    .btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:500;font-family:'DM Sans',sans-serif;transition:color 0.15s,border-color 0.15s}
-    .btn-secondary:hover{color:var(--text);border-color:var(--muted)}
-    .btn-sm{padding:5px 11px;border-radius:6px;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:background 0.15s}
-    .btn-sm.accent{background:var(--accent);color:white}
-    .btn-sm.accent:hover{background:#f08030}
-    .btn-sm.ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
-    .btn-sm.ghost:hover{color:var(--text);border-color:var(--muted)}
-    .btn-sm.green{background:var(--green);color:white}
-    .btn-sm.red{background:transparent;color:var(--red);border:1px solid rgba(224,82,82,0.3)}
-    .btn-sm:disabled{opacity:0.4;cursor:not-allowed}
+    .btn{border:none;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+    .btn-accent{background:var(--accent);color:#fff;padding:7px 16px;font-size:0.82rem}
+    .btn-accent:hover{background:#f08030}
+    .btn-accent:disabled{background:var(--border2);color:var(--muted2);cursor:not-allowed}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:6px 12px;font-size:0.78rem}
+    .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
+    .btn-green{background:var(--green);color:#fff;padding:7px 14px;font-size:0.8rem}
+    .btn-green:hover{background:#3d9d6a}
+    .btn-red{background:transparent;color:var(--red);border:1px solid rgba(224,82,82,.3);padding:5px 10px;font-size:0.75rem}
+    .btn-sm{padding:5px 10px;font-size:0.73rem}
 
-    /* QUEUE */
-    .queue-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:12px}
-    .queue-card.approved{border-color:rgba(76,175,125,0.4)}
-    .queue-card.skipped{opacity:0.4}
-    .queue-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px}
-    .queue-name{font-weight:600;font-size:0.92rem;color:var(--text)}
-    .queue-meta{font-size:0.73rem;color:var(--muted);margin-top:2px}
-    .queue-body{background:var(--surface2);border-radius:8px;padding:14px;font-size:0.8rem;line-height:1.7;color:var(--muted);border-left:3px solid var(--border2);margin-bottom:14px;white-space:pre-wrap;max-height:180px;overflow-y:auto}
-    .queue-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    /* CARDS */
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color .15s}
+    .card:hover{border-color:var(--border2)}
+    .card.approved{border-color:rgba(76,175,125,.4)}
+    .card.skipped{opacity:.45}
+    .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+    .card-name{font-weight:600;font-size:.92rem;color:var(--text)}
+    .card-sub{font-size:.73rem;color:var(--muted);margin-top:2px}
+    .card-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace;margin-bottom:8px}
+    .card-meta span{color:var(--muted)}
+    .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+    .tag{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+    .tag-corp{background:rgba(91,141,238,.12);color:var(--blue)}
+    .tag-quiet{background:rgba(224,82,82,.12);color:var(--red)}
+    .tag-ann{background:rgba(155,126,219,.12);color:var(--purple)}
+    .tag-nb{background:rgba(90,88,85,.2);color:var(--muted)}
+    .tag-hv{background:rgba(245,166,35,.12);color:var(--yellow)}
+    .tag-rep{background:rgba(76,175,125,.12);color:var(--green)}
+    .tag-msu{background:rgba(61,189,176,.12);color:var(--teal)}
+    .tag-campaign{background:rgba(232,119,42,.12);color:var(--accent);font-size:.65rem}
+    .card-body{background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:.8rem;line-height:1.7;color:var(--muted);white-space:pre-wrap;max-height:160px;overflow-y:auto;border-left:3px solid var(--border2);margin-bottom:12px}
+    .card-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border)}
+    .status-pill{font-size:.68rem;padding:2px 9px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
 
-    /* SEGMENT PILLS */
-    .seg-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-    .seg-btn{background:transparent;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.75rem;font-weight:500;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
-    .seg-btn:hover{border-color:var(--border2);color:var(--text)}
-    .seg-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+    /* COMPANY CARDS */
+    .company-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
+    .company-card:hover{border-color:var(--border2)}
+    .company-card.expanded{border-color:var(--accent)}
+    .company-contacts{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+    .company-card.expanded .company-contacts{display:block}
+    .contact-mini{background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .contact-mini-name{font-size:.85rem;font-weight:500;color:var(--text)}
+    .contact-mini-email{font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace}
 
-    /* MODAL */
-    #modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
-    #modal-overlay.open{display:flex}
-    #modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,0.5)}
-    .modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-    .modal-header h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--text)}
-    .modal-subj-row{padding:0 24px 12px;border-bottom:1px solid var(--border)}
-    .modal-subj-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted2);font-weight:600;margin-bottom:4px}
-    #modal-subject{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 12px;font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none}
-    #modal-subject:focus{border-color:var(--accent)}
-    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1;padding:4px;border-radius:4px}
-    .modal-close:hover{color:var(--text)}
-    .modal-body{padding:16px 24px;flex:1;overflow-y:auto}
-    #modal-email{width:100%;min-height:280px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:0.83rem;line-height:1.6;resize:vertical;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s}
-    #modal-email:focus{border-color:var(--accent)}
-    .modal-footer{padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-    .modal-footer button{padding:8px 18px;border-radius:8px;font-size:0.82rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:background 0.15s}
-    #btn-approve-modal{background:var(--green);color:white}
-    #btn-copy-modal{background:var(--accent);color:white}
-    #btn-copy-modal:hover{background:#f08030}
-    #btn-close-modal{background:var(--surface2);color:var(--muted);border:1px solid var(--border2)}
+    /* CAMPAIGN */
+    .campaign-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
+    .campaign-title{font-size:.95rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px}
+    .campaign-desc{font-size:.78rem;color:var(--muted);margin-top:4px;margin-bottom:14px}
+    .campaign-meta{display:flex;gap:16px;font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace;margin-bottom:14px}
+    .campaign-contacts-preview{display:flex;gap:8px;flex-wrap:wrap}
 
     /* EMPTY / MISC */
     .empty{text-align:center;padding:60px 24px;color:var(--muted2)}
-    .empty-icon{font-size:2rem;margin-bottom:12px;opacity:0.4}
-    .empty h3{font-size:0.95rem;color:var(--muted);margin-bottom:6px}
-    .empty p{font-size:0.78rem}
-    .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle}
+    .empty-icon{font-size:2rem;margin-bottom:12px;opacity:.4}
+    .empty h3{font-size:.95rem;color:var(--muted);margin-bottom:6px}
+    .spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .badge-count{background:rgba(76,175,125,0.15);color:var(--green);border-radius:20px;padding:1px 7px;font-size:0.68rem;font-family:'DM Mono',monospace;margin-left:4px}
-    .sync-banner{background:rgba(91,141,238,0.1);border:1px solid rgba(91,141,238,0.25);border-radius:8px;padding:10px 16px;margin-bottom:16px;font-size:0.78rem;color:var(--blue);display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .sync-note{font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace;margin-bottom:16px}
+    .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+    input[type=text]{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+    input[type=text]:focus{border-color:var(--accent)}
+    input::placeholder{color:var(--muted2)}
+
+    /* MODAL */
+    #modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
+    #modal-overlay.open{display:flex}
+    #modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:660px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+    .modal-hdr{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .modal-hdr h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--text)}
+    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1}
+    .modal-close:hover{color:var(--text)}
+    .modal-subj{padding:10px 24px;border-bottom:1px solid var(--border)}
+    .modal-subj-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px;font-weight:700}
+    #modal-subject{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;outline:none}
+    #modal-subject:focus{border-color:var(--accent)}
+    .modal-body{padding:14px 24px;flex:1;overflow-y:auto}
+    #modal-email{width:100%;min-height:260px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:.83rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+    #modal-email:focus{border-color:var(--accent)}
+    .modal-ftr{padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+    .modal-ftr button{padding:8px 18px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+    #btn-approve-modal{background:var(--green);color:#fff}
+    #btn-copy-modal{background:var(--accent);color:#fff}
+    #btn-copy-modal:hover{background:#f08030}
+    #btn-close-modal{background:var(--surface2);color:var(--muted);border:1px solid var(--border2)}
   </style>
 </head>
 <body>
@@ -152,466 +147,716 @@
     <a href="/outreach.html" class="nav-tab active">Outreach</a>
   </div>
   <div class="nav-right">
-    <span class="nav-timestamp" id="last-updated"></span>
+    <span style="font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace" id="last-updated"></span>
+    <button class="btn btn-ghost btn-sm" onclick="syncFromTripleseat()" id="btn-sync">↻ Sync Tripleseat</button>
   </div>
 </nav>
 
 <div class="page">
-  <div class="page-header">
-    <div>
-      <div class="page-title">Outreach Engine</div>
-      <div class="page-sub" id="page-sub">Loading contacts…</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-secondary" onclick="loadFromCache()" id="btn-load-cache">↓ Load saved contacts</button>
-      <button class="btn-secondary" onclick="syncFromTripleseat()" id="btn-sync">↻ Sync from Tripleseat</button>
-    </div>
-  </div>
-
-  <!-- SYNC BANNER -->
-  <div class="sync-banner" id="sync-banner" style="display:none">
-    <span id="sync-banner-text"></span>
-    <button class="btn-sm accent" onclick="syncFromTripleseat()">Sync now</button>
-  </div>
 
   <!-- PROGRESS -->
-  <div class="progress-wrap" id="progress-wrap" style="display:none">
-    <div class="progress-label" id="progress-label">Fetching page 1…</div>
-    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  <div id="progress-wrap" style="display:none" class="progress-wrap">
+    <div class="progress-label" id="progress-label">Loading…</div>
+    <div class="progress-bg"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-pill active" onclick="setFilter('all')" id="pill-all">
-      <div class="stat-dot" style="background:var(--accent);box-shadow:0 0 6px var(--accent)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-all">—</div><div class="stat-label">All contacts</div></div>
-    </div>
-    <div class="stat-pill" onclick="setFilter('gone-quiet')" id="pill-gone-quiet">
-      <div class="stat-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-gone-quiet">—</div><div class="stat-label">Gone quiet</div></div>
-    </div>
-    <div class="stat-pill" onclick="setFilter('anniversary')" id="pill-anniversary">
-      <div class="stat-dot" style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-anniversary">—</div><div class="stat-label">Anniversary (90d)</div></div>
-    </div>
-    <div class="stat-pill" onclick="setFilter('corporate')" id="pill-corporate">
-      <div class="stat-dot" style="background:var(--blue);box-shadow:0 0 6px var(--blue)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-corporate">—</div><div class="stat-label">Corporate</div></div>
-    </div>
-    <div class="stat-pill" onclick="setFilter('no-booking')" id="pill-no-booking">
-      <div class="stat-dot" style="background:var(--muted2)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-no-booking">—</div><div class="stat-label">Never booked</div></div>
-    </div>
-    <div class="stat-pill" onclick="showTab('queue')" id="pill-queue">
-      <div class="stat-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div>
-      <div class="stat-info"><div class="stat-count" id="sc-queue">0</div><div class="stat-label">Email queue</div></div>
-    </div>
+  <!-- MAIN TABS -->
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="showTab('today')" id="tab-today">Today's Outreach</button>
+    <button class="main-tab" onclick="showTab('campaigns')" id="tab-campaigns">Campaigns</button>
+    <button class="main-tab" onclick="showTab('companies')" id="tab-companies">Companies <span class="badge" id="badge-companies">—</span></button>
+    <button class="main-tab" onclick="showTab('contacts')" id="tab-contacts">All Contacts <span class="badge" id="badge-contacts">—</span></button>
+    <button class="main-tab" onclick="showTab('queue')" id="tab-queue">Email Queue <span class="badge green" id="badge-queue">0</span></button>
   </div>
 
-  <!-- INNER TABS -->
-  <div class="inner-tabs">
-    <button class="inner-tab active" onclick="showTab('contacts')" id="tab-contacts">Contacts</button>
-    <button class="inner-tab" onclick="showTab('queue')" id="tab-queue">
-      Email Queue <span class="badge-count" id="queue-badge">0</span>
-    </button>
-  </div>
+  <div id="pane-today"></div>
+  <div id="pane-campaigns" style="display:none"></div>
+  <div id="pane-companies" style="display:none"></div>
+  <div id="pane-contacts" style="display:none"></div>
+  <div id="pane-queue" style="display:none"></div>
 
-  <!-- CONTACTS PANE -->
-  <div id="pane-contacts">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text)" id="list-title">All Contacts</div>
-        <div style="font-size:0.75rem;color:var(--muted);margin-top:2px" id="list-sub"></div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <input type="text" id="search-contacts" placeholder="Search name, company, email…"
-          style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;outline:none;width:220px"
-          oninput="renderContacts()">
-        <button class="btn-primary" onclick="queueAll()" id="btn-queue-all">✉ Queue all for outreach</button>
-      </div>
-    </div>
-
-    <!-- SUB-SEGMENT PILLS -->
-    <div class="seg-filter" id="seg-filter" style="display:none">
-      <button class="seg-btn active" onclick="setSubSeg('all')" id="subseg-all">All</button>
-      <button class="seg-btn" onclick="setSubSeg('6mo')" id="subseg-6mo">6+ months quiet</button>
-      <button class="seg-btn" onclick="setSubSeg('12mo')" id="subseg-12mo">12+ months quiet</button>
-      <button class="seg-btn" onclick="setSubSeg('18mo')" id="subseg-18mo">18+ months quiet</button>
-    </div>
-
-    <div id="contact-list"></div>
-  </div>
-
-  <!-- QUEUE PANE -->
-  <div id="pane-queue" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text)">Email Queue</div>
-        <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Review and approve each email. Nothing goes out without your OK.</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-secondary" onclick="clearQueue()">Clear queue</button>
-        <button class="btn-primary" onclick="approveAll()">✓ Approve all ready</button>
-      </div>
-    </div>
-    <div id="queue-list"></div>
-  </div>
 </div>
 
 <!-- MODAL -->
 <div id="modal-overlay">
   <div id="modal">
-    <div class="modal-header">
+    <div class="modal-hdr">
       <h2 id="modal-title">Review Email</h2>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
-    <div class="modal-subj-row">
-      <div class="modal-subj-label">Subject line</div>
+    <div class="modal-subj">
+      <div class="modal-subj-lbl">Subject line</div>
       <input type="text" id="modal-subject" placeholder="Email subject…">
     </div>
-    <div class="modal-body">
-      <textarea id="modal-email"></textarea>
-    </div>
-    <div class="modal-footer">
+    <div class="modal-body"><textarea id="modal-email"></textarea></div>
+    <div class="modal-ftr">
       <button id="btn-close-modal" onclick="closeModal()">Close</button>
       <button id="btn-copy-modal" onclick="copyModal()">Copy to clipboard</button>
-      <button id="btn-approve-modal" onclick="approveFromModal()">✓ Approve & save</button>
+      <button id="btn-approve-modal" onclick="approveFromModal()">✓ Approve</button>
     </div>
   </div>
 </div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
-const API_TS    = '/.netlify/functions/tripleseat';
-const API_AI    = '/.netlify/functions/ai';
-const API_STORE = '/.netlify/functions/store';
+const API_TS = '/.netlify/functions/tripleseat';
+const API_AI = '/.netlify/functions/ai';
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let contacts    = [];
-let emailQueue  = [];
-let activeFilter   = 'all';
-let activeSubSeg   = 'all';
-let activeTab      = 'contacts';
-let modalQueueId   = null;
-let lastSyncDate   = null;
+let contacts  = [];
+let companies = {};   // domain/name → { name, contacts[] }
+let queue     = [];
+let activeTab = 'today';
+let modalQueueId = null;
 
-// ── SEGMENTATION ──────────────────────────────────────────────────────────────
-// KEY FIX: Use event_date and created_at rather than updated_at
-// updated_at changes whenever Ryan touches the record — useless for "quiet" detection
-// We use created_at as proxy for "when we last heard from them" since leads are created
-// when the customer submits. If no new lead in 6+ months = gone quiet.
+// Personal email domains to exclude from company grouping
+const PERSONAL_DOMAINS = new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','msn.com','me.com','mac.com','comcast.net','att.net','verizon.net','sbcglobal.net']);
 
+// ── COMPANY DOMAIN EXTRACTION ─────────────────────────────────────────────────
+function extractDomain(email) {
+  if(!email) return null;
+  const m = email.toLowerCase().match(/@([^@]+)$/);
+  if(!m) return null;
+  const domain = m[1];
+  return PERSONAL_DOMAINS.has(domain) ? null : domain;
+}
+
+function domainToName(domain) {
+  if(!domain) return null;
+  const map = {
+    'msu.edu': 'Michigan State University',
+    'michigan.gov': 'State of Michigan',
+    'lsd.k12.mi.us': 'Lansing School District',
+    'okemos.k12.mi.us': 'Okemos Public Schools',
+    'haslett.k12.mi.us': 'Haslett Public Schools',
+    'ingham.org': 'Ingham County',
+    'eaton.org': 'Eaton County',
+    'lansingmi.gov': 'City of Lansing',
+    'deltadental.com': 'Delta Dental',
+    'bcbsm.com': 'Blue Cross Blue Shield',
+    'sparrow.org': 'Sparrow Health System',
+    'mclaren.org': 'McLaren Health',
+    'allegiance.org': 'Henry Ford Allegiance',
+  };
+  if(map[domain]) return map[domain];
+  // Convert domain to readable name
+  const base = domain.replace(/\.(com|org|edu|gov|net|mil|k12\.mi\.us|mi\.us)$/, '').split('.').pop();
+  return base.charAt(0).toUpperCase() + base.slice(1);
+}
+
+// ── TAGGING ───────────────────────────────────────────────────────────────────
 function tagContact(c) {
   const tags = [];
   const now = Date.now();
 
-  // Use created_at as "last heard from customer" — it's when they submitted the inquiry
-  const lastHeard = c.created_at ? new Date(c.created_at).getTime() : null;
-  const daysSinceHeard = lastHeard ? Math.floor((now - lastHeard) / 86400000) : null;
+  // Use event_date as primary signal — that's when the actual event was
+  // Fall back to created_at if no event_date
+  const eventTs   = c.event_date ? new Date(c.event_date).getTime() : null;
+  const createdTs = c.created_at ? new Date(c.created_at).getTime() : null;
+  const refTs     = eventTs || createdTs;
+  const daysSinceRef = refTs ? Math.floor((now - refTs) / 86400000) : null;
 
-  // Gone quiet buckets — based on days since they submitted their inquiry
-  if (daysSinceHeard !== null) {
-    if (daysSinceHeard >= 180) tags.push('gone-quiet-6mo');   // 6+ months
-    if (daysSinceHeard >= 365) tags.push('gone-quiet-12mo');  // 12+ months
-    if (daysSinceHeard >= 548) tags.push('gone-quiet-18mo');  // 18+ months
+  c._daysSinceEvent = daysSinceRef;
+  c._eventTs = eventTs;
+  c._createdTs = createdTs;
+
+  // Company domain
+  const domain = extractDomain(c.email_address);
+  c.company_domain = domain;
+  if(!c.company && domain) c._derived_company = domainToName(domain);
+
+  // Gone quiet — event or inquiry was 6+ months ago
+  if(daysSinceRef !== null) {
+    if(daysSinceRef >= 180) tags.push('gone-quiet-6mo');
+    if(daysSinceRef >= 365) tags.push('gone-quiet-12mo');
+    if(daysSinceRef >= 548) tags.push('gone-quiet-18mo');
   }
 
-  // Corporate — has a company name
-  if (c.company && c.company.trim()) tags.push('corporate');
+  // Corporate — has company name or non-personal domain
+  if((c.company && c.company.trim()) || domain) tags.push('corporate');
 
-  // No booking — turned down or no event date and status looks unconfirmed
-  if (c.turned_down_at) tags.push('no-booking');
-  else if (!c.event_date && daysSinceHeard > 14) tags.push('no-booking');
+  // MSU
+  if(domain === 'msu.edu' || (c.company||'').toLowerCase().includes('michigan state') || (c.company||'').toLowerCase().includes('msu')) tags.push('msu');
 
-  // Anniversary — their event_date OR created_at falls within next 90 days
-  // when we look at just month/day (ignoring year)
-  const dateToCheck = c.event_date || c.created_at;
-  if (dateToCheck) {
-    const ref = new Date(dateToCheck);
-    if (!isNaN(ref)) {
-      const yearsAgo = new Date().getFullYear() - ref.getFullYear();
-      if (yearsAgo >= 1) {
-        // Set the anniversary to this year
-        const anniversary = new Date(ref);
-        anniversary.setFullYear(new Date().getFullYear());
-        // Handle Feb 29 edge case
-        if (isNaN(anniversary.getTime())) anniversary.setDate(28);
-        const daysUntil = Math.floor((anniversary.getTime() - now) / 86400000);
-        // Within next 90 days OR passed in last 7 days (just missed)
-        if (daysUntil >= -7 && daysUntil <= 90) tags.push('anniversary');
-      }
+  // Never booked
+  if(c.turned_down_at || (!c.event_date && daysSinceRef > 30)) tags.push('no-booking');
+
+  // High value
+  if((c.guest_count || 0) >= 75) tags.push('high-value');
+
+  // Anniversary — event or inquiry anniversary within next 90 days
+  const dateForAnn = eventTs || createdTs;
+  if(dateForAnn) {
+    const ref = new Date(dateForAnn);
+    const yearsAgo = new Date().getFullYear() - ref.getFullYear();
+    if(yearsAgo >= 1) {
+      const ann = new Date(ref); ann.setFullYear(new Date().getFullYear());
+      if(isNaN(ann.getTime())) ann.setDate(28);
+      const dUntil = Math.floor((ann.getTime() - now) / 86400000);
+      if(dUntil >= -7 && dUntil <= 90) { tags.push('anniversary'); c._annDaysUntil = dUntil; }
     }
   }
 
-  // High value — guest count > 50 or multiple events (we can't know revenue from leads API)
-  if ((c.guest_count || 0) >= 75) tags.push('high-value');
+  // Event type detection from description
+  const desc = (c.event_description || c.additional_information || '').toLowerCase();
+  if(/graduat|commencement/.test(desc)) tags.push('graduation');
+  if(/holiday|christmas|xmas|thanksgiving|new year/.test(desc)) tags.push('holiday');
+  if(/wedding|reception|bride|groom/.test(desc)) tags.push('wedding');
+  if(/corporate|office|meeting|lunch|company|employee|staff|team/.test(desc)) tags.push('office-lunch');
 
   c._tags = tags;
-  c._daysSinceHeard = daysSinceHeard;
   return c;
 }
 
-function getSegment(filter, subSeg) {
-  let list = contacts;
-  if (filter === 'gone-quiet') {
-    if (subSeg === '18mo') list = contacts.filter(c => c._tags.includes('gone-quiet-18mo'));
-    else if (subSeg === '12mo') list = contacts.filter(c => c._tags.includes('gone-quiet-12mo'));
-    else if (subSeg === '6mo') list = contacts.filter(c => c._tags.includes('gone-quiet-6mo'));
-    else list = contacts.filter(c => c._tags.includes('gone-quiet-6mo'));
-  } else if (filter === 'anniversary') {
-    list = contacts.filter(c => c._tags.includes('anniversary'));
-  } else if (filter === 'corporate') {
-    list = contacts.filter(c => c._tags.includes('corporate'));
-  } else if (filter === 'no-booking') {
-    list = contacts.filter(c => c._tags.includes('no-booking'));
-  }
-  return list;
+// ── COMPANY GROUPING ──────────────────────────────────────────────────────────
+function buildCompanies(contactList) {
+  const map = {};
+  contactList.forEach(c => {
+    const companyName = c.company || c._derived_company;
+    const domain = c.company_domain;
+    const key = companyName ? companyName.toLowerCase().trim() : (domain || null);
+    if(!key || !c.email_address) return;
+    if(!map[key]) map[key] = { name: companyName || domainToName(domain) || key, domain, contacts: [], totalEvents: 0, totalGuests: 0 };
+    map[key].contacts.push(c);
+    if(c.event_date) map[key].totalEvents++;
+    if(c.guest_count) map[key].totalGuests += (c.guest_count || 0);
+  });
+  // Sort by contact count desc
+  return Object.fromEntries(Object.entries(map).sort((a,b) => b[1].contacts.length - a[1].contacts.length));
 }
 
-function updateStats() {
-  const gq  = contacts.filter(c => c._tags.includes('gone-quiet-6mo')).length;
-  const ann = contacts.filter(c => c._tags.includes('anniversary')).length;
-  const cor = contacts.filter(c => c._tags.includes('corporate')).length;
-  const nb  = contacts.filter(c => c._tags.includes('no-booking')).length;
-  document.getElementById('sc-all').textContent        = contacts.length.toLocaleString();
-  document.getElementById('sc-gone-quiet').textContent = gq.toLocaleString();
-  document.getElementById('sc-anniversary').textContent = ann.toLocaleString();
-  document.getElementById('sc-corporate').textContent  = cor.toLocaleString();
-  document.getElementById('sc-no-booking').textContent = nb.toLocaleString();
-  document.getElementById('sc-queue').textContent      = emailQueue.length;
-  const readyCount = emailQueue.filter(q=>q.status==='ready'||q.status==='approved').length;
-  document.getElementById('queue-badge').textContent   = readyCount;
-}
+// ── CAMPAIGN ENGINE ───────────────────────────────────────────────────────────
+const CAMPAIGNS = [
+  { id:'anniversary',  label:'🎉 Event Anniversary',    icon:'🎉', color:'var(--purple)', desc:'Their event anniversary falls within 90 days — perfect timing to reconnect.', filter: c=>c._tags.includes('anniversary'), priority:10 },
+  { id:'msu',          label:'🟢 MSU Accounts',         icon:'🟢', color:'var(--teal)',   desc:'Michigan State University contacts — football season, graduation, department events.', filter: c=>c._tags.includes('msu'), priority:9 },
+  { id:'gone-quiet',   label:'😶 Gone Quiet 6mo+',      icon:'😶', color:'var(--red)',    desc:'No activity in 6+ months. A single warm email can re-activate these.', filter: c=>c._tags.includes('gone-quiet-6mo'), priority:8 },
+  { id:'high-value',   label:'⭐ High Value (75+ guests)',icon:'⭐', color:'var(--yellow)', desc:'Large events — these are high priority for personalized outreach.', filter: c=>c._tags.includes('high-value'), priority:7 },
+  { id:'corporate',    label:'🏢 Corporate Accounts',   icon:'🏢', color:'var(--blue)',   desc:'Company and organization contacts — office lunches, team events, company meetings.', filter: c=>c._tags.includes('corporate') && !c._tags.includes('msu'), priority:6 },
+  { id:'graduation',   label:'🎓 Graduation Season',    icon:'🎓', color:'var(--accent2)',desc:'Contacts with graduation events in their history — May/June opportunity.', filter: c=>c._tags.includes('graduation'), priority:5 },
+  { id:'holiday',      label:'🎄 Holiday Events',       icon:'🎄', color:'var(--green)',  desc:'Past holiday party contacts — book early, fill up fast.', filter: c=>c._tags.includes('holiday'), priority:4 },
+  { id:'no-booking',   label:'📋 Never Booked',         icon:'📋', color:'var(--muted)',  desc:'Inquired but never confirmed. One more warm touch.', filter: c=>c._tags.includes('no-booking') && c.email_address, priority:3 },
+  { id:'wedding',      label:'💍 Wedding/Social',        icon:'💍', color:'var(--purple)', desc:'Wedding and social event contacts.', filter: c=>c._tags.includes('wedding'), priority:3 },
+];
 
-// ── RENDER CONTACTS ───────────────────────────────────────────────────────────
-function renderContacts() {
-  const list = document.getElementById('contact-list');
-  const search = document.getElementById('search-contacts').value.toLowerCase().trim();
-  let shown = getSegment(activeFilter, activeSubSeg);
+// Daily batch: pick top N contacts across campaigns, deduped, respecting 30-day rule
+function buildDailyBatch(count = 50) {
+  const now = Date.now();
+  const inQueue = new Set(queue.map(q => String(q.id)));
+  const contacted = JSON.parse(localStorage.getItem('srg-contacted') || '{}');
 
-  if (search) {
-    shown = shown.filter(c => {
-      const hay = [c.first_name,c.last_name,c.company,c.email_address,c.event_description,c.location?.name].join(' ').toLowerCase();
-      return hay.includes(search);
+  const scored = [];
+  contacts.forEach(c => {
+    if(!c.email_address || !c.email_address.includes('@')) return; // no valid email
+    if(inQueue.has(String(c.id))) return; // already queued
+    // 30-day rule
+    const lastContacted = contacted[String(c.id)];
+    if(lastContacted && (now - lastContacted) < 30 * 86400000) return;
+
+    // Score the contact
+    let score = 0;
+    let campaign = null;
+    CAMPAIGNS.forEach(cam => {
+      if(cam.filter(c)) { score += cam.priority; if(!campaign || cam.priority > CAMPAIGNS.find(x=>x.id===campaign)?.priority) campaign = cam.id; }
     });
+    if(score > 0) scored.push({ contact: c, score, campaign });
+  });
+
+  // Sort by score desc, take top N
+  scored.sort((a,b) => b.score - a.score);
+  return scored.slice(0, count);
+}
+
+// ── LOAD / SYNC ───────────────────────────────────────────────────────────────
+async function init() {
+  // Load queue from localStorage
+  try { queue = JSON.parse(localStorage.getItem('srg-queue') || '[]'); } catch(e) { queue = []; }
+  // Load contacts from cache
+  const cached = localStorage.getItem('srg-contacts');
+  if(cached) {
+    try {
+      const raw = JSON.parse(cached);
+      contacts = raw.map(tagContact);
+      companies = buildCompanies(contacts);
+      updateBadges();
+      renderTab(activeTab);
+      const ts = localStorage.getItem('srg-lastsync');
+      if(ts) document.getElementById('last-updated').textContent = 'Synced '+new Date(ts).toLocaleDateString();
+      const daysSince = ts ? Math.floor((Date.now()-new Date(ts))/86400000) : 999;
+      if(daysSince >= 3) {
+        // Auto-sync in background if stale
+        syncFromTripleseat(true);
+      }
+      return;
+    } catch(e) {}
+  }
+  // No cache — sync now
+  syncFromTripleseat(false);
+}
+
+async function syncFromTripleseat(background = false) {
+  const btn = document.getElementById('btn-sync');
+  if(btn) { btn.disabled=true; btn.textContent='Syncing…'; }
+  if(!background) {
+    document.getElementById('progress-wrap').style.display='block';
+    document.getElementById('progress-label').textContent='Connecting to Tripleseat…';
+    document.getElementById('progress-fill').style.width='0%';
   }
 
-  if (!shown.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No contacts in this segment</h3><p>Try a different filter or sync from Tripleseat.</p></div>`;
-    return;
-  }
-
-  const inQueue = new Set(emailQueue.map(q => String(q.id)));
-  const display = shown.slice(0, 150);
-
-  list.innerHTML = display.map(c => {
-    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Unknown';
-    const queued = inQueue.has(String(c.id));
-    const days = c._daysSinceHeard;
-    const eventDate = c.event_date ? new Date(c.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : null;
-    const tags = c._tags || [];
-
-    // Show anniversary countdown if applicable
-    let annCountdown = '';
-    if (tags.includes('anniversary') && (c.event_date || c.created_at)) {
-      const ref = new Date(c.event_date || c.created_at);
-      const ann = new Date(ref); ann.setFullYear(new Date().getFullYear());
-      const dUntil = Math.floor((ann.getTime() - Date.now()) / 86400000);
-      if (dUntil >= 0) annCountdown = ` · anniversary in ${dUntil}d`;
-      else annCountdown = ` · anniversary was ${Math.abs(dUntil)}d ago`;
+  const all = []; let page=1; let totalPages=1;
+  try {
+    while(page <= Math.min(totalPages, 90)) {
+      if(!background) {
+        document.getElementById('progress-label').textContent=`Fetching page ${page} of ${Math.min(totalPages,90)} — ${all.length.toLocaleString()} contacts…`;
+        document.getElementById('progress-fill').style.width=Math.round(page/Math.min(totalPages,90)*100)+'%';
+      }
+      const res = await fetch(`${API_TS}?endpoint=leads&page=${page}&limit=100`);
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const raw = await res.json();
+      totalPages = raw.total_pages || 1;
+      (raw.results || []).forEach(c => all.push(c));
+      page++;
+      if(page <= Math.min(totalPages,90)) await new Promise(r=>setTimeout(r,80));
     }
+    localStorage.setItem('srg-contacts', JSON.stringify(all));
+    localStorage.setItem('srg-lastsync', new Date().toISOString());
+    contacts = all.map(tagContact);
+    companies = buildCompanies(contacts);
+    updateBadges();
+    renderTab(activeTab);
+    document.getElementById('last-updated').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    if(!background) {
+      document.getElementById('progress-label').textContent=`✓ ${contacts.length.toLocaleString()} contacts synced and saved`;
+      document.getElementById('progress-fill').style.width='100%';
+      setTimeout(()=>document.getElementById('progress-wrap').style.display='none', 3000);
+    }
+  } catch(err) {
+    if(!background) { document.getElementById('progress-label').textContent='Error: '+err.message; }
+    console.error('Sync error:', err);
+  }
+  if(btn) { btn.disabled=false; btn.textContent='↻ Sync Tripleseat'; }
+}
 
-    return `
-    <div class="contact-row${queued?' queued':''}" id="crow-${c.id}">
-      <div class="contact-main">
-        <div class="contact-name">${esc(name)}</div>
-        ${c.company?`<div class="contact-company">${esc(c.company)}</div>`:''}
-        <div class="contact-meta">
-          ${c.email_address?`<div class="cmeta"><span>Email</span> ${esc(c.email_address)}</div>`:''}
-          ${eventDate?`<div class="cmeta"><span>Event</span> ${eventDate}${annCountdown}</div>`:''}
-          ${days!==null?`<div class="cmeta"><span>Submitted</span> ${days}d ago</div>`:''}
-          ${c.guest_count?`<div class="cmeta"><span>Guests</span> ${c.guest_count}</div>`:''}
-          ${c.location?.name?`<div class="cmeta"><span>Location</span> ${esc(c.location.name)}</div>`:''}
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+  activeTab = tab;
+  ['today','campaigns','companies','contacts','queue'].forEach(t => {
+    document.getElementById('pane-'+t).style.display = t===tab?'block':'none';
+    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
+  });
+  renderTab(tab);
+}
+
+function renderTab(tab) {
+  if(tab==='today')     renderToday();
+  else if(tab==='campaigns') renderCampaigns();
+  else if(tab==='companies') renderCompanies();
+  else if(tab==='contacts')  renderContacts();
+  else if(tab==='queue')     renderQueue();
+}
+
+function updateBadges() {
+  document.getElementById('badge-contacts').textContent = contacts.length.toLocaleString();
+  document.getElementById('badge-companies').textContent = Object.keys(companies).length.toLocaleString();
+  document.getElementById('badge-queue').textContent = queue.filter(q=>q.status==='ready'||q.status==='approved').length;
+}
+
+// ── TODAY'S OUTREACH ──────────────────────────────────────────────────────────
+function renderToday() {
+  const pane = document.getElementById('pane-today');
+  if(!contacts.length) { pane.innerHTML=loadingOrEmpty(); return; }
+  const batch = buildDailyBatch(50);
+  const contacted = JSON.parse(localStorage.getItem('srg-contacted') || '{}');
+  const recentlyContacted = contacts.filter(c => contacted[c.id] && (Date.now()-contacted[c.id]) < 7*86400000).length;
+
+  // Stats
+  const statsHTML = `
+    <div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(150px,1fr))">
+      ${statCard(batch.length, 'Recommended today', 'var(--accent)', null)}
+      ${statCard(queue.filter(q=>q.status==='pending').length, 'Need generation', 'var(--yellow)', null)}
+      ${statCard(queue.filter(q=>q.status==='ready').length, 'Ready to approve', 'var(--blue)', null)}
+      ${statCard(queue.filter(q=>q.status==='approved').length, 'Approved', 'var(--green)', null)}
+      ${statCard(recentlyContacted, 'Contacted this week', 'var(--teal)', null)}
+      ${statCard(contacts.filter(c=>c._tags.includes('anniversary')).length, 'Anniversaries (90d)', 'var(--purple)', null)}
+    </div>`;
+
+  // Campaign breakdown
+  const campaignRows = CAMPAIGNS.map(cam => {
+    const count = contacts.filter(cam.filter).length;
+    if(count === 0) return '';
+    const batchCount = batch.filter(b=>b.campaign===cam.id).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.1rem">${cam.icon}</span>
+        <div>
+          <div style="font-size:.88rem;font-weight:500;color:var(--text)">${cam.label.replace(/^[^ ]+ /,'')}</div>
+          <div style="font-size:.73rem;color:var(--muted)">${cam.desc}</div>
         </div>
-        <div class="contact-tags">
-          ${tags.map(t=>`<span class="tag ${t}">${t.replace(/-/g,' ')}</span>`).join('')}
-        </div>
-        ${c.additional_information?`<div style="font-size:0.72rem;color:var(--muted2);margin-top:5px;font-style:italic">${esc(String(c.additional_information).slice(0,100))}${c.additional_information.length>100?'…':''}</div>`:''}
       </div>
-      <div class="contact-actions">
-        ${queued
-          ? `<span style="font-size:0.72rem;color:var(--green);font-family:'DM Mono',monospace">✓ Queued</span>`
-          : `<button class="btn-sm accent" onclick="queueOne(${c.id})">+ Queue</button>`}
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:${cam.color}">${count.toLocaleString()}</div>
+        <div style="font-size:.68rem;color:var(--muted2);font-family:'DM Mono',monospace">${batchCount} in today's batch</div>
       </div>
     </div>`;
   }).join('');
 
-  if (shown.length > 150) {
-    list.innerHTML += `<div style="text-align:center;padding:20px;color:var(--muted2);font-size:0.78rem;font-family:'DM Mono',monospace">Showing 150 of ${shown.length.toLocaleString()} — use search to narrow results</div>`;
-  }
+  // Batch preview
+  const batchCards = batch.slice(0,20).map(({contact:c, campaign}) => {
+    const cam = CAMPAIGNS.find(x=>x.id===campaign);
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Unknown';
+    const company = c.company || c._derived_company || '';
+    return `<div class="card" style="border-left:3px solid ${cam?.color||'var(--border)'}">
+      <div class="card-header">
+        <div>
+          <div class="card-name">${esc(name)}</div>
+          ${company?`<div class="card-sub">${esc(company)}</div>`:''}
+        </div>
+        ${cam?`<span class="tag tag-campaign">${cam.icon} ${cam.label.replace(/^[^ ]+ /,'')}</span>`:''}
+      </div>
+      <div class="card-meta">
+        ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
+        ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
+        ${c.guest_count?`<div><span>Guests</span> ${c.guest_count}</div>`:''}
+        ${c._annDaysUntil!==undefined?`<div><span>Anniversary in</span> ${c._annDaysUntil}d</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-accent btn-sm" onclick="queueOne(${c.id},'${campaign||''}')">+ Queue</button>
+        <button class="btn btn-ghost btn-sm" onclick="skipContact(${c.id})">Skip</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  pane.innerHTML = `
+    ${statsHTML}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:4px">Campaign breakdown</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:16px">${contacts.length.toLocaleString()} total contacts across all campaigns</div>
+        ${campaignRows}
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <button class="btn btn-accent" onclick="queueBatch()">Queue today's batch (${batch.length})</button>
+          <button class="btn btn-ghost" onclick="showTab('queue')">View queue →</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:4px">Today's recommended contacts</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:14px">Sorted by priority score · 30-day contact rule enforced</div>
+        ${batch.length===0?`<div class="empty"><div class="empty-icon">✓</div><h3>All done!</h3><p>No contacts need outreach today.</p></div>`:batchCards}
+        ${batch.length>20?`<div style="text-align:center;padding:14px;color:var(--muted2);font-size:.75rem">${batch.length-20} more in batch — click "Queue today's batch" to add all</div>`:''}
+      </div>
+    </div>`;
 }
 
-// ── FILTER/SEGMENT CONTROL ────────────────────────────────────────────────────
-function setFilter(f) {
-  activeFilter = f; activeSubSeg = 'all';
-  document.querySelectorAll('.stat-pill').forEach(p=>p.classList.remove('active'));
-  const pilEl = document.getElementById('pill-'+f);
-  if(pilEl) pilEl.classList.add('active');
-
-  const titles = { all:'All Contacts', 'gone-quiet':'Gone Quiet', anniversary:'Event Anniversaries', corporate:'Corporate Accounts', 'no-booking':'Inquired — Never Booked' };
-  const descs  = {
-    all:'Every contact in your Tripleseat database',
-    'gone-quiet':'Contacts who submitted an inquiry 6+ months ago and haven\'t come back',
-    anniversary:'Their event anniversary falls within the next 90 days — perfect timing to reach out',
-    corporate:'Company accounts — higher LTV, often repeat bookers',
-    'no-booking':'Submitted a lead but never confirmed — worth one more touch'
-  };
-  document.getElementById('list-title').textContent = titles[f]||f;
-  document.getElementById('list-sub').textContent   = descs[f]||'';
-  document.getElementById('seg-filter').style.display = f==='gone-quiet'?'flex':'none';
-  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
-  const sb = document.getElementById('subseg-all'); if(sb) sb.classList.add('active');
-  showTab('contacts');
-  renderContacts();
+function statCard(num, label, color, onclick) {
+  return `<div class="stat-card${onclick?' cursor-pointer':''}">
+    <div class="stat-num" style="color:${color}">${typeof num==='number'?num.toLocaleString():num}</div>
+    <div class="stat-lbl"><span class="stat-dot" style="background:${color}"></span>${label}</div>
+  </div>`;
 }
 
-function setSubSeg(s) {
-  activeSubSeg = s;
-  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
-  const el = document.getElementById('subseg-'+s); if(el) el.classList.add('active');
-  renderContacts();
+// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
+function renderCampaigns() {
+  const pane = document.getElementById('pane-campaigns');
+  if(!contacts.length) { pane.innerHTML=loadingOrEmpty(); return; }
+  pane.innerHTML = CAMPAIGNS.map(cam => {
+    const list = contacts.filter(cam.filter);
+    if(list.length===0) return '';
+    const preview = list.slice(0,5).map(c=>`<span style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:.72rem;color:var(--muted)">${esc([c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown')}</span>`).join('');
+    return `<div class="campaign-section">
+      <div class="campaign-title" style="color:${cam.color}">${cam.icon} ${cam.label.replace(/^[^ ]+ /,'')} <span style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700">${list.length.toLocaleString()}</span></div>
+      <div class="campaign-desc">${cam.desc}</div>
+      <div class="campaign-meta">
+        <span>${list.filter(c=>c.email_address).length} with valid email</span>
+        <span>${list.filter(c=>c._tags.includes('high-value')).length} high-value</span>
+      </div>
+      <div class="campaign-contacts-preview">${preview}${list.length>5?`<span style="font-size:.72rem;color:var(--muted2);padding:3px 6px">+${list.length-5} more</span>`:''}</div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn btn-accent btn-sm" onclick="queueCampaign('${cam.id}',20)">Queue top 20</button>
+        <button class="btn btn-ghost btn-sm" onclick="viewCampaignContacts('${cam.id}')">View all contacts</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── COMPANIES ─────────────────────────────────────────────────────────────────
+function renderCompanies(searchVal='') {
+  const pane = document.getElementById('pane-companies');
+  if(!contacts.length) { pane.innerHTML=loadingOrEmpty(); return; }
+  const search = (searchVal||'').toLowerCase();
+  const entries = Object.entries(companies).filter(([k,v]) => !search || v.name.toLowerCase().includes(search) || k.includes(search));
+
+  pane.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div><span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${Object.keys(companies).length.toLocaleString()} companies</span> <span style="font-size:.78rem;color:var(--muted)">grouped by email domain and company name</span></div>
+      <input type="text" placeholder="Search companies…" value="${esc(searchVal)}" oninput="renderCompanies(this.value)" style="width:220px">
+    </div>
+    ${entries.slice(0,80).map(([key, co]) => {
+      const isMSU = co.domain === 'msu.edu';
+      const hasEvents = co.contacts.filter(c=>c.event_date).length;
+      const withEmail = co.contacts.filter(c=>c.email_address).length;
+      return `<div class="company-card" id="co-${esc(key.replace(/[^a-z0-9]/g,''))}" onclick="toggleCompany('${esc(key.replace(/[^a-z0-9]/g,''))}')">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <div>
+            <div style="font-weight:600;font-size:.95rem;color:var(--text);display:flex;align-items:center;gap:8px">
+              ${esc(co.name)}
+              ${isMSU?`<span class="tag tag-msu">MSU</span>`:''}
+            </div>
+            <div style="font-size:.73rem;color:var(--muted);margin-top:2px">${co.domain||''}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--text)">${co.contacts.length}</div>
+            <div style="font-size:.65rem;color:var(--muted2);font-family:'DM Mono',monospace">contacts</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:8px;font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace">
+          <span>${withEmail} with email</span>
+          <span>${hasEvents} past events</span>
+          ${co.totalGuests>0?`<span>${co.totalGuests.toLocaleString()} total guests</span>`:''}
+        </div>
+        <div class="company-contacts" id="cocontacts-${esc(key.replace(/[^a-z0-9]/g,''))}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-size:.78rem;color:var(--muted);font-weight:600">Contacts at ${esc(co.name)}</span>
+            <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();queueCompany('${esc(key.replace(/[^a-z0-9]/g,''))}')">Queue all for outreach</button>
+          </div>
+          ${co.contacts.slice(0,20).map(c=>{
+            const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
+            const inQueue=queue.some(q=>String(q.id)===String(c.id));
+            return `<div class="contact-mini">
+              <div>
+                <div class="contact-mini-name">${esc(name)}</div>
+                <div class="contact-mini-email">${esc(c.email_address||'no email')}</div>
+                ${c.event_date?`<div style="font-size:.68rem;color:var(--muted2);margin-top:2px">${esc(c.event_description||'event')} · ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
+              </div>
+              ${inQueue?`<span style="font-size:.72rem;color:var(--green);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();queueOne(${c.id},'corporate')">Queue</button>`}
+            </div>`;
+          }).join('')}
+          ${co.contacts.length>20?`<div style="font-size:.72rem;color:var(--muted2);text-align:center;padding:8px">+${co.contacts.length-20} more contacts</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+    ${entries.length>80?`<div style="text-align:center;padding:20px;color:var(--muted2);font-size:.78rem">${entries.length-80} more companies — search to narrow results</div>`:''}`;
+}
+
+function toggleCompany(safeKey) {
+  const card = document.getElementById('co-'+safeKey);
+  if(card) card.classList.toggle('expanded');
+}
+
+// ── ALL CONTACTS ──────────────────────────────────────────────────────────────
+function renderContacts(searchVal='', filterTag='') {
+  const pane = document.getElementById('pane-contacts');
+  if(!contacts.length) { pane.innerHTML=loadingOrEmpty(); return; }
+  const search = (searchVal||'').toLowerCase();
+  let list = contacts;
+  if(filterTag) list = list.filter(c=>c._tags.includes(filterTag));
+  if(search) list = list.filter(c=>[c.first_name,c.last_name,c.company,c.email_address,c._derived_company].join(' ').toLowerCase().includes(search));
+  const inQueue = new Set(queue.map(q=>String(q.id)));
+
+  pane.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <div><span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${list.length.toLocaleString()}</span> <span style="font-size:.78rem;color:var(--muted)">contacts</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" placeholder="Search contacts…" value="${esc(searchVal)}" oninput="renderContacts(this.value,'${filterTag}')">
+        <select onchange="renderContacts('${searchVal}',this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none">
+          <option value="">All segments</option>
+          ${CAMPAIGNS.map(c=>`<option value="${c.id}" ${filterTag===c.id?'selected':''}>${c.label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${list.slice(0,100).map(c=>{
+      const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
+      const queued=inQueue.has(String(c.id));
+      const tags=c._tags||[];
+      return `<div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-name">${esc(name)}</div>
+            ${(c.company||c._derived_company)?`<div class="card-sub">${esc(c.company||c._derived_company)}</div>`:''}
+          </div>
+          ${queued?`<span style="font-size:.72rem;color:var(--green);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn btn-accent btn-sm" onclick="queueOne(${c.id},'')">+ Queue</button>`}
+        </div>
+        <div class="card-meta">
+          ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
+          ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>`:''}
+          ${c.guest_count?`<div><span>Guests</span> ${c.guest_count}</div>`:''}
+          ${c._daysSinceEvent!==null?`<div><span>Age</span> ${c._daysSinceEvent}d</div>`:''}
+        </div>
+        <div class="card-tags">${tags.map(t=>`<span class="tag ${tagClass(t)}">${t.replace(/-/g,' ')}</span>`).join('')}</div>
+      </div>`;
+    }).join('')}
+    ${list.length>100?`<div style="text-align:center;padding:20px;color:var(--muted2);font-size:.75rem">Showing 100 of ${list.length.toLocaleString()} — search to narrow</div>`:''}`;
+}
+
+function tagClass(t) {
+  if(t.includes('quiet')) return 'tag-quiet';
+  if(t==='corporate') return 'tag-corp';
+  if(t==='anniversary') return 'tag-ann';
+  if(t==='no-booking') return 'tag-nb';
+  if(t==='high-value') return 'tag-hv';
+  if(t==='msu') return 'tag-msu';
+  return 'tag-nb';
 }
 
 // ── QUEUE ─────────────────────────────────────────────────────────────────────
-function queueOne(contactId) {
-  const c = contacts.find(x=>String(x.id)===String(contactId));
-  if(!c || emailQueue.find(q=>String(q.id)===String(contactId))) return;
-  const name = [c.first_name,c.last_name].filter(Boolean).join(' ') || 'Contact';
-  emailQueue.push({ id:String(c.id), contact:c, name, email:c.email_address||'', subject:'', body:'', status:'pending' });
-  updateStats(); renderContacts(); saveQueue();
+function renderQueue() {
+  const pane = document.getElementById('pane-queue');
+  const pending=queue.filter(q=>q.status==='pending').length;
+  const ready=queue.filter(q=>q.status==='ready').length;
+  const approved=queue.filter(q=>q.status==='approved').length;
+
+  if(!queue.length) {
+    pane.innerHTML=`<div class="empty"><div class="empty-icon">✉</div><h3>Queue is empty</h3><p>Go to Today's Outreach or Campaigns and queue some contacts.</p></div>`;
+    updateBadges(); return;
+  }
+
+  const statusColor={pending:'var(--muted2)',generating:'var(--yellow)',ready:'var(--accent)',approved:'var(--green)',skipped:'var(--muted2)',error:'var(--red)'};
+  const statusLabel={pending:'Needs generation',generating:'Generating…',ready:'Ready to review',approved:'✓ Approved',skipped:'Skipped',error:'Error'};
+
+  pane.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${queue.length}</span>
+        <span style="font-size:.78rem;color:var(--muted)"> in queue · ${ready} ready · ${approved} approved · ${pending} pending</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${pending>0?`<button class="btn btn-accent" onclick="generateAll()">✨ Generate ${pending} email${pending>1?'s':''}</button>`:''}
+        <button class="btn btn-green" onclick="approveAll()">✓ Approve all ready</button>
+        <button class="btn btn-ghost" onclick="clearQueue()">Clear queue</button>
+      </div>
+    </div>
+    ${queue.map(item=>{
+      const sc=statusColor[item.status]||'var(--muted)';
+      const sl=statusLabel[item.status]||item.status;
+      const c=item.contact;
+      return `<div class="card ${item.status}" id="qcard-${item.id}">
+        <div class="card-header">
+          <div>
+            <div class="card-name">${esc(item.name)}${(c.company||c._derived_company)?` <span style="font-size:.73rem;color:var(--muted);font-weight:400">${esc(c.company||c._derived_company)}</span>`:''}</div>
+            <div class="card-sub">${esc(item.email)}${item.subject?' · '+esc(item.subject):''}</div>
+          </div>
+          <span class="status-pill" style="color:${sc};background:${sc}22">${sl}</span>
+        </div>
+        ${item.body?`<div class="card-body">${esc(item.body)}</div>`:''}
+        <div class="card-footer">
+          ${item.status==='pending'?`<button class="btn btn-accent btn-sm" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
+          ${item.status==='ready'||item.status==='error'?`
+            <button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">👁 Review & edit</button>
+            <button class="btn btn-green btn-sm" onclick="approveItem('${item.id}')">✓ Approve</button>
+          `:''}
+          ${item.status==='approved'?`<button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">👁 View</button>`:''}
+          ${item.status!=='skipped'?`<button class="btn btn-ghost btn-sm" onclick="skipItem('${item.id}')">Skip</button>`:''}
+          <button class="btn btn-red btn-sm" onclick="removeItem('${item.id}')">Remove</button>
+        </div>
+      </div>`;
+    }).join('')}`;
+  updateBadges();
 }
 
-function queueAll() {
-  const shown = getSegment(activeFilter, activeSubSeg);
-  const search = document.getElementById('search-contacts').value.toLowerCase().trim();
-  let toQueue = shown;
-  if(search) toQueue = shown.filter(c=>[c.first_name,c.last_name,c.company,c.email_address].join(' ').toLowerCase().includes(search));
-  const inQueue = new Set(emailQueue.map(q=>String(q.id)));
+// ── QUEUE ACTIONS ─────────────────────────────────────────────────────────────
+function queueOne(contactId, campaign) {
+  const c = contacts.find(x=>String(x.id)===String(contactId));
+  if(!c || queue.find(q=>String(q.id)===String(contactId))) return;
+  const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact';
+  queue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending',campaign:campaign||''});
+  saveQueue(); updateBadges();
+  if(activeTab==='today'||activeTab==='contacts') renderTab(activeTab);
+}
+
+function queueBatch() {
+  const batch = buildDailyBatch(50);
   let added=0;
-  toQueue.slice(0,100).forEach(c=>{
-    if(!inQueue.has(String(c.id))){
+  batch.forEach(({contact:c, campaign}) => {
+    if(!queue.find(q=>String(q.id)===String(c.id))){
       const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact';
-      emailQueue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending'});
+      queue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending',campaign});
       added++;
     }
   });
-  if(added>0){ updateStats(); saveQueue(); showTab('queue'); }
-  else alert('All visible contacts are already in the queue.');
+  saveQueue(); updateBadges();
+  if(added>0) showTab('queue');
 }
 
-function clearQueue() {
-  if(!confirm('Clear all queued emails?')) return;
-  emailQueue=[]; updateStats(); renderQueue(); saveQueue();
+function queueCampaign(campaignId, limit) {
+  const cam = CAMPAIGNS.find(c=>c.id===campaignId);
+  if(!cam) return;
+  const inQueue=new Set(queue.map(q=>String(q.id)));
+  const contacted=JSON.parse(localStorage.getItem('srg-contacted')||'{}');
+  const toAdd=contacts.filter(cam.filter).filter(c=>c.email_address&&!inQueue.has(String(c.id))&&!(contacted[c.id]&&Date.now()-contacted[c.id]<30*86400000)).slice(0,limit);
+  toAdd.forEach(c=>{
+    const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact';
+    queue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending',campaign:campaignId});
+  });
+  saveQueue(); updateBadges(); showTab('queue');
 }
 
-function approveAll() {
-  emailQueue.filter(q=>q.status==='ready').forEach(q=>q.status='approved');
-  renderQueue(); saveQueue();
+function queueCompany(safeKey) {
+  const entry = Object.entries(companies).find(([k])=>k.replace(/[^a-z0-9]/g,'')==safeKey);
+  if(!entry) return;
+  const [, co] = entry;
+  const inQueue=new Set(queue.map(q=>String(q.id)));
+  co.contacts.filter(c=>c.email_address&&!inQueue.has(String(c.id))).slice(0,10).forEach(c=>{
+    const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact';
+    queue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending',campaign:'corporate'});
+  });
+  saveQueue(); updateBadges(); showTab('queue');
 }
 
-// ── GENERATE EMAILS ───────────────────────────────────────────────────────────
+function viewCampaignContacts(campaignId) {
+  showTab('contacts');
+  renderContacts('', campaignId);
+}
+
+function skipContact(contactId) {
+  const contacted=JSON.parse(localStorage.getItem('srg-contacted')||'{}');
+  contacted[String(contactId)]=Date.now();
+  localStorage.setItem('srg-contacted',JSON.stringify(contacted));
+  renderTab(activeTab);
+}
+
+function saveQueue() { try { localStorage.setItem('srg-queue',JSON.stringify(queue)); } catch(e){} }
+function clearQueue() { if(!confirm('Clear all queued emails?')) return; queue=[]; saveQueue(); updateBadges(); renderQueue(); }
+function approveAll() { queue.filter(q=>q.status==='ready').forEach(q=>q.status='approved'); saveQueue(); updateBadges(); renderQueue(); }
+function approveItem(id) { const i=queue.find(q=>q.id===id); if(i){i.status='approved'; markContacted(i.id); saveQueue(); updateBadges(); renderQueue();} }
+function skipItem(id) { const i=queue.find(q=>q.id===id); if(i){i.status='skipped'; saveQueue(); renderQueue();} }
+function removeItem(id) { queue=queue.filter(q=>q.id!==id); saveQueue(); updateBadges(); renderQueue(); renderTab(activeTab); }
+function markContacted(contactId) {
+  const contacted=JSON.parse(localStorage.getItem('srg-contacted')||'{}');
+  contacted[String(contactId)]=Date.now();
+  localStorage.setItem('srg-contacted',JSON.stringify(contacted));
+}
+
+// ── EMAIL GENERATION ──────────────────────────────────────────────────────────
 async function generateOne(itemId) {
-  const item = emailQueue.find(q=>q.id===itemId);
-  if(!item) return;
+  const item=queue.find(q=>q.id===itemId); if(!item) return;
   item.status='generating'; renderQueue();
-
   try {
-    const res = await fetch(API_AI, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact: item.contact }),
-    });
-    if(!res.ok) {
-      const err = await res.json().catch(()=>({error:`HTTP ${res.status}`}));
-      throw new Error(err.error || `HTTP ${res.status}`);
-    }
-    const data = await res.json();
-    item.subject = data.subject || 'Following up from Saddleback Catering';
-    item.body    = data.body    || data.raw || 'Error generating email body.';
-    item.status  = 'ready';
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:item.contact,campaign:item.campaign})});
+    const data=await res.json();
+    if(!res.ok) throw new Error(data.error||`HTTP ${res.status}`);
+    item.subject=data.subject||'Following up from Saddleback Catering';
+    item.body=data.body||'Unable to generate email body.';
+    item.status='ready';
   } catch(err) {
-    item.body   = `Error: ${err.message}`;
-    item.status = 'error';
+    item.body=`Error: ${err.message}`;
+    item.status='error';
   }
-  renderQueue(); saveQueue();
+  saveQueue(); renderQueue(); updateBadges();
 }
 
-async function generateAllPending() {
-  const pending = emailQueue.filter(q=>q.status==='pending');
+async function generateAll() {
+  const pending=queue.filter(q=>q.status==='pending');
   if(!pending.length) return;
-  const btn = document.getElementById('btn-gen-all');
-  if(btn){ btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Generating…'; }
+  const btn=document.querySelector('[onclick="generateAll()"]');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Generating…';}
   for(let i=0;i<pending.length;i++){
     await generateOne(pending[i].id);
-    await new Promise(r=>setTimeout(r,300));
+    if(i<pending.length-1) await new Promise(r=>setTimeout(r,250));
   }
-  if(btn){ btn.disabled=false; btn.innerHTML=`✨ Generate emails`; }
-}
-
-function skipItem(id){ const i=emailQueue.find(q=>q.id===id); if(i){i.status='skipped'; renderQueue(); saveQueue();} }
-function removeItem(id){ emailQueue=emailQueue.filter(q=>q.id!==id); renderQueue(); renderContacts(); saveQueue(); }
-function approveItem(id){ const i=emailQueue.find(q=>q.id===id); if(i){i.status='approved'; renderQueue(); saveQueue();} }
-
-// ── RENDER QUEUE ──────────────────────────────────────────────────────────────
-function renderQueue() {
-  const list = document.getElementById('queue-list');
-  if(!emailQueue.length){
-    list.innerHTML=`<div class="empty"><div class="empty-icon">✉</div><h3>Queue is empty</h3><p>Select contacts from the Contacts tab and click "+ Queue" or "Queue all for outreach"</p></div>`;
-    updateStats(); return;
-  }
-  const pending=emailQueue.filter(q=>q.status==='pending').length;
-  const ready=emailQueue.filter(q=>q.status==='ready').length;
-  const approved=emailQueue.filter(q=>q.status==='approved').length;
-  const statusColors={pending:'var(--muted2)',generating:'var(--yellow)',ready:'var(--accent)',approved:'var(--green)',skipped:'var(--muted2)',error:'var(--red)'};
-  const statusLabels={pending:'Needs generation',generating:'Generating…',ready:'Ready to review',approved:'✓ Approved',skipped:'Skipped',error:'Error'};
-
-  list.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-      <span style="font-size:0.78rem;color:var(--muted);font-family:'DM Mono',monospace">${emailQueue.length} in queue · ${ready} ready · ${approved} approved · ${pending} pending</span>
-      ${pending>0?`<button class="btn-primary" id="btn-gen-all" onclick="generateAllPending()">✨ Generate ${pending} email${pending>1?'s':''}</button>`:''}
-    </div>
-  ` + emailQueue.map(item=>{
-    const sc=statusColors[item.status]||'var(--muted)';
-    const sl=statusLabels[item.status]||item.status;
-    const c=item.contact;
-    return `
-    <div class="queue-card ${item.status}" id="qcard-${item.id}">
-      <div class="queue-header">
-        <div>
-          <div class="queue-name">${esc(item.name)}${c.company?` <span style="font-size:0.73rem;color:var(--muted);font-weight:400">${esc(c.company)}</span>`:''}</div>
-          <div class="queue-meta">${esc(item.email)}${item.subject?` · <em>${esc(item.subject)}</em>`:''}</div>
-        </div>
-        <span style="font-size:0.68rem;color:${sc};background:${sc}22;padding:2px 9px;border-radius:20px;white-space:nowrap;font-family:'DM Mono',monospace">${sl}</span>
-      </div>
-      ${item.body?`<div class="queue-body">${esc(item.body)}</div>`:''}
-      <div class="queue-actions">
-        ${item.status==='pending'?`<button class="btn-sm accent" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
-        ${item.status==='ready'||item.status==='error'?`
-          <button class="btn-sm ghost" onclick="openModal('${item.id}')">👁 Review & edit</button>
-          <button class="btn-sm green" onclick="approveItem('${item.id}')">✓ Approve</button>
-        `:''}
-        ${item.status==='approved'?`<button class="btn-sm ghost" onclick="openModal('${item.id}')">👁 View</button>`:''}
-        ${item.status!=='skipped'?`<button class="btn-sm ghost" onclick="skipItem('${item.id}')">Skip</button>`:''}
-        <button class="btn-sm red" onclick="removeItem('${item.id}')">Remove</button>
-      </div>
-    </div>`;
-  }).join('');
-  updateStats();
+  if(btn){btn.disabled=false;btn.innerHTML=`✨ Generate emails`;}
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function openModal(itemId) {
-  const item=emailQueue.find(q=>q.id===itemId); if(!item) return;
+  const item=queue.find(q=>q.id===itemId); if(!item) return;
   modalQueueId=itemId;
   document.getElementById('modal-title').textContent=`Email to ${item.name}`;
   document.getElementById('modal-subject').value=item.subject||'';
@@ -619,141 +864,27 @@ function openModal(itemId) {
   document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal() {
-  if(modalQueueId){
-    const item=emailQueue.find(q=>q.id===modalQueueId);
-    if(item){ item.subject=document.getElementById('modal-subject').value; item.body=document.getElementById('modal-email').value; }
-  }
-  document.getElementById('modal-overlay').classList.remove('open');
-  modalQueueId=null; renderQueue(); saveQueue();
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-subject').value;i.body=document.getElementById('modal-email').value;}}
+  document.getElementById('modal-overlay').classList.remove('open'); modalQueueId=null; saveQueue(); renderQueue();
 }
 function approveFromModal() {
-  if(modalQueueId){
-    const item=emailQueue.find(q=>q.id===modalQueueId);
-    if(item){ item.subject=document.getElementById('modal-subject').value; item.body=document.getElementById('modal-email').value; item.status='approved'; }
-  }
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-subject').value;i.body=document.getElementById('modal-email').value;i.status='approved';markContacted(i.id);}}
   closeModal();
 }
-function copyModal(){
-  const subj=document.getElementById('modal-subject').value;
-  const body=document.getElementById('modal-email').value;
-  navigator.clipboard.writeText(`Subject: ${subj}\n\n${body}`).then(()=>{
-    const btn=document.getElementById('btn-copy-modal');
-    btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent='Copy to clipboard',2000);
+function copyModal() {
+  const t=document.getElementById('modal-email').value;
+  navigator.clipboard.writeText(`Subject: ${document.getElementById('modal-subject').value}\n\n${t}`).then(()=>{
+    const btn=document.getElementById('btn-copy-modal'); btn.textContent='✓ Copied!'; setTimeout(()=>btn.textContent='Copy to clipboard',2000);
   });
 }
 document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function showTab(tab) {
-  activeTab=tab;
-  document.getElementById('pane-contacts').style.display=tab==='contacts'?'block':'none';
-  document.getElementById('pane-queue').style.display=tab==='queue'?'block':'none';
-  document.getElementById('tab-contacts').classList.toggle('active',tab==='contacts');
-  document.getElementById('tab-queue').classList.toggle('active',tab==='queue');
-  if(tab==='queue') renderQueue();
-}
-
-// ── PERSISTENCE ───────────────────────────────────────────────────────────────
-async function saveQueue() {
-  try {
-    localStorage.setItem('srg-queue', JSON.stringify(emailQueue));
-  } catch(e){ console.warn('Could not save queue:', e.message); }
-}
-
-async function loadFromCache() {
-  const btn=document.getElementById('btn-load-cache');
-  btn.disabled=true; btn.textContent='Loading…';
-  document.getElementById('page-sub').textContent='Loading saved contacts…';
-
-  try {
-    // Try localStorage first — fast, no server needed
-    const cached = localStorage.getItem('srg-contacts');
-    const cachedQueue = localStorage.getItem('srg-queue');
-    const cachedSync = localStorage.getItem('srg-lastsync');
-
-    if(cached) {
-      const parsed = JSON.parse(cached);
-      contacts = parsed.map(tagContact);
-      lastSyncDate = cachedSync;
-      if(cachedQueue) emailQueue = JSON.parse(cachedQueue);
-      updateStats(); renderContacts(); renderQueue();
-      const syncDate = cachedSync ? new Date(cachedSync) : null;
-      const syncStr = syncDate ? syncDate.toLocaleDateString() : 'unknown';
-      document.getElementById('page-sub').textContent = `${contacts.length.toLocaleString()} contacts loaded · last synced ${syncStr}`;
-      document.getElementById('last-updated').textContent = `Cached ${syncDate ? syncDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : ''}`;
-
-      // Show sync banner if cache is old (3+ days)
-      if(syncDate) {
-        const daysSince = Math.floor((Date.now()-syncDate.getTime())/86400000);
-        if(daysSince >= 3) {
-          document.getElementById('sync-banner-text').textContent = `Contact data is ${daysSince} days old. Sync for latest Tripleseat data.`;
-          document.getElementById('sync-banner').style.display = 'flex';
-        }
-      }
-    } else {
-      // No cache — sync from Tripleseat
-      document.getElementById('page-sub').textContent = 'No cached data found — syncing from Tripleseat…';
-      btn.disabled=false; btn.textContent='↓ Load saved contacts';
-      await syncFromTripleseat();
-      return;
-    }
-  } catch(e) {
-    console.warn('Cache load error:', e.message);
-    document.getElementById('page-sub').textContent = 'Syncing from Tripleseat…';
-    btn.disabled=false; btn.textContent='↓ Load saved contacts';
-    await syncFromTripleseat();
-    return;
-  }
-  btn.disabled=false; btn.textContent='↓ Load saved contacts';
-}
-
-async function syncFromTripleseat() {
-  const btn=document.getElementById('btn-sync');
-  btn.disabled=true; btn.textContent='Syncing…';
-  document.getElementById('sync-banner').style.display='none';
-  document.getElementById('progress-wrap').style.display='block';
-
-  const allC=[]; let page=1; let totalPages=1;
-  try {
-    while(page<=Math.min(totalPages,90)){
-      document.getElementById('progress-label').textContent=`Fetching page ${page} of ${Math.min(totalPages,90)} — ${allC.length.toLocaleString()} contacts loaded…`;
-      document.getElementById('progress-fill').style.width=Math.round(page/Math.min(totalPages,90)*100)+'%';
-      const res=await fetch(`${API_TS}?endpoint=leads&page=${page}&limit=100`);
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const raw=await res.json();
-      totalPages=raw.total_pages||1;
-      (raw.results||[]).forEach(c=>allC.push(c));
-      page++;
-      if(page<=Math.min(totalPages,90)) await new Promise(r=>setTimeout(r,100));
-    }
-
-    contacts=allC.map(tagContact);
-    updateStats(); renderContacts();
-    document.getElementById('progress-fill').style.width='100%';
-    document.getElementById('progress-label').textContent=`✓ ${contacts.length.toLocaleString()} contacts synced from Tripleseat`;
-    document.getElementById('page-sub').textContent=`${contacts.length.toLocaleString()} contacts · ${contacts.filter(c=>c._tags.includes('gone-quiet-6mo')).length.toLocaleString()} gone quiet · ${contacts.filter(c=>c._tags.includes('anniversary')).length} anniversaries · ${contacts.filter(c=>c._tags.includes('corporate')).length.toLocaleString()} corporate`;
-    document.getElementById('last-updated').textContent=`Synced ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
-
-    // Save to localStorage for instant load next time
-    document.getElementById('progress-label').textContent=`Saving ${contacts.length.toLocaleString()} contacts to local cache…`;
-    try {
-      localStorage.setItem('srg-contacts', JSON.stringify(allC));
-      localStorage.setItem('srg-lastsync', new Date().toISOString());
-    } catch(e){ console.warn('localStorage save failed (may be full):', e.message); }
-    document.getElementById('progress-label').textContent=`✓ Saved — contacts load instantly next visit`;
-    setTimeout(()=>document.getElementById('progress-wrap').style.display='none',4000);
-  } catch(err){
-    document.getElementById('progress-label').textContent=`Error: ${err.message}`;
-    document.getElementById('page-sub').textContent=`Sync error: ${err.message}`;
-  }
-  btn.disabled=false; btn.textContent='↻ Sync from Tripleseat';
-}
-
 // ── UTILS ─────────────────────────────────────────────────────────────────────
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function loadingOrEmpty(){return contacts.length?'':`<div class="empty"><div class="empty-icon">⟳</div><h3>Loading contacts…</h3><p>Syncing from Tripleseat. This may take a moment for all ${(8600).toLocaleString()}+ contacts.</p></div>`;}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
-loadFromCache();
+init();
 </script>
 </body>
 </html>
