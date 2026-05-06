@@ -1,31 +1,32 @@
-exports.handler = async (event) => {
-  const CORS = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json',
-  };
+// Netlify function — Claude API proxy
+// Fixes: correct model name, proper error handling, campaign-aware prompts
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Content-Type': 'application/json',
+};
+
+exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
   if (event.httpMethod !== 'POST') return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method not allowed' }) };
 
-  // Get API key from Netlify environment variable
   const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY;
   if (!ANTHROPIC_KEY) {
-    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'ANTHROPIC_API_KEY not set in Netlify environment variables' }) };
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: 'ANTHROPIC_API_KEY environment variable is not set in Netlify. Go to Site Configuration → Environment Variables and add it.' }) };
   }
 
+  let body;
+  try { body = JSON.parse(event.body || '{}'); }
+  catch(e) { return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid JSON body' }) }; }
+
+  const { contact, campaign } = body;
+  if (!contact) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing contact in request body' }) };
+
+  const prompt = buildPrompt(contact, campaign);
+
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { prompt, contact } = body;
-
-    if (!prompt && !contact) {
-      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing prompt or contact' }) };
-    }
-
-    // Build the email generation prompt if contact is passed directly
-    const userPrompt = prompt || buildPrompt(contact);
-
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -34,78 +35,91 @@ exports.handler = async (event) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 700,
-        messages: [{ role: 'user', content: userPrompt }],
+        model: 'claude-sonnet-4-6',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: prompt }],
       }),
     });
 
+    const responseText = await res.text();
+
     if (!res.ok) {
-      const err = await res.text();
-      console.error('Anthropic error:', res.status, err);
-      return { statusCode: res.status, headers: CORS, body: JSON.stringify({ error: `Anthropic API error: ${res.status}`, detail: err }) };
+      console.error(`Anthropic API error ${res.status}:`, responseText);
+      let detail = responseText;
+      try { detail = JSON.parse(responseText).error?.message || responseText; } catch(e) {}
+      return {
+        statusCode: res.status,
+        headers: CORS,
+        body: JSON.stringify({ error: `Anthropic API error ${res.status}: ${detail}` })
+      };
     }
 
-    const data = await res.json();
+    const data = JSON.parse(responseText);
     const text = data.content?.map(b => b.text || '').join('') || '';
 
-    // Parse subject line if present
+    // Parse SUBJECT: line from response
     const lines = text.split('\n');
-    let subject = '';
+    let subject = `Following up — ${contact.first_name || 'there'}`;
     let emailBody = text;
     if (lines[0].toUpperCase().startsWith('SUBJECT:')) {
       subject = lines[0].replace(/^SUBJECT:\s*/i, '').trim();
-      emailBody = lines.slice(2).join('\n').trim();
+      emailBody = lines.slice(1).filter(l=>l.trim()).join('\n').trim();
     }
 
-    return {
-      statusCode: 200,
-      headers: CORS,
-      body: JSON.stringify({ subject, body: emailBody, raw: text }),
-    };
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ subject, body: emailBody }) };
+
   } catch (err) {
     console.error('AI function error:', err);
-    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: err.message }) };
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: `Function error: ${err.message}` }) };
   }
 };
 
-function buildPrompt(c) {
+// ── CAMPAIGN-AWARE PROMPT BUILDER ─────────────────────────────────────────────
+function buildPrompt(c, campaign) {
   const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'there';
-  const tags = c._tags || [];
-  const monthsSince = c.updated_at ? Math.round((Date.now() - new Date(c.updated_at)) / 2592000000) : null;
   const eventDate = c.event_date ? new Date(c.event_date).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : null;
 
-  let context = '';
-  if (tags.includes('anniversary')) context = `Their event anniversary is coming up — they booked around this time of year before. Reference that timing naturally.`;
-  else if (tags.includes('gone-quiet-18mo')) context = `They haven't been in touch for over 18 months. Keep it brief and light — easy to re-engage, no pressure.`;
-  else if (tags.includes('gone-quiet-12mo')) context = `About a year has passed since their last activity. A warm check-in is appropriate.`;
-  else if (tags.includes('gone-quiet-6mo')) context = `6 months since their last activity. Perfect time for a gentle re-engagement.`;
-  else if (tags.includes('no-booking')) context = `They inquired but never confirmed a booking. This is a second-chance outreach — be warm, not pushy.`;
-  else if (tags.includes('corporate')) context = `Corporate account — focus on convenience, reliability, and feeding large groups well.`;
-  else if (tags.includes('repeat')) context = `Repeat customer — acknowledge the relationship, make them feel valued.`;
-  else context = `General outreach to a past catering contact.`;
+  // Campaign context
+  const campaignCtx = {
+    'gone-quiet':    `This person inquired ${c._daysSinceEvent||'a while'} ago but we haven't heard back. Write a brief, low-pressure check-in. Make it easy to respond.`,
+    'anniversary':   `Their event anniversary is coming up. They may do this event annually. Reference the timing naturally — "this time of year" or "coming up on a year since".`,
+    'corporate':     `This is a corporate contact at ${c.company||'a company'}. Focus on how Saddleback can make their team meals, lunch meetings, or company events easy and impressive.`,
+    'no-booking':    `They submitted a lead but never confirmed. Something may have changed — budget, timing, or they just got busy. Keep it warm and easy, not pushy.`,
+    'high-value':    `Large event with ${c.guest_count||'many'} guests. These are high-priority. Be professional and specific about our ability to handle large groups.`,
+    'msu':           `MSU contact. Reference Michigan State, Sparty, East Lansing — show we know the territory. Could be for a game day, department lunch, event, or graduation.`,
+    'graduation':    `Graduation season is coming up. If they've booked a grad party before, mention it. If not, plant the seed for celebrating their graduate.`,
+    'holiday':       `Holiday season is approaching. Office holiday parties, end-of-year team celebrations, family gatherings — these fill up fast.`,
+    'default':       `General outreach to a past catering contact. Be warm and useful, not generic.`
+  };
 
-  return `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan — award-winning BBQ catering.
+  const ctx = campaign ? (campaignCtx[campaign] || campaignCtx.default) : campaignCtx.default;
 
-Write a SHORT, personal outreach email. Make it feel like Ryan actually remembers this person.
+  return `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan — award-winning BBQ catering for corporate events, weddings, graduations, holiday parties, and celebrations of all kinds.
 
-Contact: ${name}
-${c.company ? `Company: ${c.company}` : ''}
-${c.email_address ? `Email: ${c.email_address}` : ''}
-${c.event_description ? `Past event: ${c.event_description}` : ''}
-${eventDate ? `Event date: ${eventDate}` : ''}
-${c.guest_count ? `Guest count: ${c.guest_count}` : ''}
-${c.location?.name ? `Location: ${c.location.name}` : ''}
-${c.additional_information ? `Notes: ${String(c.additional_information).slice(0, 200)}` : ''}
-${monthsSince ? `Months since last contact: ${monthsSince}` : ''}
+Write a SHORT, personal outreach email. Sound like a real person, not a marketing department.
 
-Context: ${context}
+CONTACT INFO:
+- Name: ${name}
+${c.company ? `- Company: ${c.company}` : ''}
+${c.email_address ? `- Email: ${c.email_address}` : ''}
+${c.event_description ? `- Past event: ${c.event_description}` : ''}
+${eventDate ? `- Event date: ${eventDate}` : ''}
+${c.guest_count ? `- Guest count: ${c.guest_count}` : ''}
+${c.location?.name ? `- Location: ${c.location.name}` : ''}
+${c.additional_information ? `- Notes from their inquiry: ${String(c.additional_information).slice(0,200)}` : ''}
+${c.company_domain && !['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com'].includes(c.company_domain) ? `- Email domain: ${c.company_domain}` : ''}
 
-Rules:
-- 3 short paragraphs max — keep it human, not marketing-y
-- Reference something specific about their event or situation
-- One clear easy call to action at the end
-- Sign as Ryan, Saddleback Catering, (517) 214-9024
-- First line MUST be: SUBJECT: [subject line here]
-- Then blank line, then email body only`;
+CAMPAIGN CONTEXT: ${ctx}
+
+RULES:
+- Max 3 short paragraphs
+- Reference something specific about their event or situation if possible
+- One clear, easy call to action at the end (reply to this email, schedule a call, etc.)
+- No corporate buzzwords, no "I hope this email finds you well", no "exciting opportunity"
+- Sign off as: Ryan | Saddleback Catering | (517) 214-9024
+
+FORMAT (required):
+SUBJECT: [subject line here]
+[blank line]
+[email body only — no "Dear" prefix, just start naturally]`;
 }
