@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Saddleback — Outreach</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f0e;
+      --surface: #181817;
+      --surface2: #1f1f1d;
+      --border: #2a2a27;
+      --border2: #333330;
+      --text: #f0ede8;
+      --muted: #8a8780;
+      --muted2: #5a5855;
+      --accent: #e8772a;
+      --accent2: #f5a623;
+      --green: #4caf7d;
+      --red: #e05252;
+      --yellow: #f5a623;
+      --blue: #5b8dee;
+      --purple: #9b7edb;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5; }
+
+    /* NAV */
+    nav { display:flex; align-items:center; padding:0 28px; background:var(--surface); border-bottom:1px solid var(--border); height:52px; position:sticky; top:0; z-index:50; }
+    .nav-brand { font-family:'Fraunces',serif; font-size:1.05rem; font-weight:600; color:var(--accent2); margin-right:32px; letter-spacing:-0.3px; text-decoration:none; }
+    .nav-tabs { display:flex; }
+    .nav-tab { padding:0 16px; height:52px; display:flex; align-items:center; font-size:0.82rem; font-weight:500; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:color 0.15s,border-color 0.15s; text-decoration:none; }
+    .nav-tab:hover { color:var(--text); }
+    .nav-tab.active { color:var(--text); border-bottom-color:var(--accent); }
+    .nav-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+    .nav-timestamp { font-size:0.72rem; color:var(--muted2); font-family:'DM Mono',monospace; }
+
+    /* LAYOUT */
+    .page { padding:24px 28px; max-width:1400px; margin:0 auto; }
+    .page-title { font-family:'Fraunces',serif; font-size:1.4rem; font-weight:600; color:var(--text); letter-spacing:-0.4px; }
+    .page-sub { font-size:0.78rem; color:var(--muted); margin-top:3px; }
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:16px; }
+
+    /* PROGRESS BAR */
+    .progress-wrap { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-bottom:20px; }
+    .progress-label { font-size:0.78rem; color:var(--muted); margin-bottom:8px; font-family:'DM Mono',monospace; }
+    .progress-bar-bg { background:var(--surface2); border-radius:4px; height:6px; overflow:hidden; }
+    .progress-bar-fill { height:100%; background:var(--accent); border-radius:4px; transition:width 0.3s; }
+
+    /* STATS */
+    .stats-row { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+    .stat-pill { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 16px; display:flex; align-items:center; gap:10px; flex:1; min-width:130px; cursor:pointer; transition:border-color 0.15s; }
+    .stat-pill:hover { border-color:var(--border2); }
+    .stat-pill.active { border-color:var(--accent); }
+    .stat-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .stat-count { font-family:'Fraunces',serif; font-size:1.3rem; font-weight:700; line-height:1; color:var(--text); }
+    .stat-label { font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; font-weight:600; margin-top:2px; }
+
+    /* TWO-COLUMN LAYOUT */
+    .two-col { display:grid; grid-template-columns:320px 1fr; gap:20px; align-items:start; }
+    @media(max-width:900px) { .two-col { grid-template-columns:1fr; } }
+
+    /* SEGMENT SIDEBAR */
+    .sidebar-title { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted2); margin-bottom:12px; }
+    .seg-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s,background 0.15s; }
+    .seg-card:hover { border-color:var(--border2); }
+    .seg-card.active { border-color:var(--accent); background:rgba(232,119,42,0.06); }
+    .seg-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+    .seg-name { font-size:0.88rem; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
+    .seg-count { font-family:'DM Mono',monospace; font-size:0.75rem; color:var(--accent); background:rgba(232,119,42,0.12); padding:2px 8px; border-radius:20px; }
+    .seg-desc { font-size:0.73rem; color:var(--muted); line-height:1.4; }
+
+    /* CONTACT LIST */
+    .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+    .list-title { font-family:'Fraunces',serif; font-size:1.1rem; font-weight:600; color:var(--text); }
+    .list-sub { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+    .btn-primary { background:var(--accent); color:white; border:none; padding:8px 18px; border-radius:8px; cursor:pointer; font-size:0.8rem; font-weight:600; font-family:'DM Sans',sans-serif; transition:background 0.15s; display:flex; align-items:center; gap:6px; }
+    .btn-primary:hover { background:#f08030; }
+    .btn-primary:disabled { background:var(--border2); color:var(--muted2); cursor:not-allowed; }
+    .btn-secondary { background:transparent; color:var(--muted); border:1px solid var(--border2); padding:7px 14px; border-radius:8px; cursor:pointer; font-size:0.78rem; font-weight:500; font-family:'DM Sans',sans-serif; transition:color 0.15s,border-color 0.15s; }
+    .btn-secondary:hover { color:var(--text); border-color:var(--muted); }
+
+    /* CONTACT ROW */
+    .contact-row { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; margin-bottom:8px; display:flex; align-items:flex-start; gap:14px; transition:border-color 0.15s; }
+    .contact-row:hover { border-color:var(--border2); }
+    .contact-row.queued { border-color:rgba(76,175,125,0.4); background:rgba(76,175,125,0.04); }
+    .contact-row.skipped { opacity:0.4; }
+    .contact-check { margin-top:2px; flex-shrink:0; }
+    .contact-check input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:var(--accent); }
+    .contact-main { flex:1; min-width:0; }
+    .contact-name { font-weight:600; font-size:0.9rem; color:var(--text); }
+    .contact-company { font-size:0.73rem; color:var(--muted); margin-top:1px; }
+    .contact-meta { display:flex; gap:14px; margin-top:6px; flex-wrap:wrap; }
+    .cmeta { font-size:0.72rem; color:var(--muted2); font-family:'DM Mono',monospace; }
+    .cmeta span { color:var(--muted); }
+    .contact-tags { display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+    .tag { font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tag.corporate { background:rgba(91,141,238,0.12); color:var(--blue); }
+    .tag.repeat { background:rgba(76,175,125,0.12); color:var(--green); }
+    .tag.high-value { background:rgba(245,166,35,0.12); color:var(--yellow); }
+    .tag.gone-quiet { background:rgba(224,82,82,0.12); color:var(--red); }
+    .tag.anniversary { background:rgba(155,126,219,0.12); color:var(--purple); }
+    .tag.no-booking { background:rgba(90,88,85,0.2); color:var(--muted); }
+    .contact-actions { display:flex; gap:6px; flex-shrink:0; align-items:flex-start; }
+    .btn-sm { padding:5px 11px; border-radius:6px; font-size:0.72rem; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+    .btn-sm.accent { background:var(--accent); color:white; }
+    .btn-sm.accent:hover { background:#f08030; }
+    .btn-sm.ghost { background:transparent; color:var(--muted); border:1px solid var(--border2); }
+    .btn-sm.ghost:hover { color:var(--text); border-color:var(--muted); }
+    .btn-sm.green { background:var(--green); color:white; }
+    .btn-sm.green:hover { background:#3d9d6a; }
+    .btn-sm:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* EMAIL QUEUE */
+    .queue-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; margin-bottom:12px; }
+    .queue-card.approved { border-color:rgba(76,175,125,0.4); }
+    .queue-card.skipped { opacity:0.4; }
+    .queue-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12px; gap:12px; }
+    .queue-name { font-weight:600; font-size:0.92rem; color:var(--text); }
+    .queue-meta { font-size:0.73rem; color:var(--muted); margin-top:2px; }
+    .queue-body { background:var(--surface2); border-radius:8px; padding:14px; font-size:0.8rem; line-height:1.7; color:var(--muted); border-left:3px solid var(--border2); margin-bottom:14px; white-space:pre-wrap; max-height:200px; overflow-y:auto; }
+    .queue-body.expanded { max-height:none; }
+    .queue-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .queue-status { font-size:0.72rem; font-family:'DM Mono',monospace; color:var(--muted2); margin-left:auto; }
+    .queue-status.approved { color:var(--green); }
+
+    /* EMPTY */
+    .empty { text-align:center; padding:60px 24px; color:var(--muted2); }
+    .empty-icon { font-size:2rem; margin-bottom:12px; opacity:0.4; }
+    .empty h3 { font-size:0.95rem; color:var(--muted); margin-bottom:6px; }
+    .empty p { font-size:0.78rem; }
+
+    /* MODAL */
+    #modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:100; justify-content:center; align-items:center; padding:20px; }
+    #modal-overlay.open { display:flex; }
+    #modal { background:var(--surface); border:1px solid var(--border2); border-radius:16px; width:100%; max-width:620px; max-height:85vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 60px rgba(0,0,0,0.5); }
+    .modal-header { padding:20px 24px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .modal-header h2 { font-family:'Fraunces',serif; font-size:1rem; font-weight:600; color:var(--text); }
+    .modal-close { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1.2rem; line-height:1; padding:4px; border-radius:4px; transition:color 0.15s; }
+    .modal-close:hover { color:var(--text); }
+    .modal-body { padding:16px 24px; flex:1; overflow-y:auto; }
+    #modal-email { width:100%; min-height:280px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); padding:14px; font-size:0.83rem; line-height:1.6; resize:vertical; font-family:'DM Sans',sans-serif; outline:none; transition:border-color 0.15s; }
+    #modal-email:focus { border-color:var(--accent); }
+    .modal-footer { padding:14px 24px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; }
+    .modal-footer button { padding:8px 18px; border-radius:8px; font-size:0.82rem; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; transition:background 0.15s; }
+    #btn-approve-modal { background:var(--green); color:white; }
+    #btn-copy-modal { background:var(--accent); color:white; }
+    #btn-copy-modal:hover { background:#f08030; }
+    #btn-close-modal { background:var(--surface2); color:var(--muted); border:1px solid var(--border2); }
+
+    /* SPINNER */
+    .spinner { display:inline-block; width:12px; height:12px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.6s linear infinite; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* TABS */
+    .inner-tabs { display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+    .inner-tab { padding:10px 16px; font-size:0.82rem; font-weight:500; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:color 0.15s,border-color 0.15s; background:none; border-top:none; border-left:none; border-right:none; font-family:'DM Sans',sans-serif; }
+    .inner-tab:hover { color:var(--text); }
+    .inner-tab.active { color:var(--text); border-bottom-color:var(--accent); }
+
+    /* SKELETONS */
+    .skeleton { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; animation:pulse 1.5s ease-in-out infinite; margin-bottom:8px; }
+    .skel-line { height:10px; background:var(--surface2); border-radius:4px; margin-bottom:8px; }
+    .skel-line.short { width:40%; }
+    .skel-line.medium { width:65%; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="/">🔥 Saddleback SRG</a>
+  <div class="nav-tabs">
+    <a href="/" class="nav-tab">Pipeline</a>
+    <a href="/analytics.html" class="nav-tab">Analytics</a>
+    <a href="/outreach.html" class="nav-tab active">Outreach</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-timestamp" id="last-updated"></span>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Outreach Engine</div>
+      <div class="page-sub" id="page-sub">Loading contacts from Tripleseat…</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-secondary" onclick="loadAllContacts()" id="btn-reload">↻ Reload contacts</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label" id="progress-label">Fetching page 1…</div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-pill active" onclick="setSegment('all')" id="pill-all">
+      <div class="stat-dot" style="background:var(--accent);box-shadow:0 0 6px var(--accent)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-all">—</div><div class="stat-label">All contacts</div></div>
+    </div>
+    <div class="stat-pill" onclick="setSegment('gone-quiet')" id="pill-gone-quiet">
+      <div class="stat-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-gone-quiet">—</div><div class="stat-label">Gone quiet</div></div>
+    </div>
+    <div class="stat-pill" onclick="setSegment('anniversary')" id="pill-anniversary">
+      <div class="stat-dot" style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-anniversary">—</div><div class="stat-label">Anniversary</div></div>
+    </div>
+    <div class="stat-pill" onclick="setSegment('corporate')" id="pill-corporate">
+      <div class="stat-dot" style="background:var(--blue);box-shadow:0 0 6px var(--blue)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-corporate">—</div><div class="stat-label">Corporate</div></div>
+    </div>
+    <div class="stat-pill" onclick="setSegment('no-booking')" id="pill-no-booking">
+      <div class="stat-dot" style="background:var(--muted2)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-no-booking">—</div><div class="stat-label">Never booked</div></div>
+    </div>
+    <div class="stat-pill" onclick="setSegment('queue')" id="pill-queue">
+      <div class="stat-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+      <div class="stat-info"><div class="stat-count" id="sc-queue">0</div><div class="stat-label">Email queue</div></div>
+    </div>
+  </div>
+
+  <!-- INNER TABS -->
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showTab('contacts')" id="tab-contacts">Contacts</button>
+    <button class="inner-tab" onclick="showTab('queue')" id="tab-queue">Email Queue <span id="queue-badge" style="background:rgba(76,175,125,0.15);color:var(--green);border-radius:20px;padding:1px 7px;font-size:0.68rem;font-family:'DM Mono',monospace;margin-left:4px">0</span></button>
+  </div>
+
+  <!-- CONTACTS TAB -->
+  <div id="pane-contacts">
+    <div class="list-header">
+      <div>
+        <div class="list-title" id="list-title">All Contacts</div>
+        <div class="list-sub" id="list-sub"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="search-contacts" placeholder="Search name, company, email…" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:0.8rem;font-family:'DM Sans',sans-serif;outline:none;width:220px;" oninput="renderContacts()">
+        <button class="btn-primary" id="btn-queue-selected" onclick="queueSelected()" disabled>
+          ✉ Queue selected for outreach
+        </button>
+        <button class="btn-secondary" onclick="selectAll()">Select all</button>
+      </div>
+    </div>
+    <div id="contact-list"></div>
+  </div>
+
+  <!-- QUEUE TAB -->
+  <div id="pane-queue" style="display:none;">
+    <div class="list-header">
+      <div>
+        <div class="list-title">Email Queue</div>
+        <div class="list-sub">Review and approve each email before it sends. Nothing goes out without your OK.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-secondary" onclick="clearQueue()">Clear queue</button>
+        <button class="btn-primary" id="btn-approve-all" onclick="approveAll()">✓ Approve all</button>
+      </div>
+    </div>
+    <div id="queue-list">
+      <div class="empty">
+        <div class="empty-icon">✉</div>
+        <h3>Queue is empty</h3>
+        <p>Select contacts from the Contacts tab and click "Queue selected for outreach"</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL MODAL -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div class="modal-header">
+      <h2 id="modal-title">Review Email</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="modal-email"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button id="btn-close-modal" onclick="closeModal()">Close</button>
+      <button id="btn-copy-modal" onclick="copyModal()">Copy to clipboard</button>
+      <button id="btn-approve-modal" onclick="approveFromModal()">✓ Approve</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '/.netlify/functions/tripleseat';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let allContacts = [];
+let segments = { 'all':[], 'gone-quiet':[], 'anniversary':[], 'corporate':[], 'no-booking':[] };
+let activeSegment = 'all';
+let emailQueue = []; // {id, contact, email, subject, body, status: 'pending'|'generating'|'ready'|'approved'|'skipped'}
+let activeTab = 'contacts';
+let modalContactId = null;
+
+// ── SEGMENTATION ──────────────────────────────────────────────────────────────
+function segmentContacts(contacts) {
+  const now = new Date();
+  const seg = { 'all': contacts, 'gone-quiet':[], 'anniversary':[], 'corporate':[], 'no-booking':[] };
+
+  contacts.forEach(c => {
+    const hasBooked = c.event_date || c.updated_at;
+    const daysSinceUpdate = c.updated_at ? Math.floor((now - new Date(c.updated_at)) / 86400000) : 999;
+    const isGoneQuiet = daysSinceUpdate >= 270 && daysSinceUpdate < 730; // 9-24 months quiet
+    const isCorporate = !!(c.company && c.company.trim());
+    const neverBooked = !c.event_date && c.turned_down_at == null;
+
+    // Anniversary: event was roughly this week, 1-3 years ago
+    let isAnniversary = false;
+    if (c.event_date) {
+      const eventDate = new Date(c.event_date);
+      if (!isNaN(eventDate)) {
+        const thisYear = new Date(eventDate);
+        thisYear.setFullYear(now.getFullYear());
+        const diff = Math.abs(now - thisYear);
+        const diffDays = diff / 86400000;
+        const yearsAgo = now.getFullYear() - eventDate.getFullYear();
+        if (diffDays <= 21 && yearsAgo >= 1 && yearsAgo <= 3) isAnniversary = true;
+      }
+    }
+
+    if (isGoneQuiet) seg['gone-quiet'].push(c);
+    if (isAnniversary) seg['anniversary'].push(c);
+    if (isCorporate) seg['corporate'].push(c);
+    if (neverBooked) seg['no-booking'].push(c);
+  });
+
+  return seg;
+}
+
+function tagsForContact(c) {
+  const tags = [];
+  if (c.company) tags.push('corporate');
+  const days = c.updated_at ? Math.floor((Date.now() - new Date(c.updated_at)) / 86400000) : 999;
+  if (days >= 270 && days < 730) tags.push('gone-quiet');
+  if (!c.event_date && !c.turned_down_at) tags.push('no-booking');
+  if (c.event_date) {
+    const ed = new Date(c.event_date);
+    if (!isNaN(ed)) {
+      const thisYear = new Date(ed); thisYear.setFullYear(new Date().getFullYear());
+      if (Math.abs(Date.now() - thisYear) / 86400000 <= 21 && new Date().getFullYear() > ed.getFullYear()) tags.push('anniversary');
+    }
+  }
+  return tags;
+}
+
+// ── LOAD ALL CONTACTS ─────────────────────────────────────────────────────────
+async function loadAllContacts() {
+  allContacts = [];
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('btn-reload').disabled = true;
+  document.getElementById('page-sub').textContent = 'Loading contacts from Tripleseat…';
+
+  const MAX_PAGES = 90; // 90 pages × 100 = up to 9,000 contacts
+  let page = 1;
+  let totalPages = 1;
+
+  try {
+    while (page <= Math.min(totalPages, MAX_PAGES)) {
+      document.getElementById('progress-label').textContent =
+        `Fetching page ${page} of ${Math.min(totalPages, MAX_PAGES)} — ${allContacts.length} contacts loaded…`;
+      const pct = totalPages > 1 ? Math.round((page / Math.min(totalPages, MAX_PAGES)) * 100) : 10;
+      document.getElementById('progress-fill').style.width = pct + '%';
+
+      const res = await fetch(`${API_BASE}?endpoint=leads&page=${page}&limit=100`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const raw = await res.json();
+      const results = raw.results || [];
+      totalPages = raw.total_pages || 1;
+
+      allContacts = allContacts.concat(results);
+      page++;
+
+      // Render incrementally every 5 pages
+      if (page % 5 === 0 || page > Math.min(totalPages, MAX_PAGES)) {
+        segments = segmentContacts(allContacts);
+        updateStats();
+        renderContacts();
+      }
+
+      // Small delay to avoid rate limiting
+      if (page <= Math.min(totalPages, MAX_PAGES)) await new Promise(r => setTimeout(r, 120));
+    }
+
+    segments = segmentContacts(allContacts);
+    updateStats();
+    renderContacts();
+
+    document.getElementById('progress-fill').style.width = '100%';
+    document.getElementById('progress-label').textContent = `✓ ${allContacts.length} contacts loaded from Tripleseat`;
+    document.getElementById('page-sub').textContent = `${allContacts.length.toLocaleString()} contacts loaded · ${segments['gone-quiet'].length} gone quiet · ${segments['anniversary'].length} anniversaries coming up · ${segments['corporate'].length} corporate accounts`;
+    document.getElementById('last-updated').textContent = `Updated ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+
+    setTimeout(() => { document.getElementById('progress-wrap').style.display = 'none'; }, 3000);
+  } catch (err) {
+    document.getElementById('progress-label').textContent = `Error: ${err.message}`;
+    document.getElementById('page-sub').textContent = `Error loading contacts — ${err.message}`;
+  }
+
+  document.getElementById('btn-reload').disabled = false;
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('sc-all').textContent = allContacts.length.toLocaleString();
+  document.getElementById('sc-gone-quiet').textContent = segments['gone-quiet'].length.toLocaleString();
+  document.getElementById('sc-anniversary').textContent = segments['anniversary'].length.toLocaleString();
+  document.getElementById('sc-corporate').textContent = segments['corporate'].length.toLocaleString();
+  document.getElementById('sc-no-booking').textContent = segments['no-booking'].length.toLocaleString();
+  document.getElementById('sc-queue').textContent = emailQueue.length;
+  document.getElementById('queue-badge').textContent = emailQueue.filter(q=>q.status==='ready'||q.status==='approved').length;
+}
+
+// ── SEGMENT ───────────────────────────────────────────────────────────────────
+function setSegment(seg) {
+  activeSegment = seg;
+  document.querySelectorAll('.stat-pill').forEach(p => p.classList.remove('active'));
+  document.getElementById('pill-' + (seg === 'queue' ? 'queue' : seg)).classList.add('active');
+  if (seg === 'queue') { showTab('queue'); return; }
+  showTab('contacts');
+  renderContacts();
+  const titles = {
+    'all': 'All Contacts',
+    'gone-quiet': 'Gone Quiet',
+    'anniversary': 'Event Anniversaries',
+    'corporate': 'Corporate Accounts',
+    'no-booking': 'Inquired — Never Booked',
+  };
+  const descs = {
+    'all': 'Every contact in your Tripleseat database',
+    'gone-quiet': 'Customers who haven\'t engaged in 9–24 months — prime re-engagement targets',
+    'anniversary': 'Their event anniversary is within 3 weeks — perfect timing to reach out',
+    'corporate': 'Company accounts — higher LTV, often repeat bookers',
+    'no-booking': 'Submitted a lead but never confirmed an event — worth one more outreach',
+  };
+  document.getElementById('list-title').textContent = titles[seg] || seg;
+  document.getElementById('list-sub').textContent = descs[seg] || '';
+}
+
+// ── RENDER CONTACTS ───────────────────────────────────────────────────────────
+function renderContacts() {
+  const list = document.getElementById('contact-list');
+  const search = document.getElementById('search-contacts').value.toLowerCase().trim();
+  let contacts = (activeSegment === 'all' ? allContacts : segments[activeSegment]) || [];
+
+  if (search) {
+    contacts = contacts.filter(c => {
+      const hay = [c.first_name, c.last_name, c.company, c.email_address, c.event_description].join(' ').toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  if (!contacts.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>No contacts in this segment</h3><p>Try a different filter or reload contacts.</p></div>`;
+    return;
+  }
+
+  const inQueue = new Set(emailQueue.map(q => String(q.id)));
+
+  list.innerHTML = contacts.slice(0, 200).map(c => {
+    const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Unknown';
+    const tags = tagsForContact(c);
+    const queued = inQueue.has(String(c.id));
+    const days = c.updated_at ? Math.floor((Date.now() - new Date(c.updated_at)) / 86400000) : null;
+    const eventDate = c.event_date ? new Date(c.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : null;
+
+    return `
+    <div class="contact-row${queued?' queued':''}" id="crow-${c.id}">
+      <div class="contact-check"><input type="checkbox" id="chk-${c.id}" ${queued?'checked disabled':''}></div>
+      <div class="contact-main">
+        <div class="contact-name">${escHtml(name)}</div>
+        ${c.company ? `<div class="contact-company">${escHtml(c.company)}</div>` : ''}
+        <div class="contact-meta">
+          ${c.email_address ? `<div class="cmeta"><span>Email</span> ${escHtml(c.email_address)}</div>` : ''}
+          ${eventDate ? `<div class="cmeta"><span>Last event</span> ${eventDate}</div>` : ''}
+          ${days !== null ? `<div class="cmeta"><span>Updated</span> ${days}d ago</div>` : ''}
+          ${c.guest_count ? `<div class="cmeta"><span>Guests</span> ${c.guest_count}</div>` : ''}
+        </div>
+        <div class="contact-tags">
+          ${tags.map(t => `<span class="tag ${t}">${t.replace('-',' ')}</span>`).join('')}
+        </div>
+        ${c.additional_information ? `<div style="font-size:0.72rem;color:var(--muted2);margin-top:6px;font-style:italic;">${escHtml(String(c.additional_information).slice(0,100))}${c.additional_information.length>100?'…':''}</div>` : ''}
+      </div>
+      <div class="contact-actions">
+        ${queued
+          ? `<span style="font-size:0.72rem;color:var(--green);font-family:'DM Mono',monospace;">✓ Queued</span>`
+          : `<button class="btn-sm accent" onclick="queueOne(${c.id})">+ Queue</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+
+  if (contacts.length > 200) {
+    list.innerHTML += `<div style="text-align:center;padding:20px;color:var(--muted2);font-size:0.78rem;font-family:'DM Mono',monospace;">Showing 200 of ${contacts.length.toLocaleString()} — use search to narrow results</div>`;
+  }
+}
+
+function selectAll() {
+  const contacts = (activeSegment === 'all' ? allContacts : segments[activeSegment]) || [];
+  contacts.forEach(c => {
+    const chk = document.getElementById('chk-' + c.id);
+    if (chk && !chk.disabled) chk.checked = true;
+  });
+  document.getElementById('btn-queue-selected').disabled = false;
+}
+
+// ── QUEUE ─────────────────────────────────────────────────────────────────────
+function queueOne(contactId) {
+  const c = allContacts.find(x => String(x.id) === String(contactId));
+  if (!c || emailQueue.find(q => String(q.id) === String(contactId))) return;
+  const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Contact';
+  emailQueue.push({ id: String(c.id), contact: c, name, email: c.email_address || '', subject: '', body: '', status: 'pending' });
+  updateStats();
+  renderContacts();
+  renderQueue();
+  document.getElementById('queue-badge').textContent = emailQueue.length;
+}
+
+function queueSelected() {
+  const contacts = (activeSegment === 'all' ? allContacts : segments[activeSegment]) || [];
+  const inQueue = new Set(emailQueue.map(q => String(q.id)));
+  let added = 0;
+  contacts.forEach(c => {
+    const chk = document.getElementById('chk-' + c.id);
+    if (chk && chk.checked && !inQueue.has(String(c.id))) {
+      const name = [c.first_name, c.last_name].filter(Boolean).join(' ') || 'Contact';
+      emailQueue.push({ id: String(c.id), contact: c, name, email: c.email_address || '', subject:'', body:'', status:'pending' });
+      added++;
+    }
+  });
+  updateStats();
+  renderContacts();
+  renderQueue();
+  if (added > 0) showTab('queue');
+}
+
+function clearQueue() {
+  if (!confirm('Clear all queued emails?')) return;
+  emailQueue = [];
+  updateStats();
+  renderQueue();
+}
+
+// ── GENERATE EMAILS ───────────────────────────────────────────────────────────
+async function generateEmailForItem(item) {
+  const c = item.contact;
+  const name = item.name;
+  const tags = tagsForContact(c);
+  const days = c.updated_at ? Math.floor((Date.now() - new Date(c.updated_at)) / 86400000) : null;
+  const monthsSince = days ? Math.round(days/30) : null;
+  const eventDate = c.event_date ? new Date(c.event_date).toLocaleDateString('en-US',{month:'long',year:'numeric'}) : null;
+
+  let context = '';
+  if (tags.includes('anniversary')) context = `Their event anniversary is coming up — they booked an event around this time of year before. Mention that.`;
+  else if (tags.includes('gone-quiet')) context = `They haven't been in touch for about ${monthsSince} months. Keep it light — don't make them feel guilty, just make it easy to re-engage.`;
+  else if (tags.includes('no-booking')) context = `They inquired but never confirmed a booking. Be warm, not pushy. Maybe something changed and the timing is right now.`;
+  else if (tags.includes('corporate')) context = `This is a corporate account. Focus on convenience, reliability, and the ability to feed large groups professionally.`;
+  else context = `This is a general outreach to a past contact.`;
+
+  const prompt = `You are Ryan, Catering Director at Saddleback Restaurant Group in Lansing, Michigan — award-winning BBQ catering for corporate events, weddings, graduations, holiday parties, and all kinds of celebrations.
+
+Write a SHORT, warm, personal outreach email to this contact. NOT a generic blast — make it feel like Ryan actually remembers them.
+
+Contact: ${name}
+${c.company ? `Company: ${c.company}` : ''}
+${c.email_address ? `Email: ${c.email_address}` : ''}
+${c.event_description ? `Past event: ${c.event_description}` : ''}
+${eventDate ? `Event date: ${eventDate}` : ''}
+${c.guest_count ? `Guest count: ${c.guest_count}` : ''}
+${c.location?.name ? `Location: ${c.location.name}` : ''}
+${c.additional_information ? `Notes: ${String(c.additional_information).slice(0,200)}` : ''}
+
+Context: ${context}
+
+Rules:
+- 3 short paragraphs max
+- Sound like a real person, not a marketing email
+- Reference something specific about their event or situation if possible
+- End with one clear, easy call to action (reply to this email, schedule a call, etc.)
+- No subject line in the body — just the email text
+- Sign off as Ryan, Saddleback Catering, (517) 214-9024
+
+Also provide a subject line on the FIRST line in this format:
+SUBJECT: [your subject line here]
+Then a blank line, then the email body.`;
+
+  try {
+    const res = await fetch(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b => b.text || '').join('') || '';
+    const lines = text.split('\n');
+    let subject = 'Following up from Saddleback Catering';
+    let body = text;
+    if (lines[0].startsWith('SUBJECT:')) {
+      subject = lines[0].replace('SUBJECT:', '').trim();
+      body = lines.slice(2).join('\n').trim();
+    }
+    item.subject = subject;
+    item.body = body;
+    item.status = 'ready';
+  } catch (err) {
+    item.body = `Error generating email: ${err.message}`;
+    item.status = 'error';
+  }
+}
+
+async function generateAllPending() {
+  const pending = emailQueue.filter(q => q.status === 'pending');
+  if (!pending.length) return;
+
+  const btn = document.getElementById('btn-generate-all');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Generating…'; }
+
+  for (let i = 0; i < pending.length; i++) {
+    pending[i].status = 'generating';
+    renderQueue();
+    await generateEmailForItem(pending[i]);
+    renderQueue();
+    if (i < pending.length - 1) await new Promise(r => setTimeout(r, 300));
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '✨ Generate all emails'; }
+  renderQueue();
+}
+
+// ── RENDER QUEUE ──────────────────────────────────────────────────────────────
+function renderQueue() {
+  const list = document.getElementById('queue-list');
+  if (!emailQueue.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">✉</div><h3>Queue is empty</h3><p>Select contacts from the Contacts tab and click "Queue selected for outreach"</p></div>`;
+    updateStats();
+    return;
+  }
+
+  const pending = emailQueue.filter(q => q.status === 'pending').length;
+  const ready   = emailQueue.filter(q => q.status === 'ready').length;
+  const approved = emailQueue.filter(q => q.status === 'approved').length;
+
+  let topBar = `<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:0.78rem;color:var(--muted);font-family:'DM Mono',monospace;">${emailQueue.length} in queue · ${ready} ready · ${approved} approved · ${pending} need generation</span>`;
+  if (pending > 0) {
+    topBar += `<button class="btn-primary" id="btn-generate-all" onclick="generateAllPending()">✨ Generate ${pending} email${pending>1?'s':''}</button>`;
+  }
+  topBar += `</div>`;
+
+  list.innerHTML = topBar + emailQueue.map(item => {
+    const statusBadge = {
+      pending: `<span style="font-size:0.68rem;color:var(--muted2);background:var(--surface2);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">Needs generation</span>`,
+      generating: `<span style="font-size:0.68rem;color:var(--yellow);background:rgba(245,166,35,0.1);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;"><span class="spinner" style="border-top-color:var(--yellow);border-color:rgba(245,166,35,0.3)"></span> Generating…</span>`,
+      ready: `<span style="font-size:0.68rem;color:var(--accent);background:rgba(232,119,42,0.1);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">Ready to review</span>`,
+      approved: `<span style="font-size:0.68rem;color:var(--green);background:rgba(76,175,125,0.1);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">✓ Approved</span>`,
+      skipped: `<span style="font-size:0.68rem;color:var(--muted2);background:var(--surface2);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">Skipped</span>`,
+      error: `<span style="font-size:0.68rem;color:var(--red);background:rgba(224,82,82,0.1);padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;">Error</span>`,
+    }[item.status] || '';
+
+    const c = item.contact;
+    const company = c.company ? `<span style="font-size:0.73rem;color:var(--muted)">${escHtml(c.company)}</span>` : '';
+
+    return `
+    <div class="queue-card ${item.status}" id="qcard-${item.id}">
+      <div class="queue-header">
+        <div>
+          <div class="queue-name">${escHtml(item.name)} ${company}</div>
+          <div class="queue-meta">${escHtml(item.email)}${item.subject ? ' · ' + escHtml(item.subject) : ''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">${statusBadge}</div>
+      </div>
+      ${item.body ? `<div class="queue-body" id="qbody-${item.id}">${escHtml(item.body)}</div>` : ''}
+      <div class="queue-actions">
+        ${item.status === 'pending' ? `<button class="btn-sm accent" onclick="generateOne('${item.id}')">✨ Generate</button>` : ''}
+        ${item.status === 'ready' || item.status === 'error' ? `
+          <button class="btn-sm accent" onclick="openQueueModal('${item.id}')">👁 Review & edit</button>
+          <button class="btn-sm green" onclick="approveItem('${item.id}')">✓ Approve</button>
+        ` : ''}
+        ${item.status === 'approved' ? `<button class="btn-sm ghost" onclick="openQueueModal('${item.id}')">👁 View</button>` : ''}
+        ${item.status !== 'skipped' ? `<button class="btn-sm ghost" onclick="skipItem('${item.id}')">Skip</button>` : ''}
+        <button class="btn-sm ghost" onclick="removeItem('${item.id}')" style="color:var(--red);border-color:rgba(224,82,82,0.3)">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  updateStats();
+}
+
+async function generateOne(itemId) {
+  const item = emailQueue.find(q => q.id === itemId);
+  if (!item) return;
+  item.status = 'generating';
+  renderQueue();
+  await generateEmailForItem(item);
+  renderQueue();
+}
+
+function approveItem(itemId) {
+  const item = emailQueue.find(q => q.id === itemId);
+  if (item) { item.status = 'approved'; renderQueue(); }
+}
+
+function skipItem(itemId) {
+  const item = emailQueue.find(q => q.id === itemId);
+  if (item) { item.status = 'skipped'; renderQueue(); }
+}
+
+function removeItem(itemId) {
+  emailQueue = emailQueue.filter(q => q.id !== itemId);
+  renderQueue();
+  renderContacts();
+}
+
+function approveAll() {
+  emailQueue.filter(q => q.status === 'ready').forEach(q => q.status = 'approved');
+  renderQueue();
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openQueueModal(itemId) {
+  const item = emailQueue.find(q => q.id === itemId);
+  if (!item) return;
+  modalContactId = itemId;
+  document.getElementById('modal-title').textContent = `Email to ${item.name}${item.subject ? ' · ' + item.subject : ''}`;
+  document.getElementById('modal-email').value = item.body || '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal() {
+  // Save any edits back to queue
+  if (modalContactId) {
+    const item = emailQueue.find(q => q.id === modalContactId);
+    if (item) item.body = document.getElementById('modal-email').value;
+  }
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalContactId = null;
+  renderQueue();
+}
+
+function approveFromModal() {
+  if (modalContactId) {
+    const item = emailQueue.find(q => q.id === modalContactId);
+    if (item) { item.body = document.getElementById('modal-email').value; item.status = 'approved'; }
+  }
+  closeModal();
+}
+
+function copyModal() {
+  const txt = document.getElementById('modal-email').value;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('btn-copy-modal');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy to clipboard'; }, 2000);
+  });
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(tab) {
+  activeTab = tab;
+  document.getElementById('pane-contacts').style.display = tab === 'contacts' ? 'block' : 'none';
+  document.getElementById('pane-queue').style.display    = tab === 'queue'    ? 'block' : 'none';
+  document.getElementById('tab-contacts').classList.toggle('active', tab === 'contacts');
+  document.getElementById('tab-queue').classList.toggle('active', tab === 'queue');
+  if (tab === 'queue') renderQueue();
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadAllContacts();
+</script>
+</body>
+</html>
