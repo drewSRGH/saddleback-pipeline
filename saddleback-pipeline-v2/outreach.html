@@ -378,69 +378,86 @@ function buildBatch(n=50) {
 // ── LOAD FROM SUPABASE ────────────────────────────────────────────────────────
 async function loadFromDB() {
   setStatus('Loading contacts from database…', 'ld');
-  try {
-    const metaRes = await fetch(`${API_ST}?action=get-metadata`);
-    const meta = await metaRes.json().catch(()=>({}));
+  let debugInfo = { step: 'start', metaResponse: null, contactsResponse: null };
 
+  try {
+    // Step 1: Check metadata — are there saved contacts?
+    debugInfo.step = 'get-metadata';
+    const metaRes = await fetch(`${API_ST}?action=get-metadata`);
+    const meta = await metaRes.json().catch(e => ({ configured: false, parseError: e.message }));
+    debugInfo.metaResponse = meta;
+
+    // Not configured — show setup instructions
     if(meta.configured === false || meta.ok === false) {
       dbConfigured = false;
-      renderSetupBanner();
+      renderSetupBanner(meta.error || 'Supabase not configured');
       setStatus('','');
       return;
     }
     dbConfigured = true;
 
+    // Check if data actually exists
+    const totalOutreach = parseInt(meta.total_outreach || '0');
     const lastSync = meta.last_full_sync;
-    if(!lastSync || meta.total_outreach === '0' || !meta.total_outreach) {
-      setStatus('No contacts in database yet. Click "↻ Full Sync" to import from Tripleseat.', 'wa');
+    debugInfo.totalOutreach = totalOutreach;
+    debugInfo.lastSync = lastSync;
+
+    if(!lastSync || totalOutreach === 0) {
+      setStatus('No saved contacts found. Click "↻ Full Sync" to import from Tripleseat for the first time.', 'wa');
       renderTab(activeTab);
       return;
     }
 
-    setProgress(10, `Loading ${parseInt(meta.total_outreach||0).toLocaleString()} contacts…`);
+    // Step 2: Load contacts from outreach_contacts table
+    debugInfo.step = 'get-contacts';
+    setProgress(20, `Loading ${totalOutreach.toLocaleString()} contacts from Supabase…`);
+    const cRes = await fetch(`${API_ST}?action=get-contacts&limit=10000`);
+    const cData = await cRes.json().catch(e => ({ contacts: [], loadError: e.message }));
+    debugInfo.contactsResponse = { count: cData.contacts?.length, loadedFrom: cData.loadedFrom, error: cData.loadError };
 
-    // Load contacts
-    const cRes = await fetch(`${API_ST}?action=get-contacts&limit=5000`);
-    const cData = await cRes.json().catch(()=>({contacts:[]}));
     if(!cData.contacts?.length) {
-      setStatus('No contacts found. Click "↻ Full Sync".', 'wa');
-      renderTab(activeTab); return;
+      // Data was supposed to be there (metadata said so) but isn't — this means
+      // save-outreach-contacts failed previously. Prompt re-sync with clear explanation.
+      setStatus(`⚠ Metadata says ${totalOutreach.toLocaleString()} contacts exist but outreach_contacts table returned 0 rows. The previous sync may have failed. Click "↻ Full Sync" to rebuild.`, 'er');
+      renderTab(activeTab);
+      return;
     }
 
-    setProgress(80, 'Processing…');
+    setProgress(80, 'Processing contacts…');
     contacts = cData.contacts.map(enrichContact);
     companies = buildCompanies(contacts);
 
-    // Load queue
-    const qRes = await fetch(`${API_ST}?action=get-queue`);
-    const qData = await qRes.json().catch(()=>({queue:[]}));
+    // Step 3: Load queue and suppressed list in parallel
+    debugInfo.step = 'get-queue-and-suppressed';
+    const [qData, sData] = await Promise.all([
+      fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]})),
+      fetch(`${API_ST}?action=get-suppressed`).then(r=>r.json()).catch(()=>({list:[]})),
+    ]);
     queue = qData.queue || [];
-
-    // Load suppressed
-    const sRes = await fetch(`${API_ST}?action=get-suppressed`);
-    const sData = await sRes.json().catch(()=>({list:[]}));
     suppressed = new Set((sData.list||[]).map(e=>e.toLowerCase()));
 
-    setProgress(100, '✓ Loaded');
+    setProgress(100, `✓ ${contacts.length.toLocaleString()} contacts loaded`);
     hideProgress();
 
     const syncDate = lastSync ? new Date(lastSync) : null;
-    document.getElementById('last-sync-label').textContent = syncDate ? 'Last sync ' + syncDate.toLocaleDateString() : '';
-    setStatus(`✓ ${contacts.length.toLocaleString()} contacts loaded · synced ${syncDate ? syncDate.toLocaleDateString() : 'never'}`, 'ok');
+    document.getElementById('last-sync-label').textContent = syncDate ? 'Synced ' + syncDate.toLocaleDateString() : '';
+    setStatus(`✓ ${contacts.length.toLocaleString()} contacts loaded from Supabase · last synced ${syncDate ? syncDate.toLocaleDateString() : 'never'}`, 'ok');
     setTimeout(()=>setStatus('',''), 5000);
 
     updateBadges(); renderTab(activeTab);
 
-    // Warn if stale
+    // Stale data warning (only warn, don't block)
     if(syncDate && (Date.now()-syncDate.getTime()) > 3*86400000) {
-      setStatus(`Data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Click "↻ Full Sync" for latest Tripleseat data.`, 'wa');
+      setTimeout(()=>setStatus(`Contact data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider clicking "↻ Full Sync" for latest Tripleseat data.`, 'wa'), 5500);
     }
 
   } catch(err) {
-    console.error('Load error:', err);
-    setStatus('Error loading contacts: ' + err.message, 'er');
+    console.error('[loadFromDB] Error at step', debugInfo.step, ':', err);
+    setStatus(`Error loading from Supabase (step: ${debugInfo.step}): ${err.message}`, 'er');
     renderTab(activeTab);
   }
+  // Store debug info globally for the debug tab
+  window._lastLoadDebug = debugInfo;
 }
 
 // ── FULL SYNC FROM TRIPLESEAT ─────────────────────────────────────────────────
@@ -475,27 +492,49 @@ async function doFullSync() {
     await sbPost('save-contacts', {contacts: allContacts});
 
     // Step 5: Build outreach_contacts (deduped, enriched)
-    setProgress(82, 'Deduplicating and building outreach profiles…');
+    setProgress(82, 'Building deduplicated outreach profiles…');
     const outreach = buildOutreachContacts(allLeads, allBookings, allAccounts, allContacts);
-    setProgress(90, `${outreach.length.toLocaleString()} unique contacts — saving to outreach table…`);
-    await sbPost('save-outreach-contacts', {contacts: outreach});
+    setProgress(88, `${outreach.length.toLocaleString()} unique contacts — saving to Supabase…`);
 
-    // Step 6: Load into memory
+    // Save outreach contacts — this is the critical step that enables page-load persistence
+    // Save in batches to avoid payload limits and get clear error feedback
+    let savedCount = 0;
+    const batchSize = 300;
+    for(let i=0; i < outreach.length; i += batchSize) {
+      const batch = outreach.slice(i, i+batchSize);
+      const pct = 88 + Math.round((i/outreach.length)*10);
+      setProgress(pct, `Saving contacts ${i+1}–${Math.min(i+batchSize, outreach.length)} of ${outreach.length.toLocaleString()}…`);
+      const result = await sbPost('save-outreach-contacts', {contacts: batch});
+      if(result && result.ok === false) {
+        throw new Error(`save-outreach-contacts failed on batch ${i/batchSize + 1}: ${result.error}`);
+      }
+      savedCount += batch.length;
+    }
+
+    // Verify the save by reading metadata back
+    setProgress(98, 'Verifying save…');
+    const verifyMeta = await fetch(`${API_ST}?action=get-metadata`).then(r=>r.json()).catch(()=>({}));
+    const savedTotal = parseInt(verifyMeta.total_outreach||'0');
+    if(savedTotal === 0) {
+      throw new Error(`Save verification failed: metadata shows 0 contacts after saving ${savedCount}. Check Supabase logs.`);
+    }
+
+    // Step 6: Load into memory from the saved data
     contacts = outreach.map(enrichContact);
     companies = buildCompanies(contacts);
     updateBadges(); renderTab(activeTab);
-
-    setProgress(100, `✓ Sync complete — ${contacts.length.toLocaleString()} unique contacts`);
-    hideProgress();
-    document.getElementById('last-sync-label').textContent = 'Synced ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    setStatus(`✓ Full sync complete: ${allLeads.length.toLocaleString()} leads, ${allBookings.length.toLocaleString()} bookings, ${contacts.length.toLocaleString()} unique contacts`, 'ok');
-    setTimeout(()=>setStatus('',''), 6000);
     dbConfigured = true;
 
+    setProgress(100, `✓ Sync complete — ${contacts.length.toLocaleString()} unique contacts saved to Supabase`);
+    hideProgress();
+    document.getElementById('last-sync-label').textContent = 'Synced ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setStatus(`✓ Full sync complete and saved to Supabase: ${allLeads.length.toLocaleString()} leads, ${allBookings.length.toLocaleString()} bookings, ${contacts.length.toLocaleString()} unique contacts. Page will now load from database.`, 'ok');
+    setTimeout(()=>setStatus('',''), 8000);
+
   } catch(err) {
-    console.error('Sync error:', err);
+    console.error('[doFullSync] Error:', err);
     setProgress(100, 'Sync error: ' + err.message);
-    setStatus('Sync error: ' + err.message, 'er');
+    setStatus(`Sync error: ${err.message}`, 'er');
   }
   if(btn){btn.disabled=false; btn.textContent='↻ Full Sync';}
 }
@@ -956,21 +995,33 @@ function renderDebug() {
 }
 async function loadDebug() {
   const el=document.getElementById('dbg-content');if(!el)return;
+  el.textContent='Loading debug info from Supabase…';
   try{
-    const res=await fetch(`${API_ST}?action=debug`);
-    const data=await res.json();
+    const [debugRes] = await Promise.all([
+      fetch(`${API_ST}?action=debug`).then(r=>r.json()).catch(e=>({error:e.message})),
+    ]);
     el.textContent=JSON.stringify({
-      ...data,
-      frontendState:{
-        contactsLoaded:contacts.length,
-        companiesBuilt:Object.keys(companies).length,
-        queueLength:queue.length,
-        suppressedCount:suppressed.size,
+      supabase: debugRes,
+      frontend: {
+        contactsInMemory: contacts.length,
+        companiesBuilt: Object.keys(companies).length,
+        queueLength: queue.length,
+        suppressedCount: suppressed.size,
         dbConfigured,
         activeTab,
+        lastPageLoadDebug: window._lastLoadDebug || 'no load debug info yet',
+      },
+      persistence: {
+        storageProvider: dbConfigured ? 'Supabase' : 'none (not configured)',
+        totalOutreach: debugRes?.syncMetadata?.total_outreach || '0',
+        lastFullSync: debugRes?.syncMetadata?.last_full_sync || 'never',
+        readyToLoad: debugRes?.readyToLoad,
+        note: contacts.length > 0
+          ? `Loaded ${contacts.length} contacts from ${dbConfigured ? 'Supabase' : 'session memory only'}`
+          : 'No contacts in memory — page load found no data',
       }
     },null,2);
-  }catch(err){el.textContent='Error: '+err.message;}
+  }catch(err){el.textContent='Debug error: '+err.message;}
 }
 function confirmClear(){
   if(!confirm('Clear ALL stored data in Supabase? Cannot be undone.'))return;
@@ -981,21 +1032,24 @@ function confirmClear(){
 }
 
 // ── SETUP BANNER ──────────────────────────────────────────────────────────────
-function renderSetupBanner() {
+function renderSetupBanner(errorMsg) {
   document.getElementById('pane-today').innerHTML = `<div class="setup-banner">
-    <h3>⚙ Database not configured</h3>
-    <p style="font-size:.82rem;color:var(--m);margin-bottom:12px">To persist contacts across browsers and devices, add these environment variables in Netlify:</p>
+    <h3>⚙ Supabase not configured${errorMsg ? ': '+errorMsg : ''}</h3>
+    <p style="font-size:.82rem;color:var(--m);margin-bottom:12px">To persist contacts across browsers and devices, add these in Netlify:</p>
     <ol>
       <li>Go to <strong>supabase.com</strong> → New project → name it <code>saddleback-crm</code></li>
       <li>Wait ~2 min → go to <strong>Settings → API</strong></li>
-      <li>Copy <strong>Project URL</strong> → add as <code>SUPABASE_URL</code> in Netlify env vars</li>
-      <li>Copy <strong>service_role key</strong> (not anon) → add as <code>SUPABASE_KEY</code></li>
-      <li>In Supabase → <strong>SQL Editor</strong> → run the schema SQL file from the project repo</li>
+      <li>Copy <strong>Project URL</strong> → add to Netlify as <code>SUPABASE_URL</code></li>
+      <li>Copy <strong>service_role key</strong> (not anon key) → add to Netlify as <code>SUPABASE_KEY</code></li>
+      <li>In Supabase → <strong>SQL Editor</strong> → run the <code>supabase_schema.sql</code> file</li>
       <li>In Netlify → <strong>Deploys → Trigger deploy</strong></li>
       <li>Come back here and click <strong>↻ Full Sync</strong></li>
     </ol>
-    <div style="margin-top:14px;display:flex;gap:8px">
-      <button class="btn ba" onclick="doFullSync()">↻ Full Sync (session only — no DB)</button>
+    <div style="background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.2);border-radius:6px;padding:9px 12px;margin:12px 0;font-size:.76rem;color:var(--r)">
+      If you already set SUPABASE_URL and SUPABASE_KEY: make sure you triggered a redeploy in Netlify after adding the vars, and check the Debug tab to confirm both are present.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn ba" onclick="doFullSync()">↻ Full Sync (session only, no DB)</button>
       <button class="btn bgh" onclick="showTab('debug')">Debug / status →</button>
     </div>
   </div>`;
