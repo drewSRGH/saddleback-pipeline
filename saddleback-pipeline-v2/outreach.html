@@ -7,760 +7,909 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#0f0f0e;--surface:#181817;--surface2:#1f1f1d;
-      --border:#2a2a27;--border2:#333330;
-      --text:#f0ede8;--muted:#8a8780;--muted2:#5a5855;
-      --accent:#e8772a;--accent2:#f5a623;
-      --green:#4caf7d;--red:#e05252;--yellow:#f5a623;
-      --blue:#5b8dee;--purple:#9b7edb;--teal:#3dbdb0;
-    }
+    :root{--bg:#0f0f0e;--s:#181817;--s2:#1f1f1d;--b:#2a2a27;--b2:#333330;--t:#f0ede8;--m:#8a8780;--m2:#5a5855;--a:#e8772a;--a2:#f5a623;--g:#4caf7d;--r:#e05252;--y:#f5a623;--bl:#5b8dee;--pu:#9b7edb;--te:#3dbdb0;}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
-    nav{display:flex;align-items:center;padding:0 28px;background:var(--surface);border-bottom:1px solid var(--border);height:52px;position:sticky;top:0;z-index:50}
-    .nav-brand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--accent2);margin-right:32px;text-decoration:none}
-    .nav-tabs{display:flex}
-    .nav-tab{padding:0 16px;height:52px;display:flex;align-items:center;font-size:.82rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;text-decoration:none}
-    .nav-tab:hover{color:var(--text)}
-    .nav-tab.active{color:var(--text);border-bottom-color:var(--accent)}
-    .nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-    .page{padding:20px 28px;max-width:1400px;margin:0 auto}
-    .main-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px}
-    .main-tab{padding:11px 20px;font-size:.85rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;transition:color .15s,border-color .15s}
-    .main-tab:hover{color:var(--text)}
-    .main-tab.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
-    .badge{display:inline-block;background:rgba(232,119,42,.15);color:var(--accent);border-radius:20px;padding:1px 7px;font-size:.68rem;font-family:'DM Mono',monospace;margin-left:5px}
-    .badge.green{background:rgba(76,175,125,.15);color:var(--green)}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px}
-    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-    .stat-num{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;color:var(--text);line-height:1}
-    .stat-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0}
-    .stat-lbl{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:4px;display:flex;align-items:center}
-    .progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:20px}
-    .progress-label{font-size:.78rem;color:var(--muted);margin-bottom:8px;font-family:'DM Mono',monospace}
-    .progress-bg{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden}
-    .progress-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
-    .status-msg{font-size:.8rem;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-family:'DM Mono',monospace}
-    .status-msg.loading{background:rgba(91,141,238,.1);color:var(--blue);border:1px solid rgba(91,141,238,.2)}
-    .status-msg.success{background:rgba(76,175,125,.1);color:var(--green);border:1px solid rgba(76,175,125,.2)}
-    .status-msg.error{background:rgba(224,82,82,.1);color:var(--red);border:1px solid rgba(224,82,82,.2)}
-    .status-msg.warning{background:rgba(245,166,35,.1);color:var(--yellow);border:1px solid rgba(245,166,35,.2)}
-    .btn{border:none;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
-    .btn-accent{background:var(--accent);color:#fff;padding:7px 16px;font-size:.82rem}
-    .btn-accent:hover{background:#f08030}
-    .btn-accent:disabled{background:var(--border2);color:var(--muted2);cursor:not-allowed}
-    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2);padding:6px 12px;font-size:.78rem}
-    .btn-ghost:hover{color:var(--text);border-color:var(--muted)}
-    .btn-green{background:var(--green);color:#fff;padding:7px 14px;font-size:.8rem}
-    .btn-green:hover{background:#3d9d6a}
-    .btn-red{background:transparent;color:var(--red);border:1px solid rgba(224,82,82,.3);padding:5px 10px;font-size:.75rem}
-    .btn-sm{padding:5px 10px;font-size:.73rem}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color .15s}
-    .card:hover{border-color:var(--border2)}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;font-size:14px;line-height:1.5}
+    nav{display:flex;align-items:center;padding:0 24px;background:var(--s);border-bottom:1px solid var(--b);height:52px;position:sticky;top:0;z-index:50}
+    .nb{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--a2);margin-right:28px;text-decoration:none}
+    .nt{display:flex}
+    .ntb{padding:0 14px;height:52px;display:flex;align-items:center;font-size:.82rem;font-weight:500;color:var(--m);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;text-decoration:none}
+    .ntb:hover{color:var(--t)}
+    .ntb.active{color:var(--t);border-bottom-color:var(--a)}
+    .nr{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .page{padding:18px 24px;max-width:1400px;margin:0 auto}
+    /* TABS */
+    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--b);margin-bottom:22px;overflow-x:auto}
+    .tab{padding:10px 16px;font-size:.82rem;font-weight:500;color:var(--m);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:color .15s,border-color .15s}
+    .tab:hover{color:var(--t)}
+    .tab.active{color:var(--t);border-bottom-color:var(--a);font-weight:600}
+    .bge{display:inline-block;background:rgba(232,119,42,.15);color:var(--a);border-radius:20px;padding:1px 6px;font-size:.66rem;font-family:'DM Mono',monospace;margin-left:4px}
+    .bge.g{background:rgba(76,175,125,.15);color:var(--g)}
+    .bge.r{background:rgba(224,82,82,.15);color:var(--r)}
+    /* GRID */
+    .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin-bottom:20px}
+    .sc{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:13px 15px}
+    .sn{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;color:var(--t);line-height:1}
+    .sl{font-size:.66rem;color:var(--m);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:4px}
+    /* PROGRESS */
+    .pw{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:13px 16px;margin-bottom:18px}
+    .pl{font-size:.76rem;color:var(--m);margin-bottom:7px;font-family:'DM Mono',monospace}
+    .pb{background:var(--s2);border-radius:4px;height:5px;overflow:hidden}
+    .pf{height:100%;background:var(--a);border-radius:4px;transition:width .3s}
+    /* STATUS */
+    .sm{font-size:.78rem;padding:9px 13px;border-radius:7px;margin-bottom:14px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:8px}
+    .sm.ld{background:rgba(91,141,238,.1);color:var(--bl);border:1px solid rgba(91,141,238,.2)}
+    .sm.ok{background:rgba(76,175,125,.1);color:var(--g);border:1px solid rgba(76,175,125,.2)}
+    .sm.er{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
+    .sm.wa{background:rgba(245,166,35,.1);color:var(--y);border:1px solid rgba(245,166,35,.2)}
+    /* BUTTONS */
+    .btn{border:none;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+    .ba{background:var(--a);color:#fff;padding:7px 14px;font-size:.8rem}
+    .ba:hover{background:#f08030}
+    .ba:disabled{background:var(--b2);color:var(--m2);cursor:not-allowed}
+    .bg_{background:transparent;color:var(--m);border:1px solid var(--b2);padding:6px 11px;font-size:.76rem}
+    .bg_:hover{color:var(--t);border-color:var(--m)}
+    .bge_{background:var(--g);color:#fff;padding:6px 13px;font-size:.78rem}
+    .bge_:hover{background:#3d9d6a}
+    .br_{background:transparent;color:var(--r);border:1px solid rgba(224,82,82,.3);padding:5px 9px;font-size:.73rem}
+    .bs{padding:5px 9px;font-size:.72rem}
+    /* CARDS */
+    .card{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:15px;margin-bottom:9px;transition:border-color .15s}
+    .card:hover{border-color:var(--b2)}
     .card.approved{border-color:rgba(76,175,125,.4)}
-    .card.skipped{opacity:.45}
-    .card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
-    .card-name{font-weight:600;font-size:.92rem;color:var(--text)}
-    .card-sub{font-size:.73rem;color:var(--muted);margin-top:2px}
-    .card-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace;margin-bottom:8px}
-    .card-meta span{color:var(--muted)}
-    .card-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-    .tag{font-size:.62rem;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
-    .tag-corp{background:rgba(91,141,238,.12);color:var(--blue)}
-    .tag-quiet{background:rgba(224,82,82,.12);color:var(--red)}
-    .tag-ann{background:rgba(155,126,219,.12);color:var(--purple)}
-    .tag-nb{background:rgba(90,88,85,.2);color:var(--muted)}
-    .tag-hv{background:rgba(245,166,35,.12);color:var(--yellow)}
-    .tag-msu{background:rgba(61,189,176,.12);color:var(--teal)}
-    .tag-campaign{background:rgba(232,119,42,.12);color:var(--accent);font-size:.65rem}
-    .card-body{background:var(--surface2);border-radius:8px;padding:12px 14px;font-size:.8rem;line-height:1.7;color:var(--muted);white-space:pre-wrap;max-height:160px;overflow-y:auto;border-left:3px solid var(--border2);margin-bottom:12px}
-    .card-footer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border)}
-    .status-pill{font-size:.68rem;padding:2px 9px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
-    .company-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;cursor:pointer;transition:border-color .15s}
-    .company-card:hover{border-color:var(--border2)}
-    .company-card.expanded{border-color:var(--accent)}
-    .company-contacts{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-    .company-card.expanded .company-contacts{display:block}
-    .contact-mini{background:var(--surface2);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .campaign-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px}
-    .empty{text-align:center;padding:60px 24px;color:var(--muted2)}
-    .empty-icon{font-size:2rem;margin-bottom:12px;opacity:.4}
-    .empty h3{font-size:.95rem;color:var(--muted);margin-bottom:6px}
-    .spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+    .card.skipped{opacity:.4}
+    .card.active-lead{border-left:3px solid var(--g)}
+    .card.past-customer{border-left:3px solid var(--a)}
+    .card.never-booked{border-left:3px solid var(--m2)}
+    .card.lost{border-left:3px solid var(--r);opacity:.6}
+    .ch{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}
+    .cn{font-weight:600;font-size:.9rem;color:var(--t)}
+    .cs{font-size:.72rem;color:var(--m);margin-top:2px}
+    .cm{display:flex;gap:12px;flex-wrap:wrap;font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:7px}
+    .cm span{color:var(--m)}
+    .ct{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
+    .tag{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+    .tc{background:rgba(91,141,238,.12);color:var(--bl)}
+    .tq{background:rgba(224,82,82,.12);color:var(--r)}
+    .ta{background:rgba(155,126,219,.12);color:var(--pu)}
+    .tn{background:rgba(90,88,85,.2);color:var(--m)}
+    .th{background:rgba(245,166,35,.12);color:var(--y)}
+    .tm{background:rgba(61,189,176,.12);color:var(--te)}
+    .tp{background:rgba(232,119,42,.12);color:var(--a)}
+    .tal{background:rgba(76,175,125,.12);color:var(--g)}
+    .tlost{background:rgba(224,82,82,.08);color:var(--r)}
+    .cb{background:var(--s2);border-radius:7px;padding:11px 13px;font-size:.78rem;line-height:1.7;color:var(--m);white-space:pre-wrap;max-height:150px;overflow-y:auto;border-left:3px solid var(--b2);margin-bottom:11px}
+    .cf{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--b)}
+    .sp{font-size:.66rem;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
+    /* RISK FLAGS */
+    .risk-flag{background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.25);border-radius:6px;padding:7px 11px;font-size:.73rem;color:var(--r);margin-bottom:6px}
+    /* COMPANY */
+    .cc{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:15px;margin-bottom:9px;cursor:pointer;transition:border-color .15s}
+    .cc:hover{border-color:var(--b2)}
+    .cc.exp{border-color:var(--a)}
+    .cc-contacts{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--b)}
+    .cc.exp .cc-contacts{display:block}
+    .cm2{background:var(--s2);border-radius:7px;padding:9px 11px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    /* EMPTY */
+    .emp{text-align:center;padding:50px 20px;color:var(--m2)}
+    .emp-i{font-size:1.8rem;margin-bottom:10px;opacity:.4}
+    .emp h3{font-size:.92rem;color:var(--m);margin-bottom:5px}
+    .sp2{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
     @keyframes spin{to{transform:rotate(360deg)}}
-    input[type=text]{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
-    input[type=text]:focus{border-color:var(--accent)}
-    input::placeholder{color:var(--muted2)}
-    #modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
-    #modal-overlay.open{display:flex}
-    #modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:660px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.5)}
-    .modal-hdr{padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-    .modal-hdr h2{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--text)}
-    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;line-height:1}
-    .modal-close:hover{color:var(--text)}
-    .modal-subj{padding:10px 24px;border-bottom:1px solid var(--border)}
-    .modal-subj-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted2);margin-bottom:4px;font-weight:700}
-    #modal-subject{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:8px 12px;font-size:.85rem;font-family:'DM Sans',sans-serif;outline:none}
-    #modal-subject:focus{border-color:var(--accent)}
-    .modal-body{padding:14px 24px;flex:1;overflow-y:auto}
-    #modal-email{width:100%;min-height:260px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:14px;font-size:.83rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
-    #modal-email:focus{border-color:var(--accent)}
-    .modal-ftr{padding:12px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
-    .modal-ftr button{padding:8px 18px;border-radius:8px;font-size:.82rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
-    #btn-approve-modal{background:var(--green);color:#fff}
-    #btn-copy-modal{background:var(--accent);color:#fff}
-    #btn-copy-modal:hover{background:#f08030}
-    #btn-close-modal{background:var(--surface2);color:var(--muted);border:1px solid var(--border2)}
+    input[type=text]{background:var(--s);border:1px solid var(--b);color:var(--t);padding:7px 11px;border-radius:7px;font-size:.79rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+    input[type=text]:focus{border-color:var(--a)}
+    input::placeholder{color:var(--m2)}
+    select{background:var(--s);border:1px solid var(--b);color:var(--t);padding:7px 11px;border-radius:7px;font-size:.79rem;font-family:'DM Sans',sans-serif;outline:none}
+    /* DEBUG */
+    .debug-box{background:var(--s);border:1px solid var(--b2);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:.73rem;color:var(--m);white-space:pre-wrap;line-height:1.6}
+    /* MODAL */
+    #mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
+    #mo.open{display:flex}
+    #md{background:var(--s);border:1px solid var(--b2);border-radius:15px;width:100%;max-width:660px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+    .mh{padding:16px 22px 13px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+    .mh h2{font-family:'Fraunces',serif;font-size:.98rem;font-weight:600;color:var(--t)}
+    .mc_{background:none;border:none;color:var(--m);cursor:pointer;font-size:1.1rem;line-height:1}
+    .ms{padding:9px 22px;border-bottom:1px solid var(--b)}
+    .ms-l{font-size:.63rem;text-transform:uppercase;letter-spacing:.08em;color:var(--m2);margin-bottom:3px;font-weight:700}
+    #msub{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--t);padding:7px 11px;font-size:.83rem;font-family:'DM Sans',sans-serif;outline:none}
+    #msub:focus{border-color:var(--a)}
+    .mb{padding:13px 22px;flex:1;overflow-y:auto}
+    #memail{width:100%;min-height:240px;background:var(--s2);border:1px solid var(--b);border-radius:7px;color:var(--t);padding:13px;font-size:.81rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none}
+    #memail:focus{border-color:var(--a)}
+    .mf{padding:11px 22px;border-top:1px solid var(--b);display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+    .mf button{padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+    #bam{background:var(--g);color:#fff}
+    #bcm{background:var(--a);color:#fff}
+    #bcm:hover{background:#f08030}
+    #bclm{background:var(--s2);color:var(--m);border:1px solid var(--b2)}
   </style>
 </head>
 <body>
-
 <nav>
-  <a class="nav-brand" href="/">🔥 Saddleback SRG</a>
-  <div class="nav-tabs">
-    <a href="/" class="nav-tab">Pipeline</a>
-    <a href="/analytics.html" class="nav-tab">Analytics</a>
-    <a href="/outreach.html" class="nav-tab active">Outreach</a>
+  <a class="nb" href="/">🔥 Saddleback SRG</a>
+  <div class="nt">
+    <a href="/" class="ntb">Pipeline</a>
+    <a href="/analytics.html" class="ntb">Analytics</a>
+    <a href="/outreach.html" class="ntb active">Outreach</a>
   </div>
-  <div class="nav-right">
-    <span style="font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace" id="last-updated"></span>
-    <button class="btn btn-ghost btn-sm" onclick="syncFromTripleseat()" id="btn-sync">↻ Sync Tripleseat</button>
+  <div class="nr">
+    <span style="font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace" id="last-updated"></span>
+    <button class="btn bg_ bs" onclick="syncFromTripleseat()" id="btn-sync">↻ Sync</button>
   </div>
 </nav>
 
 <div class="page">
-
-  <!-- STATUS MESSAGE -->
   <div id="status-msg" style="display:none"></div>
+  <div id="progress-wrap" style="display:none" class="pw"><div class="pl" id="pl">Loading…</div><div class="pb"><div class="pf" id="pf" style="width:0%"></div></div></div>
 
-  <!-- PROGRESS -->
-  <div id="progress-wrap" style="display:none" class="progress-wrap">
-    <div class="progress-label" id="progress-label">Loading…</div>
-    <div class="progress-bg"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-  </div>
-
-  <!-- MAIN TABS -->
-  <div class="main-tabs">
-    <button class="main-tab active" onclick="showTab('today')" id="tab-today">Today's Outreach</button>
-    <button class="main-tab" onclick="showTab('campaigns')" id="tab-campaigns">Campaigns</button>
-    <button class="main-tab" onclick="showTab('companies')" id="tab-companies">Companies <span class="badge" id="badge-companies">—</span></button>
-    <button class="main-tab" onclick="showTab('contacts')" id="tab-contacts">All Contacts <span class="badge" id="badge-contacts">—</span></button>
-    <button class="main-tab" onclick="showTab('queue')" id="tab-queue">Email Queue <span class="badge green" id="badge-queue">0</span></button>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('today')" id="tab-today">Today</button>
+    <button class="tab" onclick="showTab('campaigns')" id="tab-campaigns">Campaigns</button>
+    <button class="tab" onclick="showTab('open')" id="tab-open">Open Accounts <span class="bge g" id="bg-open">—</span></button>
+    <button class="tab" onclick="showTab('past')" id="tab-past">Past / Reactivation <span class="bge" id="bg-past">—</span></button>
+    <button class="tab" onclick="showTab('companies')" id="tab-companies">Companies <span class="bge" id="bg-companies">—</span></button>
+    <button class="tab" onclick="showTab('contacts')" id="tab-contacts">All Contacts <span class="bge" id="bg-contacts">—</span></button>
+    <button class="tab" onclick="showTab('queue')" id="tab-queue">Email Queue <span class="bge g" id="bg-queue">0</span></button>
+    <button class="tab" onclick="showTab('suppressed')" id="tab-suppressed">Do Not Contact</button>
+    <button class="tab" onclick="showTab('debug')" id="tab-debug">Debug / Sync</button>
   </div>
 
   <div id="pane-today"></div>
   <div id="pane-campaigns" style="display:none"></div>
+  <div id="pane-open" style="display:none"></div>
+  <div id="pane-past" style="display:none"></div>
   <div id="pane-companies" style="display:none"></div>
   <div id="pane-contacts" style="display:none"></div>
   <div id="pane-queue" style="display:none"></div>
-
+  <div id="pane-suppressed" style="display:none"></div>
+  <div id="pane-debug" style="display:none"></div>
 </div>
 
-<!-- MODAL -->
-<div id="modal-overlay">
-  <div id="modal">
-    <div class="modal-hdr">
-      <h2 id="modal-title">Review Email</h2>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+<div id="mo">
+  <div id="md">
+    <div class="mh"><h2 id="mt">Review Email</h2><button class="mc_" onclick="closeModal()">✕</button></div>
+    <div class="ms"><div class="ms-l">Subject</div><input type="text" id="msub" placeholder="Subject…"></div>
+    <div class="mb">
+      <div id="risk-flags-display" style="margin-bottom:10px"></div>
+      <textarea id="memail"></textarea>
     </div>
-    <div class="modal-subj">
-      <div class="modal-subj-lbl">Subject line</div>
-      <input type="text" id="modal-subject" placeholder="Email subject…">
-    </div>
-    <div class="modal-body"><textarea id="modal-email"></textarea></div>
-    <div class="modal-ftr">
-      <button id="btn-close-modal" onclick="closeModal()">Close</button>
-      <button id="btn-copy-modal" onclick="copyModal()">Copy to clipboard</button>
-      <button id="btn-approve-modal" onclick="approveFromModal()">✓ Approve</button>
+    <div class="mf">
+      <button id="bclm" onclick="closeModal()">Close</button>
+      <button id="bcm" onclick="copyModal()">Copy</button>
+      <button id="bam" onclick="approveFromModal()">✓ Approve</button>
     </div>
   </div>
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
-const API_TS    = '/.netlify/functions/tripleseat';
-const API_AI    = '/.netlify/functions/ai';
-const API_STORE = '/.netlify/functions/store';
+const API_TS = '/.netlify/functions/tripleseat';
+const API_AI = '/.netlify/functions/ai';
+const API_ST = '/.netlify/functions/store';
 
-// ── STATE (in-memory only — never written to localStorage) ────────────────────
-let contacts    = [];   // full contact list, in memory during session
-let companies   = {};   // grouped by domain/company name
-let queue       = [];   // email queue
-let contacted   = {};   // contactId → timestamp of last contact
-let activeTab   = 'today';
-let modalQueueId = null;
-let storeAvailable = true; // set false if Netlify Blobs unavailable
+// ── PERSONAL DOMAINS — never become companies ──────────────────────────────
+const PD = new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','msn.com','me.com','mac.com','comcast.net','att.net','verizon.net','sbcglobal.net','charter.net','cox.net','earthlink.net','protonmail.com','tutanota.com','ymail.com','googlemail.com','rocketmail.com','bellsouth.net','optonline.net','roadrunner.com','windstream.net','frontier.com','juno.com']);
 
-const PERSONAL_DOMAINS = new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','msn.com','me.com','mac.com','comcast.net','att.net','verizon.net','sbcglobal.net']);
+const DM = {'msu.edu':'Michigan State University','michigan.gov':'State of Michigan','lsd.k12.mi.us':'Lansing School District','okemos.k12.mi.us':'Okemos Public Schools','ingham.org':'Ingham County','lansingmi.gov':'City of Lansing','deltadental.com':'Delta Dental','bcbsm.com':'Blue Cross Blue Shield','sparrow.org':'Sparrow Health System','mclaren.org':'McLaren Health','cooleylaw.edu':'Cooley Law School','occ.edu':'Oakland Community College','lcc.edu':'Lansing Community College'};
 
-// ── CLEANUP: remove old oversized localStorage keys ───────────────────────────
-(function cleanupOldStorage() {
-  try {
-    ['srg-contacts','srg-lastsync','srg-queue','srg-contacted'].forEach(k => {
-      try { localStorage.removeItem(k); } catch(e) {}
-    });
-  } catch(e) {}
-})();
+// ── STATE ──────────────────────────────────────────────────────────────────
+let contacts=[], companies={}, queue=[], contacted={}, suppressed=new Set();
+let activeTab='today', modalQueueId=null, storeOk=false, storeError='';
 
-// ── STATUS HELPERS ────────────────────────────────────────────────────────────
-function setStatus(msg, type='loading') {
-  const el = document.getElementById('status-msg');
-  if(!msg) { el.style.display='none'; return; }
-  el.className = 'status-msg '+type;
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-function setProgress(pct, label) {
-  document.getElementById('progress-wrap').style.display = 'block';
-  document.getElementById('progress-fill').style.width = pct+'%';
-  document.getElementById('progress-label').textContent = label;
-}
-function hideProgress() { setTimeout(()=>document.getElementById('progress-wrap').style.display='none', 2000); }
+// ── CLEANUP old localStorage keys ─────────────────────────────────────────
+(function(){ try{['srg-contacts','srg-lastsync','srg-queue','srg-contacted','srg-suppressed'].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){} })();
 
-// ── COMPANY & TAGGING ─────────────────────────────────────────────────────────
-function extractDomain(email) {
-  if(!email) return null;
-  const m = email.toLowerCase().match(/@([^@]+)$/);
-  if(!m) return null;
-  return PERSONAL_DOMAINS.has(m[1]) ? null : m[1];
-}
+// ── STATUS ─────────────────────────────────────────────────────────────────
+function setStatus(msg,type='ld'){const el=document.getElementById('status-msg');if(!msg){el.style.display='none';return;}el.className='sm '+type;el.innerHTML=msg;el.style.display='flex';}
+function setProgress(pct,label){document.getElementById('progress-wrap').style.display='block';document.getElementById('pf').style.width=pct+'%';document.getElementById('pl').textContent=label;}
+function hideProgress(){setTimeout(()=>{document.getElementById('progress-wrap').style.display='none';},2500);}
 
-const DOMAIN_MAP = {
-  'msu.edu':'Michigan State University','michigan.gov':'State of Michigan',
-  'lsd.k12.mi.us':'Lansing School District','okemos.k12.mi.us':'Okemos Public Schools',
-  'ingham.org':'Ingham County','lansingmi.gov':'City of Lansing',
-  'deltadental.com':'Delta Dental','bcbsm.com':'Blue Cross Blue Shield',
-  'sparrow.org':'Sparrow Health System','mclaren.org':'McLaren Health',
-};
+// ── DOMAIN & COMPANY ───────────────────────────────────────────────────────
+function getDomain(email){if(!email)return null;const m=email.toLowerCase().match(/@([^@]+)$/);return(m&&!PD.has(m[1]))?m[1]:null;}
+function domainName(d){if(!d)return null;if(DM[d])return DM[d];const b=d.replace(/\.(com|org|edu|gov|net|mil|k12\.mi\.us|mi\.us)$/,'').split('.').pop();return b.charAt(0).toUpperCase()+b.slice(1);}
 
-function domainToName(domain) {
-  if(!domain) return null;
-  if(DOMAIN_MAP[domain]) return DOMAIN_MAP[domain];
-  const base = domain.replace(/\.(com|org|edu|gov|net|mil|k12\.mi\.us|mi\.us)$/,'').split('.').pop();
-  return base.charAt(0).toUpperCase()+base.slice(1);
+// ── DEDUPLICATION ──────────────────────────────────────────────────────────
+// Tripleseat returns one record per INQUIRY, not per person.
+// Deduplicate by email (primary), then by name if no email.
+// Keep the most recent record as the "primary" but collect all event history.
+function deduplicateContacts(raw){
+  const byEmail={}, byName={};
+  raw.forEach(c=>{
+    const email=(c.email_address||'').toLowerCase().trim();
+    const name=[c.first_name,c.last_name].filter(Boolean).join(' ').toLowerCase().trim();
+    const key=email||name;
+    if(!key) return;
+    if(!byEmail[key]){
+      byEmail[key]={...c, _eventHistory:[]};
+    }
+    // Add this inquiry as an event history entry
+    if(c.event_date||c.event_description){
+      byEmail[key]._eventHistory.push({
+        date:c.event_date, description:c.event_description, guests:c.guest_count,
+        style:c.event_style, location:c.location?.name, notes:c.additional_information,
+        created:c.created_at, status:c.turned_down_at?'turned_down':'submitted'
+      });
+    }
+    // Keep most recent record's fields as primary (updated_at or created_at)
+    const existingDate=new Date(byEmail[key].created_at||0);
+    const thisDate=new Date(c.created_at||0);
+    if(thisDate>existingDate){
+      // Update primary fields but keep accumulated history
+      const hist=byEmail[key]._eventHistory;
+      byEmail[key]={...c, _eventHistory:hist};
+    }
+  });
+  return Object.values(byEmail);
 }
 
-function tagContact(c) {
+// ── ACCOUNT STATUS ─────────────────────────────────────────────────────────
+function getAccountStatus(c){
+  const now=Date.now();
+  const eventTs=c.event_date?new Date(c.event_date).getTime():null;
+  const createdTs=c.created_at?new Date(c.created_at).getTime():null;
+  const updatedTs=c.updated_at?new Date(c.updated_at).getTime():null;
+  const daysSinceCreated=createdTs?Math.floor((now-createdTs)/86400000):null;
+  const daysSinceUpdated=updatedTs?Math.floor((now-updatedTs)/86400000):null;
+  if(c.turned_down_at) return 'lost';
+  // Future event = active
+  if(eventTs&&eventTs>now) return 'active-upcoming';
+  // Recently submitted (within 14 days) = active inquiry
+  if(daysSinceCreated!==null&&daysSinceCreated<=14) return 'active-inquiry';
+  // Recently updated (within 7 days) = someone touched it recently
+  if(daysSinceUpdated!==null&&daysSinceUpdated<=7) return 'active-inquiry';
+  // Past event date = past customer
+  if(eventTs&&eventTs<now) return 'past-customer';
+  // Old inquiry, no event date = inquired never booked
+  if(daysSinceCreated!==null&&daysSinceCreated>14) return 'inquired-never-booked';
+  return 'unknown';
+}
+
+const STATUS_LABELS={'active-upcoming':'Upcoming Event','active-inquiry':'Active Inquiry','past-customer':'Past Customer','inquired-never-booked':'Never Booked','lost':'Lost/Turned Down','unknown':'Unknown'};
+const STATUS_COLORS={'active-upcoming':'var(--g)','active-inquiry':'var(--bl)','past-customer':'var(--a)','inquired-never-booked':'var(--m)','lost':'var(--r)','unknown':'var(--m2)'};
+
+// ── TAGGING ────────────────────────────────────────────────────────────────
+function tagContact(c){
   const tags=[], now=Date.now();
-  const eventTs   = c.event_date  ? new Date(c.event_date).getTime()  : null;
-  const createdTs = c.created_at  ? new Date(c.created_at).getTime()  : null;
-  const refTs = eventTs || createdTs;
-  c._daysSinceEvent = refTs ? Math.floor((now-refTs)/86400000) : null;
-  c._eventTs = eventTs; c._createdTs = createdTs;
-  const domain = extractDomain(c.email_address);
-  c.company_domain = domain;
-  if(!c.company && domain) c._derived_company = domainToName(domain);
-  const days = c._daysSinceEvent;
-  if(days!==null){ if(days>=180) tags.push('gone-quiet-6mo'); if(days>=365) tags.push('gone-quiet-12mo'); if(days>=548) tags.push('gone-quiet-18mo'); }
+  const eventTs=c.event_date?new Date(c.event_date).getTime():null;
+  const createdTs=c.created_at?new Date(c.created_at).getTime():null;
+  const refTs=eventTs||createdTs;
+  c._daysSince=refTs?Math.floor((now-refTs)/86400000):null;
+  c._eventTs=eventTs; c._createdTs=createdTs;
+  c._status=getAccountStatus(c);
+  const domain=getDomain(c.email_address);
+  c._domain=domain;
+  if(!c.company&&domain) c._co=domainName(domain);
+  const days=c._daysSince;
+  if(days!==null){if(days>=180)tags.push('gone-quiet-6mo');if(days>=365)tags.push('gone-quiet-12mo');}
   if((c.company&&c.company.trim())||domain) tags.push('corporate');
-  if(domain==='msu.edu'||(c.company||'').toLowerCase().includes('michigan state')||(c.company||'').toLowerCase().includes(' msu')) tags.push('msu');
-  if(c.turned_down_at||(!c.event_date&&days>30)) tags.push('no-booking');
+  if(domain==='msu.edu'||(c.company||'').toLowerCase().includes('michigan state')||(c.company||'').toLowerCase().match(/\bmsu\b/)) tags.push('msu');
+  if(c._status==='inquired-never-booked'||c._status==='lost') tags.push('no-booking');
   if((c.guest_count||0)>=75) tags.push('high-value');
-  const dateForAnn = eventTs||createdTs;
-  if(dateForAnn){
-    const ref=new Date(dateForAnn), yearsAgo=new Date().getFullYear()-ref.getFullYear();
-    if(yearsAgo>=1){
+  // Anniversary: event_date anniversary within next 90 days
+  const annTs=eventTs||createdTs;
+  if(annTs){
+    const ref=new Date(annTs), yr=new Date().getFullYear()-ref.getFullYear();
+    if(yr>=1){
       const ann=new Date(ref); ann.setFullYear(new Date().getFullYear());
-      if(!isNaN(ann.getTime())){const dUntil=Math.floor((ann.getTime()-now)/86400000); if(dUntil>=-7&&dUntil<=90){tags.push('anniversary');c._annDaysUntil=dUntil;}}
+      if(!isNaN(ann.getTime())){
+        const dU=Math.floor((ann.getTime()-now)/86400000);
+        if(dU>=-7&&dU<=90){tags.push('anniversary');c._annDays=dU;c._annWindow=dU<=30?'30d':dU<=60?'60d':'90d';}
+      }
     }
   }
   const desc=(c.event_description||c.additional_information||'').toLowerCase();
-  if(/graduat|commencement/.test(desc)) tags.push('graduation');
-  if(/holiday|christmas|xmas|thanksgiving|new year/.test(desc)) tags.push('holiday');
+  if(/graduat|commencement|class of/.test(desc)) tags.push('graduation');
+  if(/holiday|christmas|xmas|thanksgiving|new year|year.end/.test(desc)) tags.push('holiday');
   if(/wedding|reception|bride|groom/.test(desc)) tags.push('wedding');
-  if(/corporate|office|meeting|lunch|company|employee|staff|team/.test(desc)) tags.push('office-lunch');
-  c._tags=tags; return c;
+  if(/corporate|office|meeting|lunch|company|employee|staff|team|department/.test(desc)) tags.push('office-lunch');
+  if(/football|spartan|game day|tailgate|watch party/.test(desc)) tags.push('msu-football');
+  c._tags=tags;
+  return c;
 }
 
-function buildCompanies(list) {
+// ── SEASONAL CAMPAIGNS ─────────────────────────────────────────────────────
+function getActiveCampaigns(){
+  const now=new Date(), mo=now.getMonth(); // 0=Jan
+  const active=[];
+  if(mo>=3&&mo<=5) active.push('graduation'); // Apr-Jun
+  if(mo>=6&&mo<=10) active.push('msu-football'); // Jul-Nov
+  if(mo>=7&&mo<=9) active.push('back-to-school'); // Aug-Oct
+  if(mo>=8&&mo<=11) active.push('holiday'); // Sep-Dec
+  if(mo>=5&&mo<=7) active.push('summer'); // Jun-Aug
+  return active;
+}
+
+const CAMPAIGNS=[
+  {id:'anniversary',label:'🎉 Anniversary (90d)',color:'var(--pu)',desc:'Event anniversary within 90 days.',filter:c=>c._tags.includes('anniversary'),priority:10,safeForReactivation:true},
+  {id:'msu',label:'🟢 MSU Accounts',color:'var(--te)',desc:'Michigan State contacts.',filter:c=>c._tags.includes('msu'),priority:9,safeForReactivation:true},
+  {id:'gone-quiet',label:'😶 Gone Quiet 6mo+',color:'var(--r)',desc:'No activity in 6+ months.',filter:c=>c._tags.includes('gone-quiet-6mo')&&c._status==='past-customer',priority:8,safeForReactivation:true},
+  {id:'high-value',label:'⭐ High Value',color:'var(--y)',desc:'75+ guest events.',filter:c=>c._tags.includes('high-value')&&c._status==='past-customer',priority:7,safeForReactivation:true},
+  {id:'corporate',label:'🏢 Corporate',color:'var(--bl)',desc:'Business/org contacts.',filter:c=>c._tags.includes('corporate')&&!c._tags.includes('msu')&&c._status==='past-customer',priority:6,safeForReactivation:true},
+  {id:'graduation',label:'🎓 Graduation Season',color:'var(--a2)',desc:'Past grad events.',filter:c=>c._tags.includes('graduation')&&c._status==='past-customer',priority:5,safeForReactivation:true},
+  {id:'holiday',label:'🎄 Holiday',color:'var(--g)',desc:'Past holiday parties.',filter:c=>c._tags.includes('holiday')&&c._status==='past-customer',priority:4,safeForReactivation:true},
+  {id:'no-booking',label:'📋 Never Booked',color:'var(--m)',desc:'Inquired but never confirmed.',filter:c=>c._tags.includes('no-booking')&&c.email_address,priority:3,safeForReactivation:true},
+];
+
+// ── BUILD COMPANIES ────────────────────────────────────────────────────────
+function buildCompanies(list){
   const map={};
   list.forEach(c=>{
-    const name=c.company||c._derived_company, domain=c.company_domain;
-    const key=name?name.toLowerCase().trim():(domain||null);
-    if(!key||!c.email_address) return;
-    if(!map[key]) map[key]={name:name||domainToName(domain)||key,domain,contacts:[],totalEvents:0,totalGuests:0};
+    const name=c.company||c._co;
+    const domain=c._domain;
+    if((!name&&!domain)||!c.email_address) return;
+    const key=(name||'').toLowerCase().trim()||(domain||'');
+    if(!key) return;
+    if(!map[key]) map[key]={name:name||domainName(domain)||key,domain,contacts:[],events:0,guests:0};
     map[key].contacts.push(c);
-    if(c.event_date) map[key].totalEvents++;
-    if(c.guest_count) map[key].totalGuests+=(c.guest_count||0);
+    if(c.event_date) map[key].events++;
+    if(c.guest_count) map[key].guests+=(parseInt(c.guest_count)||0);
   });
   return Object.fromEntries(Object.entries(map).sort((a,b)=>b[1].contacts.length-a[1].contacts.length));
 }
 
-// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
-const CAMPAIGNS=[
-  {id:'anniversary', label:'🎉 Event Anniversary',    color:'var(--purple)', desc:'Event anniversary within 90 days.', filter:c=>c._tags.includes('anniversary'), priority:10},
-  {id:'msu',         label:'🟢 MSU Accounts',         color:'var(--teal)',   desc:'Michigan State University contacts.', filter:c=>c._tags.includes('msu'), priority:9},
-  {id:'gone-quiet',  label:'😶 Gone Quiet 6mo+',      color:'var(--red)',    desc:'No activity in 6+ months.', filter:c=>c._tags.includes('gone-quiet-6mo'), priority:8},
-  {id:'high-value',  label:'⭐ High Value (75+ guests)',color:'var(--yellow)', desc:'Large past events.', filter:c=>c._tags.includes('high-value'), priority:7},
-  {id:'corporate',   label:'🏢 Corporate Accounts',   color:'var(--blue)',   desc:'Company and org contacts.', filter:c=>c._tags.includes('corporate')&&!c._tags.includes('msu'), priority:6},
-  {id:'graduation',  label:'🎓 Graduation Season',    color:'var(--accent2)',desc:'Past graduation events.', filter:c=>c._tags.includes('graduation'), priority:5},
-  {id:'holiday',     label:'🎄 Holiday Events',       color:'var(--green)',  desc:'Past holiday parties.', filter:c=>c._tags.includes('holiday'), priority:4},
-  {id:'no-booking',  label:'📋 Never Booked',         color:'var(--muted)',  desc:'Inquired but never confirmed.', filter:c=>c._tags.includes('no-booking')&&c.email_address, priority:3},
-];
-
-// ── DAILY BATCH ───────────────────────────────────────────────────────────────
-function buildDailyBatch(count=50) {
-  const now=Date.now(), inQueue=new Set(queue.map(q=>String(q.id)));
+// ── DAILY BATCH ────────────────────────────────────────────────────────────
+function buildBatch(n=50){
+  const now=Date.now(), inQ=new Set(queue.map(q=>String(q.id)));
   const scored=[];
   contacts.forEach(c=>{
     if(!c.email_address||!c.email_address.includes('@')) return;
-    if(inQueue.has(String(c.id))) return;
-    const last=contacted[String(c.id)];
-    if(last&&(now-last)<30*86400000) return; // 30-day rule
-    let score=0, campaign=null;
-    CAMPAIGNS.forEach(cam=>{if(cam.filter(c)){score+=cam.priority;if(!campaign||cam.priority>(CAMPAIGNS.find(x=>x.id===campaign)?.priority||0))campaign=cam.id;}});
+    if(inQ.has(String(c.id))) return;
+    if(suppressed.has((c.email_address||'').toLowerCase())) return;
+    // IMPORTANT: never queue active/open accounts for reactivation
+    if(c._status==='active-upcoming'||c._status==='active-inquiry') return;
+    if(contacted[String(c.id)]&&(now-contacted[String(c.id)])<30*86400000) return;
+    let score=0,campaign=null;
+    CAMPAIGNS.forEach(cam=>{if(cam.safeForReactivation&&cam.filter(c)){score+=cam.priority;if(!campaign||cam.priority>(CAMPAIGNS.find(x=>x.id===campaign)?.priority||0))campaign=cam.id;}});
     if(score>0) scored.push({contact:c,score,campaign});
   });
   scored.sort((a,b)=>b.score-a.score);
-  return scored.slice(0,count);
+  return scored.slice(0,n);
 }
 
-// ── BACKEND STORAGE ───────────────────────────────────────────────────────────
-async function loadFromStore() {
-  setStatus('Loading saved contacts from server…', 'loading');
-  try {
-    // Load metadata first (fast)
-    const metaRes = await fetch(`${API_STORE}?action=get-metadata`);
-    const meta = await metaRes.json();
-
-    if(meta.error) { storeAvailable=false; setStatus('Backend storage unavailable — please sync from Tripleseat to load contacts.','warning'); renderTab(activeTab); return; }
-    if(!meta.totalContacts || meta.totalContacts===0) { setStatus('No saved contacts found — click "Sync Tripleseat" to import your contacts.','warning'); renderTab(activeTab); return; }
-
-    setStatus(`Loading ${meta.totalContacts.toLocaleString()} contacts from server (${meta.totalChunks} chunks)…`, 'loading');
-    setProgress(10, `Loading ${meta.totalContacts.toLocaleString()} contacts…`);
-
-    // Load contacts
-    const contactsRes = await fetch(`${API_STORE}?action=get-contacts`);
-    const contactsData = await contactsRes.json();
-
-    if(contactsData.error||!contactsData.contacts?.length) {
-      setStatus('Could not load contacts from server: '+(contactsData.error||'empty response'), 'error');
+// ── STORE LOAD / SAVE ──────────────────────────────────────────────────────
+async function loadFromStore(){
+  setStatus('Loading contacts from server…','ld');
+  try{
+    const metaRes=await fetch(`${API_ST}?action=get-metadata`);
+    const meta=await metaRes.json().catch(()=>({}));
+    if(meta.blobsAvailable===false||meta.error){
+      storeOk=false; storeError=meta.error||'Netlify Blobs unavailable';
+      setStatus(`⚠ Backend storage unavailable: ${storeError} — click Sync to load contacts for this session.`,'wa');
       renderTab(activeTab); return;
     }
-
-    setProgress(80, 'Processing contacts…');
-    contacts = contactsData.contacts.map(tagContact);
-    companies = buildCompanies(contacts);
-
-    // Load queue
-    const queueRes = await fetch(`${API_STORE}?action=get-queue`);
-    const queueData = await queueRes.json();
-    queue = queueData.queue || [];
-
-    // Load contacted history (lightweight — just IDs and timestamps)
-    const contactedRes = await fetch(`${API_STORE}?action=get-contacted`);
-    contacted = await contactedRes.json().catch(()=>({}));
-
-    setProgress(100, `✓ ${contacts.length.toLocaleString()} contacts loaded`);
-    hideProgress();
-
-    const syncDate = meta.lastSync ? new Date(meta.lastSync) : null;
-    document.getElementById('last-updated').textContent = syncDate ? 'Synced '+syncDate.toLocaleDateString() : '';
-    setStatus(`✓ ${contacts.length.toLocaleString()} contacts loaded · last synced ${syncDate?syncDate.toLocaleDateString():'unknown'}`, 'success');
-    setTimeout(()=>setStatus('',''), 4000);
-
-    updateBadges();
-    renderTab(activeTab);
-
-    // Auto-sync if stale (3+ days)
-    if(syncDate && (Date.now()-syncDate.getTime())>3*86400000) {
-      setStatus(`Contact data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old — syncing in background…`, 'warning');
-      syncFromTripleseat(true);
+    storeOk=true;
+    if(!meta.totalContacts||meta.totalContacts===0){
+      setStatus('No saved contacts. Click "↻ Sync" to import from Tripleseat.','wa');
+      renderTab(activeTab); return;
     }
-
-  } catch(err) {
-    console.error('Load error:', err);
-    setStatus('Error loading contacts: '+err.message+' — try syncing from Tripleseat.', 'error');
+    setProgress(10,`Loading ${meta.totalContacts.toLocaleString()} contacts from server…`);
+    const res=await fetch(`${API_ST}?action=get-contacts`);
+    const data=await res.json().catch(()=>({contacts:[]}));
+    if(!data.contacts?.length){setStatus('Server returned empty contacts. Try syncing.','wa');renderTab(activeTab);return;}
+    setProgress(80,'Processing…');
+    contacts=deduplicateContacts(data.contacts).map(tagContact);
+    companies=buildCompanies(contacts);
+    const qRes=await fetch(`${API_ST}?action=get-queue`);
+    const qData=await qRes.json().catch(()=>({queue:[]}));
+    queue=qData.queue||[];
+    const coRes=await fetch(`${API_ST}?action=get-contacted`);
+    contacted=await coRes.json().catch(()=>({}));
+    const suRes=await fetch(`${API_ST}?action=get-suppressed`);
+    const suData=await suRes.json().catch(()=>({list:[]}));
+    suppressed=new Set((suData.list||[]).map(e=>e.toLowerCase()));
+    setProgress(100,'✓ Contacts loaded');
+    hideProgress();
+    const d=meta.lastSync?new Date(meta.lastSync):null;
+    document.getElementById('last-updated').textContent=d?'Synced '+d.toLocaleDateString():'';
+    setStatus(`✓ ${contacts.length.toLocaleString()} contacts loaded (deduped from ${data.contacts.length.toLocaleString()} raw records) · last synced ${d?d.toLocaleDateString():'never'}`,'ok');
+    setTimeout(()=>setStatus('',''),5000);
+    updateBadges(); renderTab(activeTab);
+    if(d&&(Date.now()-d.getTime())>3*86400000){setStatus(`Data is ${Math.floor((Date.now()-d.getTime())/86400000)} days old — consider syncing`,'wa');}
+  }catch(err){
+    setStatus('Error loading contacts: '+err.message,'er');
+    console.error('Load error:',err);
     renderTab(activeTab);
   }
 }
 
-async function saveContactsToStore(rawContacts) {
-  if(!storeAvailable) return;
-  try {
-    setProgress(90, `Saving ${rawContacts.length.toLocaleString()} contacts to server…`);
-    const res = await fetch(`${API_STORE}?action=save-contacts`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({contacts: rawContacts})
-    });
-    const data = await res.json();
-    if(!res.ok||data.error) { console.warn('Store save error:', data.error); storeAvailable=false; }
-    else setProgress(100, `✓ ${data.saved?.toLocaleString()||rawContacts.length} contacts saved to server`);
-  } catch(e) { console.warn('Could not save to store:', e.message); storeAvailable=false; }
+async function saveContacts(raw){
+  if(!storeOk) return;
+  try{
+    setProgress(92,`Saving ${raw.length.toLocaleString()} contacts to server…`);
+    const res=await fetch(`${API_ST}?action=save-contacts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contacts:raw})});
+    const d=await res.json().catch(()=>({}));
+    if(d.ok) setProgress(100,'✓ Saved to server');
+    else {storeOk=false; storeError=d.error||'save failed'; console.warn('Save failed:',d);}
+  }catch(e){storeOk=false;storeError=e.message;console.warn('Save error:',e);}
 }
+async function saveQueue(){if(!storeOk)return;try{await fetch(`${API_ST}?action=save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue})});}catch(e){}}
+async function saveContacted(){if(!storeOk)return;try{await fetch(`${API_ST}?action=save-contacted`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(contacted)});}catch(e){}}
+async function saveSuppressed(){if(!storeOk)return;try{await fetch(`${API_ST}?action=save-suppressed`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({list:[...suppressed]})});}catch(e){}}
 
-async function saveQueueToStore() {
-  if(!storeAvailable) return;
-  try {
-    await fetch(`${API_STORE}?action=save-queue`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue})});
-  } catch(e) { console.warn('Queue save error:', e.message); }
-}
-
-async function saveContactedToStore() {
-  if(!storeAvailable) return;
-  try {
-    await fetch(`${API_STORE}?action=save-contacted`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(contacted)});
-  } catch(e) { console.warn('Contacted save error:', e.message); }
-}
-
-// ── TRIPLESEAT SYNC ───────────────────────────────────────────────────────────
-async function syncFromTripleseat(background=false) {
+// ── TRIPLESEAT SYNC ────────────────────────────────────────────────────────
+async function syncFromTripleseat(bg=false){
   const btn=document.getElementById('btn-sync');
   if(btn){btn.disabled=true;btn.textContent='Syncing…';}
-  if(!background) { document.getElementById('progress-wrap').style.display='block'; setProgress(0,'Connecting to Tripleseat…'); }
-
-  const all=[]; let page=1, totalPages=1;
-  try {
+  if(!bg){setProgress(0,'Connecting to Tripleseat…');}
+  const all=[];let page=1,totalPages=1;
+  try{
     while(page<=Math.min(totalPages,90)){
-      if(!background){ setProgress(Math.round(page/Math.min(totalPages,90)*80), `Fetching page ${page} of ${Math.min(totalPages,90)} — ${all.length.toLocaleString()} contacts…`); }
+      if(!bg) setProgress(Math.round(page/Math.min(totalPages,90)*80),`Page ${page} of ${Math.min(totalPages,90)} — ${all.length.toLocaleString()} leads…`);
       const res=await fetch(`${API_TS}?endpoint=leads&page=${page}&limit=100`);
-      if(!res.ok) throw new Error(`Tripleseat API error: HTTP ${res.status}`);
+      if(!res.ok) throw new Error(`Tripleseat HTTP ${res.status}`);
       const raw=await res.json();
       totalPages=raw.total_pages||1;
       (raw.results||[]).forEach(c=>all.push(c));
       page++;
       if(page<=Math.min(totalPages,90)) await new Promise(r=>setTimeout(r,80));
     }
-
-    contacts=all.map(tagContact);
+    contacts=deduplicateContacts(all).map(tagContact);
     companies=buildCompanies(contacts);
-    updateBadges();
-    renderTab(activeTab);
-
+    updateBadges(); renderTab(activeTab);
     document.getElementById('last-updated').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    if(!background) setStatus(`✓ Synced ${contacts.length.toLocaleString()} contacts from Tripleseat`, 'success');
-    setTimeout(()=>setStatus('',''), 4000);
-
-    // Save to backend store
-    await saveContactsToStore(all);
+    if(!bg) setStatus(`✓ Synced ${all.length.toLocaleString()} raw → ${contacts.length.toLocaleString()} unique contacts`,'ok');
+    setTimeout(()=>setStatus('',''),5000);
+    await saveContacts(all);
     hideProgress();
-
-  } catch(err) {
-    console.error('Sync error:', err);
-    if(!background){ setProgress(100,'Error: '+err.message); setStatus('Sync error: '+err.message,'error'); }
+  }catch(err){
+    setProgress(100,'Error: '+err.message);
+    setStatus('Sync error: '+err.message,'er');
+    console.error('Sync:',err);
   }
-
-  if(btn){btn.disabled=false;btn.textContent='↻ Sync Tripleseat';}
+  if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
 }
 
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function showTab(tab) {
-  activeTab=tab;
-  ['today','campaigns','companies','contacts','queue'].forEach(t=>{
-    document.getElementById('pane-'+t).style.display=t===tab?'block':'none';
-    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+// ── TABS ───────────────────────────────────────────────────────────────────
+function showTab(t){
+  activeTab=t;
+  ['today','campaigns','open','past','companies','contacts','queue','suppressed','debug'].forEach(x=>{
+    document.getElementById('pane-'+x).style.display=x===t?'block':'none';
+    document.getElementById('tab-'+x).classList.toggle('active',x===t);
   });
-  renderTab(tab);
+  renderTab(t);
+}
+function renderTab(t){
+  if(t==='today') renderToday();
+  else if(t==='campaigns') renderCampaigns();
+  else if(t==='open') renderOpen();
+  else if(t==='past') renderPast();
+  else if(t==='companies') renderCompanies();
+  else if(t==='contacts') renderAllContacts();
+  else if(t==='queue') renderQueue();
+  else if(t==='suppressed') renderSuppressed();
+  else if(t==='debug') renderDebug();
+}
+function updateBadges(){
+  const open=contacts.filter(c=>c._status==='active-upcoming'||c._status==='active-inquiry').length;
+  const past=contacts.filter(c=>c._status==='past-customer'||c._status==='inquired-never-booked').length;
+  document.getElementById('bg-open').textContent=open.toLocaleString();
+  document.getElementById('bg-past').textContent=past.toLocaleString();
+  document.getElementById('bg-companies').textContent=Object.keys(companies).length.toLocaleString();
+  document.getElementById('bg-contacts').textContent=contacts.length.toLocaleString();
+  document.getElementById('bg-queue').textContent=queue.filter(q=>q.status==='ready'||q.status==='approved').length;
 }
 
-function renderTab(tab) {
-  if(tab==='today')     renderToday();
-  else if(tab==='campaigns') renderCampaigns();
-  else if(tab==='companies') renderCompanies();
-  else if(tab==='contacts')  renderContacts();
-  else if(tab==='queue')     renderQueue();
-}
-
-function updateBadges() {
-  document.getElementById('badge-contacts').textContent=contacts.length.toLocaleString();
-  document.getElementById('badge-companies').textContent=Object.keys(companies).length.toLocaleString();
-  document.getElementById('badge-queue').textContent=queue.filter(q=>q.status==='ready'||q.status==='approved').length;
-}
-
-// ── TODAY ─────────────────────────────────────────────────────────────────────
-function renderToday() {
-  const pane=document.getElementById('pane-today');
-  if(!contacts.length){pane.innerHTML=`<div class="empty"><div class="empty-icon">⟳</div><h3>No contacts loaded</h3><p>Click "Sync Tripleseat" to import your contacts from Tripleseat.</p><br><button class="btn btn-accent" onclick="syncFromTripleseat()">Sync Tripleseat now</button></div>`;return;}
-  const batch=buildDailyBatch(50);
-  const recentlyContacted=contacts.filter(c=>contacted[c.id]&&(Date.now()-contacted[c.id])<7*86400000).length;
-  const statsHTML=`<div class="stats-grid">
-    ${sc(batch.length,'Recommended today','var(--accent)')}
-    ${sc(queue.filter(q=>q.status==='pending').length,'Need generation','var(--yellow)')}
-    ${sc(queue.filter(q=>q.status==='ready').length,'Ready to approve','var(--blue)')}
-    ${sc(queue.filter(q=>q.status==='approved').length,'Approved','var(--green)')}
-    ${sc(recentlyContacted,'Contacted this week','var(--teal)')}
-    ${sc(contacts.filter(c=>c._tags.includes('anniversary')).length,'Anniversaries (90d)','var(--purple)')}
-  </div>`;
-  const campRows=CAMPAIGNS.map(cam=>{
-    const count=contacts.filter(cam.filter).length; if(!count) return '';
-    const batchCount=batch.filter(b=>b.campaign===cam.id).length;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-      <div style="flex:1"><div style="font-size:.88rem;font-weight:500;color:var(--text)">${cam.label}</div><div style="font-size:.73rem;color:var(--muted)">${cam.desc}</div></div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:${cam.color}">${count.toLocaleString()}</div>
-        <div style="font-size:.68rem;color:var(--muted2);font-family:'DM Mono',monospace">${batchCount} in today's batch</div>
-      </div>
-    </div>`;
-  }).join('');
-  const batchCards=batch.slice(0,15).map(({contact:c,campaign})=>{
-    const cam=CAMPAIGNS.find(x=>x.id===campaign), name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-    const co=c.company||c._derived_company||'';
-    return `<div class="card" style="border-left:3px solid ${cam?.color||'var(--border)'}">
-      <div class="card-header"><div><div class="card-name">${esc(name)}</div>${co?`<div class="card-sub">${esc(co)}</div>`:''}</div>${cam?`<span class="tag tag-campaign">${cam.label.split(' ').slice(0,2).join(' ')}</span>`:''}</div>
-      <div class="card-meta">
-        ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
-        ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
-        ${c._annDaysUntil!==undefined?`<div><span>Ann. in</span> ${c._annDaysUntil}d</div>`:''}
-      </div>
-      <div style="display:flex;gap:6px"><button class="btn btn-accent btn-sm" onclick="queueOne(${c.id},'${campaign||''}')">+ Queue</button><button class="btn btn-ghost btn-sm" onclick="skipContact(${c.id})">Skip 30d</button></div>
-    </div>`;
-  }).join('');
-  pane.innerHTML=`${statsHTML}<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-    <div>
-      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:16px">Campaign breakdown</div>
-      ${campRows}
-      <div style="margin-top:16px;display:flex;gap:8px">
-        <button class="btn btn-accent" onclick="queueBatch()">Queue today's batch (${batch.length})</button>
-        <button class="btn btn-ghost" onclick="showTab('queue')">View queue →</button>
-      </div>
-    </div>
-    <div>
-      <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:14px">Top contacts today</div>
-      ${batch.length===0?`<div class="empty"><div class="empty-icon">✓</div><h3>All done!</h3><p>No contacts need outreach today.</p></div>`:batchCards}
-      ${batch.length>15?`<div style="text-align:center;padding:12px;color:var(--muted2);font-size:.73rem">${batch.length-15} more — click "Queue today's batch" to add all</div>`:''}
-    </div>
-  </div>`;
-}
-function sc(num,lbl,color){return `<div class="stat-card"><div class="stat-num" style="color:${color}">${typeof num==='number'?num.toLocaleString():num}</div><div class="stat-lbl"><span class="stat-dot" style="background:${color}"></span>${lbl}</div></div>`;}
-
-// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
-function renderCampaigns() {
-  const pane=document.getElementById('pane-campaigns');
-  if(!contacts.length){pane.innerHTML=`<div class="empty"><div class="empty-icon">📋</div><h3>No contacts loaded</h3><p>Sync from Tripleseat first.</p></div>`;return;}
-  pane.innerHTML=CAMPAIGNS.map(cam=>{
-    const list=contacts.filter(cam.filter); if(!list.length) return '';
-    const preview=list.slice(0,5).map(c=>`<span style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:.72rem;color:var(--muted)">${esc([c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown')}</span>`).join('');
-    return `<div class="campaign-section">
-      <div style="font-size:.95rem;font-weight:600;color:${cam.color};display:flex;align-items:center;gap:10px;margin-bottom:4px">${cam.label} <span style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700">${list.length.toLocaleString()}</span></div>
-      <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">${cam.desc}</div>
-      <div style="font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace;margin-bottom:12px">${list.filter(c=>c.email_address).length} with valid email · ${list.filter(c=>c._tags.includes('high-value')).length} high-value</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${preview}${list.length>5?`<span style="font-size:.72rem;color:var(--muted2);padding:3px 6px">+${list.length-5} more</span>`:''}</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-accent btn-sm" onclick="queueCampaign('${cam.id}',20)">Queue top 20</button>
-        <button class="btn btn-ghost btn-sm" onclick="showTab('contacts');renderContacts('','${cam.id}')">View all →</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── COMPANIES ─────────────────────────────────────────────────────────────────
-function renderCompanies(search='') {
-  const pane=document.getElementById('pane-companies');
-  if(!contacts.length){pane.innerHTML=`<div class="empty"><div class="empty-icon">🏢</div><h3>No contacts loaded</h3></div>`;return;}
-  const s=search.toLowerCase();
-  const entries=Object.entries(companies).filter(([k,v])=>!s||v.name.toLowerCase().includes(s)||k.includes(s));
-  pane.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${Object.keys(companies).length.toLocaleString()} companies</span>
-    <input type="text" placeholder="Search companies…" value="${esc(search)}" oninput="renderCompanies(this.value)" style="width:220px">
+// ── TODAY ──────────────────────────────────────────────────────────────────
+function renderToday(){
+  const p=document.getElementById('pane-today');
+  if(!contacts.length){p.innerHTML=`<div class="emp"><div class="emp-i">⟳</div><h3>No contacts loaded</h3><p>Click "↻ Sync" to import from Tripleseat.</p><br><button class="btn ba" onclick="syncFromTripleseat()">Sync now</button></div>`;return;}
+  const batch=buildBatch(50);
+  const open=contacts.filter(c=>c._status==='active-upcoming'||c._status==='active-inquiry').length;
+  const past=contacts.filter(c=>c._status==='past-customer').length;
+  const never=contacts.filter(c=>c._status==='inquired-never-booked').length;
+  const ann=contacts.filter(c=>c._tags.includes('anniversary')).length;
+  const active=getActiveCampaigns();
+  p.innerHTML=`<div class="sg">
+    ${sc(batch.length,'Recommended today','var(--a)')}
+    ${sc(open,'Open/Active','var(--g)')}
+    ${sc(past,'Past customers','var(--a)')}
+    ${sc(never,'Never booked','var(--m)')}
+    ${sc(ann,'Anniversaries','var(--pu)')}
+    ${sc(queue.filter(q=>q.status==='ready').length,'Ready to approve','var(--bl)')}
+    ${sc(queue.filter(q=>q.status==='approved').length,'Approved','var(--g)')}
   </div>
-  ${entries.slice(0,80).map(([key,co])=>{
-    const safeKey=key.replace(/[^a-z0-9]/g,'');
-    return `<div class="company-card" id="co-${safeKey}" onclick="toggleCompany('${safeKey}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-        <div>
-          <div style="font-weight:600;font-size:.95rem;color:var(--text);display:flex;align-items:center;gap:8px">${esc(co.name)}${co.domain==='msu.edu'?`<span class="tag tag-msu">MSU</span>`:''}</div>
-          <div style="font-size:.73rem;color:var(--muted);margin-top:2px">${co.domain||''}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0"><div style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700">${co.contacts.length}</div><div style="font-size:.65rem;color:var(--muted2);font-family:'DM Mono',monospace">contacts</div></div>
+  ${active.length?`<div style="background:rgba(232,119,42,.08);border:1px solid rgba(232,119,42,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.78rem;color:var(--a)">📅 Active campaigns this season: ${active.join(', ')}</div>`:''}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+    <div>
+      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:14px">Campaign breakdown</div>
+      ${CAMPAIGNS.map(cam=>{
+        const cnt=contacts.filter(cam.filter).length; if(!cnt) return '';
+        const bCnt=batch.filter(b=>b.campaign===cam.id).length;
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--b)">
+          <div><div style="font-size:.86rem;font-weight:500;color:${cam.color}">${cam.label}</div><div style="font-size:.71rem;color:var(--m)">${cam.desc}</div></div>
+          <div style="text-align:right"><div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:${cam.color}">${cnt.toLocaleString()}</div><div style="font-size:.66rem;color:var(--m2);font-family:'DM Mono',monospace">${bCnt} in batch</div></div>
+        </div>`;
+      }).join('')}
+      <div style="margin-top:14px;display:flex;gap:7px">
+        <button class="btn ba" onclick="queueBatch()">Queue batch (${batch.length})</button>
+        <button class="btn bg_" onclick="showTab('queue')">View queue →</button>
       </div>
-      <div style="display:flex;gap:14px;margin-top:8px;font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace">
-        <span>${co.contacts.filter(c=>c.email_address).length} with email</span>
-        <span>${co.totalEvents} past events</span>
-        ${co.totalGuests>0?`<span>${co.totalGuests.toLocaleString()} total guests</span>`:''}
-      </div>
-      <div class="company-contacts" id="cocontacts-${safeKey}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <span style="font-size:.78rem;color:var(--muted);font-weight:600">Contacts at ${esc(co.name)}</span>
-          <button class="btn btn-accent btn-sm" onclick="event.stopPropagation();queueCompany('${safeKey}')">Queue all</button>
-        </div>
-        ${co.contacts.slice(0,20).map(c=>{
-          const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-          const inQ=queue.some(q=>String(q.id)===String(c.id));
-          return `<div class="contact-mini">
-            <div><div style="font-size:.85rem;font-weight:500;color:var(--text)">${esc(name)}</div>
-            <div style="font-size:.72rem;color:var(--muted2);font-family:'DM Mono',monospace">${esc(c.email_address||'no email')}</div>
-            ${c.event_date?`<div style="font-size:.68rem;color:var(--muted2);margin-top:2px">${esc(c.event_description||'event')} · ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
-            </div>
-            ${inQ?`<span style="font-size:.72rem;color:var(--green);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn btn-accent btn-sm" onclick="event.stopPropagation();queueOne(${c.id},'corporate')">Queue</button>`}
-          </div>`;
-        }).join('')}
-        ${co.contacts.length>20?`<div style="font-size:.72rem;color:var(--muted2);text-align:center;padding:8px">+${co.contacts.length-20} more</div>`:''}
-      </div>
-    </div>`;
-  }).join('')}
-  ${entries.length>80?`<div style="text-align:center;padding:20px;color:var(--muted2);font-size:.78rem">${entries.length-80} more — search to narrow</div>`:''}`;
+    </div>
+    <div>
+      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:14px">Top contacts today</div>
+      ${batch.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>All done!</h3><p>No contacts need outreach today.</p></div>`:batch.slice(0,15).map(({contact:c,campaign})=>{
+        const cam=CAMPAIGNS.find(x=>x.id===campaign);
+        const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
+        const co=c.company||c._co||'';
+        return `<div class="card">
+          <div class="ch"><div><div class="cn">${esc(name)}</div>${co?`<div class="cs">${esc(co)}</div>`:''}</div>${cam?`<span class="tag tp">${cam.label.split(' ').slice(0,2).join(' ')}</span>`:''}</div>
+          <div class="cm">
+            ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
+            ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
+            ${c._annDays!==undefined?`<div><span>Ann in</span> ${c._annDays}d</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px"><button class="btn ba bs" onclick="queueOne(${c.id},'${campaign||''}')">+ Queue</button><button class="btn bg_ bs" onclick="skipContact(${c.id})">Skip 30d</button></div>
+        </div>`;
+      }).join('')}
+      ${batch.length>15?`<div style="text-align:center;padding:10px;color:var(--m2);font-size:.72rem">${batch.length-15} more in batch</div>`:''}
+    </div>
+  </div>`;
 }
-function toggleCompany(k){const c=document.getElementById('co-'+k);if(c)c.classList.toggle('expanded');}
+function sc(n,l,color){return `<div class="sc"><div class="sn" style="color:${color}">${typeof n==='number'?n.toLocaleString():n}</div><div class="sl">${l}</div></div>`;}
 
-// ── ALL CONTACTS ──────────────────────────────────────────────────────────────
-function renderContacts(search='',filterTag='') {
-  const pane=document.getElementById('pane-contacts');
-  if(!contacts.length){pane.innerHTML=`<div class="empty"><div class="empty-icon">👥</div><h3>No contacts loaded</h3></div>`;return;}
+// ── CAMPAIGNS ──────────────────────────────────────────────────────────────
+function renderCampaigns(){
+  const p=document.getElementById('pane-campaigns');
+  if(!contacts.length){p.innerHTML=noContacts();return;}
+  p.innerHTML=CAMPAIGNS.map(cam=>{
+    const list=contacts.filter(cam.filter); if(!list.length) return '';
+    const preview=list.slice(0,5).map(c=>`<span style="background:var(--s2);border:1px solid var(--b);border-radius:5px;padding:2px 8px;font-size:.7rem;color:var(--m)">${esc([c.first_name,c.last_name].filter(Boolean).join(' ')||'?')}</span>`).join('');
+    return `<div style="background:var(--s);border:1px solid var(--b);border-radius:11px;padding:16px;margin-bottom:12px">
+      <div style="font-size:.92rem;font-weight:600;color:${cam.color};display:flex;align-items:center;gap:10px;margin-bottom:4px">${cam.label} <span style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700">${list.length.toLocaleString()}</span></div>
+      <div style="font-size:.76rem;color:var(--m);margin-bottom:10px">${cam.desc} · ${list.filter(c=>c.email_address).length} with valid email</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${preview}${list.length>5?`<span style="font-size:.7rem;color:var(--m2);padding:2px 6px">+${list.length-5} more</span>`:''}</div>
+      <div style="display:flex;gap:7px"><button class="btn ba bs" onclick="queueCampaign('${cam.id}',20)">Queue top 20</button><button class="btn bg_ bs" onclick="showTab('contacts');renderAllContacts('','${cam.id}')">View all →</button></div>
+    </div>`;
+  }).join('');
+}
+
+// ── OPEN ACCOUNTS ──────────────────────────────────────────────────────────
+function renderOpen(){
+  const p=document.getElementById('pane-open');
+  const list=contacts.filter(c=>c._status==='active-upcoming'||c._status==='active-inquiry');
+  if(!list.length){p.innerHTML=`<div class="emp"><div class="emp-i">✓</div><h3>No active/open accounts</h3><p>All contacts are past customers or older inquiries.</p></div>`;return;}
+  p.innerHTML=`<div style="background:rgba(76,175,125,.08);border:1px solid rgba(76,175,125,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.78rem;color:var(--g)">
+    ⚠ These ${list.length} contacts are active leads or have upcoming events. They are <strong>excluded from all automated outreach campaigns</strong> and should be handled by Ryan directly.
+  </div>
+  ${list.map(c=>contactCard(c,false)).join('')}`;
+}
+
+// ── PAST / REACTIVATION ────────────────────────────────────────────────────
+function renderPast(search='',filter=''){
+  const p=document.getElementById('pane-past');
   const s=search.toLowerCase();
-  let list=filterTag?contacts.filter(c=>c._tags.includes(filterTag)):contacts;
-  if(s) list=list.filter(c=>[c.first_name,c.last_name,c.company,c.email_address,c._derived_company].join(' ').toLowerCase().includes(s));
-  const inQ=new Set(queue.map(q=>String(q.id)));
-  pane.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-    <div><span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${list.length.toLocaleString()}</span> <span style="font-size:.78rem;color:var(--muted)">contacts</span></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input type="text" placeholder="Search…" value="${esc(search)}" oninput="renderContacts(this.value,'${filterTag}')">
-      <select onchange="renderContacts('${search}',this.value)" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;outline:none">
-        <option value="">All segments</option>
-        ${CAMPAIGNS.map(c=>`<option value="${c.id}" ${filterTag===c.id?'selected':''}>${c.label}</option>`).join('')}
+  let list=contacts.filter(c=>c._status==='past-customer'||c._status==='inquired-never-booked'||c._status==='lost');
+  if(filter) list=list.filter(c=>c._tags.includes(filter));
+  if(s) list=list.filter(c=>[c.first_name,c.last_name,c.company,c.email_address,c._co].join(' ').toLowerCase().includes(s));
+  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <div><span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${list.length.toLocaleString()}</span> <span style="font-size:.76rem;color:var(--m)">past/inactive contacts</span></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <input type="text" placeholder="Search…" value="${esc(search)}" oninput="renderPast(this.value,'${filter}')">
+      <select onchange="renderPast('${search}',this.value)">
+        <option value="">All past</option>
+        ${CAMPAIGNS.map(c=>`<option value="${c.id}" ${filter===c.id?'selected':''}>${c.label}</option>`).join('')}
       </select>
     </div>
   </div>
-  ${list.slice(0,100).map(c=>{
-    const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-    const queued=inQ.has(String(c.id));
-    return `<div class="card">
-      <div class="card-header"><div><div class="card-name">${esc(name)}</div>${(c.company||c._derived_company)?`<div class="card-sub">${esc(c.company||c._derived_company)}</div>`:''}</div>
-      ${queued?`<span style="font-size:.72rem;color:var(--green);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn btn-accent btn-sm" onclick="queueOne(${c.id},'')">+ Queue</button>`}</div>
-      <div class="card-meta">
-        ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
-        ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>`:''}
-        ${c.guest_count?`<div><span>Guests</span> ${c.guest_count}</div>`:''}
+  ${list.slice(0,80).map(c=>contactCard(c,true)).join('')}
+  ${list.length>80?`<div style="text-align:center;padding:16px;color:var(--m2);font-size:.74rem">${list.length-80} more — search to narrow</div>`:''}`;
+}
+
+// ── COMPANIES ──────────────────────────────────────────────────────────────
+function renderCompanies(search=''){
+  const p=document.getElementById('pane-companies');
+  if(!contacts.length){p.innerHTML=noContacts();return;}
+  const s=search.toLowerCase();
+  const entries=Object.entries(companies).filter(([k,v])=>!s||v.name.toLowerCase().includes(s)||k.includes(s));
+  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${Object.keys(companies).length.toLocaleString()} companies / accounts</span>
+    <input type="text" placeholder="Search companies…" value="${esc(search)}" oninput="renderCompanies(this.value)" style="width:200px">
+  </div>
+  ${entries.slice(0,60).map(([key,co])=>{
+    const sk=key.replace(/[^a-z0-9]/g,'').slice(0,30);
+    const active=co.contacts.filter(c=>c._status==='active-upcoming'||c._status==='active-inquiry').length;
+    return `<div class="cc" id="co-${sk}" onclick="toggleCo('${sk}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div>
+          <div style="font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:7px">${esc(co.name)}${co.domain==='msu.edu'?`<span class="tag tm">MSU</span>`:''}${active?`<span class="tag tal">${active} active</span>`:''}</div>
+          <div style="font-size:.71rem;color:var(--m);margin-top:2px">${co.domain||''}</div>
+        </div>
+        <div style="text-align:right"><div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700">${co.contacts.length}</div><div style="font-size:.63rem;color:var(--m2);font-family:'DM Mono',monospace">contacts</div></div>
       </div>
-      <div class="card-tags">${(c._tags||[]).map(t=>`<span class="tag ${tagCls(t)}">${t.replace(/-/g,' ')}</span>`).join('')}</div>
+      <div style="display:flex;gap:12px;margin-top:7px;font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace">
+        <span>${co.contacts.filter(c=>c.email_address).length} with email</span>
+        <span>${co.events} events</span>
+        ${co.guests>0?`<span>${co.guests.toLocaleString()} total guests</span>`:''}
+      </div>
+      <div class="cc-contacts" id="coc-${sk}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+          <span style="font-size:.76rem;color:var(--m);font-weight:600">Contacts at ${esc(co.name)}</span>
+          <button class="btn ba bs" onclick="event.stopPropagation();queueCompany('${sk}')">Queue for outreach</button>
+        </div>
+        ${co.contacts.slice(0,15).map(c=>{
+          const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
+          const inQ=queue.some(q=>String(q.id)===String(c.id));
+          const sc_=STATUS_COLORS[c._status]||'var(--m)';
+          return `<div class="cm2">
+            <div>
+              <div style="font-size:.83rem;font-weight:500">${esc(name)}</div>
+              <div style="font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace">${esc(c.email_address||'no email')} · <span style="color:${sc_}">${STATUS_LABELS[c._status]||'?'}</span></div>
+              ${c.event_date?`<div style="font-size:.66rem;color:var(--m2);margin-top:2px">${esc(c.event_description||'event')} · ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
+            </div>
+            ${(c._status==='active-upcoming'||c._status==='active-inquiry')
+              ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">Active — Ryan's</span>`
+              :inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ Queued</span>`
+              :`<button class="btn ba bs" onclick="event.stopPropagation();queueOne(${c.id},'corporate')">Queue</button>`}
+          </div>`;
+        }).join('')}
+        ${co.contacts.length>15?`<div style="font-size:.7rem;color:var(--m2);text-align:center;padding:7px">+${co.contacts.length-15} more</div>`:''}
+      </div>
     </div>`;
   }).join('')}
-  ${list.length>100?`<div style="text-align:center;padding:20px;color:var(--muted2);font-size:.75rem">Showing 100 of ${list.length.toLocaleString()} — search to narrow</div>`:''}`;
+  ${entries.length>60?`<div style="text-align:center;padding:16px;color:var(--m2);font-size:.74rem">${entries.length-60} more — search to narrow</div>`:''}`;
 }
-function tagCls(t){if(t.includes('quiet'))return'tag-quiet';if(t==='corporate')return'tag-corp';if(t==='anniversary')return'tag-ann';if(t==='no-booking')return'tag-nb';if(t==='high-value')return'tag-hv';if(t==='msu')return'tag-msu';return'tag-nb';}
+function toggleCo(k){const c=document.getElementById('co-'+k);if(c)c.classList.toggle('exp');}
 
-// ── QUEUE ─────────────────────────────────────────────────────────────────────
-function renderQueue() {
-  const pane=document.getElementById('pane-queue');
+// ── ALL CONTACTS ───────────────────────────────────────────────────────────
+function renderAllContacts(search='',filterTag=''){
+  const p=document.getElementById('pane-contacts');
+  if(!contacts.length){p.innerHTML=noContacts();return;}
+  const s=search.toLowerCase();
+  let list=filterTag?contacts.filter(c=>c._tags.includes(filterTag)):contacts;
+  if(s) list=list.filter(c=>[c.first_name,c.last_name,c.company,c.email_address,c._co].join(' ').toLowerCase().includes(s));
+  const inQ=new Set(queue.map(q=>String(q.id)));
+  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
+    <div><span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${list.length.toLocaleString()}</span> <span style="font-size:.76rem;color:var(--m)">unique contacts (deduped)</span></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <input type="text" placeholder="Search…" value="${esc(search)}" oninput="renderAllContacts(this.value,'${filterTag}')">
+      <select onchange="renderAllContacts('${search}',this.value)">
+        <option value="">All</option>
+        ${CAMPAIGNS.map(c=>`<option value="${c.id}" ${filterTag===c.id?'selected':''}>${c.label}</option>`).join('')}
+        <option value="active-upcoming">Active upcoming</option>
+        <option value="active-inquiry">Active inquiry</option>
+      </select>
+    </div>
+  </div>
+  ${list.slice(0,100).map(c=>contactCard(c,true)).join('')}
+  ${list.length>100?`<div style="text-align:center;padding:16px;color:var(--m2);font-size:.74rem">Showing 100 of ${list.length.toLocaleString()} — search to narrow</div>`:''}`;
+}
+
+function contactCard(c,showQueueBtn){
+  const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
+  const co=c.company||c._co||'';
+  const inQ=queue.some(q=>String(q.id)===String(c.id));
+  const sc_=STATUS_COLORS[c._status]||'var(--m)';
+  const sl=STATUS_LABELS[c._status]||'?';
+  const isActive=c._status==='active-upcoming'||c._status==='active-inquiry';
+  return `<div class="card ${c._status==='lost'?'lost':isActive?'active-lead':c._status==='past-customer'?'past-customer':'never-booked'}">
+    <div class="ch">
+      <div><div class="cn">${esc(name)}</div>${co?`<div class="cs">${esc(co)}</div>`:''}</div>
+      <span class="sp" style="color:${sc_};background:${sc_}1a">${sl}</span>
+    </div>
+    <div class="cm">
+      ${c.email_address?`<div><span>Email</span> ${esc(c.email_address)}</div>`:''}
+      ${c.event_date?`<div><span>Event</span> ${new Date(c.event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>`:''}
+      ${c.guest_count?`<div><span>Guests</span> ${c.guest_count}</div>`:''}
+      ${c._daysSince!==null?`<div><span>Age</span> ${c._daysSince}d</div>`:''}
+    </div>
+    <div class="ct">${(c._tags||[]).map(t=>`<span class="tag ${tagCls(t)}">${t.replace(/-/g,' ')}</span>`).join('')}</div>
+    ${c._eventHistory?.length>1?`<div style="font-size:.7rem;color:var(--m);margin-bottom:8px">📋 ${c._eventHistory.length} inquiries on record</div>`:''}
+    ${showQueueBtn&&!isActive?`<div style="display:flex;gap:6px">
+      ${inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn ba bs" onclick="queueOne(${c.id},'')">+ Queue</button>`}
+      <button class="btn bg_ bs" onclick="addToSuppressed('${esc((c.email_address||'').toLowerCase())}')">Suppress</button>
+    </div>`:''}
+  </div>`;
+}
+function tagCls(t){if(t.includes('quiet'))return'tq';if(t==='corporate')return'tc';if(t==='anniversary')return'ta';if(t==='no-booking')return'tn';if(t==='high-value')return'th';if(t==='msu')return'tm';if(t==='lost')return'tlost';return'tn';}
+
+// ── QUEUE ──────────────────────────────────────────────────────────────────
+function renderQueue(){
+  const p=document.getElementById('pane-queue');
   const pending=queue.filter(q=>q.status==='pending').length;
   const ready=queue.filter(q=>q.status==='ready').length;
   const approved=queue.filter(q=>q.status==='approved').length;
-  if(!queue.length){pane.innerHTML=`<div class="empty"><div class="empty-icon">✉</div><h3>Queue is empty</h3><p>Go to Today's Outreach or Campaigns and queue some contacts.</p></div>`;updateBadges();return;}
-  const statusColor={pending:'var(--muted2)',generating:'var(--yellow)',ready:'var(--accent)',approved:'var(--green)',skipped:'var(--muted2)',error:'var(--red)'};
-  const statusLabel={pending:'Needs generation',generating:'Generating…',ready:'Ready to review',approved:'✓ Approved',skipped:'Skipped',error:'Error'};
-  pane.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <div><span style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600">${queue.length}</span> <span style="font-size:.78rem;color:var(--muted)">in queue · ${ready} ready · ${approved} approved · ${pending} pending</span></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      ${pending>0?`<button class="btn btn-accent" onclick="generateAll()">✨ Generate ${pending} email${pending>1?'s':''}</button>`:''}
-      <button class="btn btn-green" onclick="approveAll()">✓ Approve all ready</button>
-      <button class="btn btn-ghost" onclick="clearQueue()">Clear queue</button>
+  if(!queue.length){p.innerHTML=`<div class="emp"><div class="emp-i">✉</div><h3>Queue is empty</h3><p>Go to Today or Campaigns to queue contacts.</p></div>`;updateBadges();return;}
+  const sColor={pending:'var(--m2)',generating:'var(--y)',ready:'var(--a)',approved:'var(--g)',skipped:'var(--m2)',error:'var(--r)'};
+  const sLabel={pending:'Needs generation',generating:'Generating…',ready:'Ready to review',approved:'✓ Approved',skipped:'Skipped',error:'Error'};
+  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:9px">
+    <div><span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${queue.length}</span> <span style="font-size:.76rem;color:var(--m)">in queue · ${ready} ready · ${approved} approved · ${pending} pending</span></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      ${pending>0?`<button class="btn ba" onclick="generateAll()">✨ Generate ${pending}</button>`:''}
+      <button class="btn bge_" onclick="approveAll()">✓ Approve all ready</button>
+      <button class="btn bg_" onclick="clearQueue()">Clear</button>
     </div>
   </div>
   ${queue.map(item=>{
-    const sc=statusColor[item.status]||'var(--muted)', sl=statusLabel[item.status]||item.status;
-    const c=item.contact, co=c?.company||c?._derived_company||'';
+    const sc_=sColor[item.status]||'var(--m)',sl=sLabel[item.status]||item.status;
+    const c=item.contact,co=c?.company||c?._co||'';
+    const hasRisks=item.riskFlags&&item.riskFlags.length>0&&item.riskFlags[0]!=='none';
     return `<div class="card ${item.status}" id="qcard-${item.id}">
-      <div class="card-header">
-        <div><div class="card-name">${esc(item.name)}${co?` <span style="font-size:.73rem;color:var(--muted);font-weight:400">${esc(co)}</span>`:''}</div>
-        <div class="card-sub">${esc(item.email)}${item.subject?' · '+esc(item.subject):''}</div></div>
-        <span class="status-pill" style="color:${sc};background:${sc}22">${sl}</span>
+      <div class="ch">
+        <div><div class="cn">${esc(item.name)}${co?` <span style="font-size:.71rem;color:var(--m);font-weight:400">${esc(co)}</span>`:''}</div>
+        <div class="cs">${esc(item.email)}${item.subject?' · '+esc(item.subject):''}</div></div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${hasRisks?`<span style="font-size:.65rem;color:var(--y);background:rgba(245,166,35,.1);padding:2px 7px;border-radius:20px;font-family:'DM Mono',monospace">⚠ ${item.riskFlags.length} flag${item.riskFlags.length>1?'s':''}</span>`:''}
+          <span class="sp" style="color:${sc_};background:${sc_}1a">${sl}</span>
+        </div>
       </div>
-      ${item.body?`<div class="card-body">${esc(item.body)}</div>`:''}
-      <div class="card-footer">
-        ${item.status==='pending'?`<button class="btn btn-accent btn-sm" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
-        ${item.status==='ready'||item.status==='error'?`<button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">👁 Review & edit</button><button class="btn btn-green btn-sm" onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
-        ${item.status==='approved'?`<button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">👁 View</button>`:''}
-        ${item.status!=='skipped'?`<button class="btn btn-ghost btn-sm" onclick="skipItem('${item.id}')">Skip</button>`:''}
-        <button class="btn btn-red btn-sm" onclick="removeItem('${item.id}')">Remove</button>
+      ${item.body?`<div class="cb">${esc(item.body)}</div>`:''}
+      <div class="cf">
+        ${item.status==='pending'?`<button class="btn ba bs" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
+        ${item.status==='ready'||item.status==='error'?`<button class="btn bg_ bs" onclick="openModal('${item.id}')">👁 Review${hasRisks?' ⚠':''}</button><button class="btn bge_ bs" onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
+        ${item.status==='approved'?`<button class="btn bg_ bs" onclick="openModal('${item.id}')">👁 View</button>`:''}
+        ${item.status!=='skipped'?`<button class="btn bg_ bs" onclick="skipItem('${item.id}')">Skip</button>`:''}
+        <button class="btn br_ bs" onclick="removeItem('${item.id}')">Remove</button>
       </div>
     </div>`;
   }).join('')}`;
   updateBadges();
 }
 
-// ── QUEUE ACTIONS ─────────────────────────────────────────────────────────────
-function queueOne(contactId,campaign){
-  const c=contacts.find(x=>String(x.id)===String(contactId));
-  if(!c||queue.find(q=>String(q.id)===String(contactId))) return;
-  const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact';
-  queue.push({id:String(c.id),contact:c,name,email:c.email_address||'',subject:'',body:'',status:'pending',campaign:campaign||''});
-  saveQueueToStore(); updateBadges(); renderTab(activeTab);
+// ── SUPPRESSED ─────────────────────────────────────────────────────────────
+function renderSuppressed(){
+  const p=document.getElementById('pane-suppressed');
+  const list=[...suppressed].sort();
+  p.innerHTML=`<div style="margin-bottom:14px">
+    <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:4px">Do Not Contact List</div>
+    <div style="font-size:.76rem;color:var(--m)">These email addresses will never be queued for outreach.</div>
+  </div>
+  <div style="display:flex;gap:7px;margin-bottom:14px">
+    <input type="text" id="supp-inp" placeholder="email@domain.com" style="flex:1">
+    <button class="btn ba" onclick="addToSuppressedManual()">Add</button>
+  </div>
+  ${list.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>No suppressed contacts</h3></div>`:''}
+  ${list.map(email=>`<div style="background:var(--s);border:1px solid var(--b);border-radius:8px;padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:.82rem;font-family:'DM Mono',monospace;color:var(--m)">${esc(email)}</span>
+    <button class="btn bg_ bs" onclick="removeSuppressed('${esc(email)}')">Remove</button>
+  </div>`).join('')}`;
+}
+
+// ── DEBUG ──────────────────────────────────────────────────────────────────
+function renderDebug(){
+  const p=document.getElementById('pane-debug');
+  p.innerHTML=`<div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:16px">Debug / Storage Status</div>
+  <div class="debug-box" id="debug-content">Loading debug info…</div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn ba" onclick="loadDebug()">Refresh</button>
+    <button class="btn bg_" onclick="syncFromTripleseat()">↻ Full Sync</button>
+    <button class="btn br_" onclick="clearAllData()">⚠ Clear all stored data</button>
+  </div>`;
+  loadDebug();
+}
+
+async function loadDebug(){
+  const el=document.getElementById('debug-content'); if(!el) return;
+  try{
+    const res=await fetch(`${API_ST}?action=debug`);
+    const data=await res.json();
+    el.textContent=JSON.stringify({
+      ...data,
+      frontendState:{
+        contactsInMemory:contacts.length,
+        uniqueCompanies:Object.keys(companies).length,
+        queueLength:queue.length,
+        suppressedCount:suppressed.size,
+        storeOk,
+        storeError:storeError||'none',
+        activeTab,
+      }
+    },null,2);
+  }catch(err){el.textContent='Error loading debug: '+err.message;}
+}
+
+async function clearAllData(){
+  if(!confirm('Clear ALL stored data? This cannot be undone.')) return;
+  contacts=[];companies={};queue=[];contacted={};suppressed=new Set();
+  try{
+    await fetch(`${API_ST}?action=save-contacts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contacts:[]})});
+    await fetch(`${API_ST}?action=save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue:[]})});
+  }catch(e){}
+  updateBadges();renderTab(activeTab);setStatus('All data cleared','ok');setTimeout(()=>setStatus('',''),3000);
+}
+
+// ── QUEUE ACTIONS ──────────────────────────────────────────────────────────
+function queueOne(cId,campaign){
+  const c=contacts.find(x=>String(x.id)===String(cId));
+  if(!c||queue.find(q=>String(q.id)===String(cId))) return;
+  if(c._status==='active-upcoming'||c._status==='active-inquiry'){alert('This is an active account — Ryan should handle it directly.');return;}
+  if(suppressed.has((c.email_address||'').toLowerCase())){alert('This contact is on the Do Not Contact list.');return;}
+  queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',riskFlags:[],status:'pending',campaign:campaign||''});
+  saveQueue();updateBadges();renderTab(activeTab);
 }
 function queueBatch(){
-  const batch=buildDailyBatch(50); let added=0;
+  const batch=buildBatch(50);let added=0;
   batch.forEach(({contact:c,campaign})=>{
     if(!queue.find(q=>String(q.id)===String(c.id))){
-      queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',status:'pending',campaign});
+      queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',riskFlags:[],status:'pending',campaign});
       added++;
     }
   });
-  saveQueueToStore(); updateBadges(); if(added>0) showTab('queue');
+  saveQueue();updateBadges();if(added>0)showTab('queue');
 }
 function queueCampaign(camId,limit){
-  const cam=CAMPAIGNS.find(c=>c.id===camId); if(!cam) return;
-  const inQ=new Set(queue.map(q=>String(q.id)));
-  const now=Date.now();
-  contacts.filter(cam.filter).filter(c=>c.email_address&&!inQ.has(String(c.id))&&!(contacted[c.id]&&now-contacted[c.id]<30*86400000)).slice(0,limit).forEach(c=>{
-    queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',status:'pending',campaign:camId});
+  const cam=CAMPAIGNS.find(c=>c.id===camId);if(!cam)return;
+  const inQ=new Set(queue.map(q=>String(q.id)));const now=Date.now();
+  contacts.filter(cam.filter).filter(c=>c.email_address&&!inQ.has(String(c.id))&&c._status!=='active-upcoming'&&c._status!=='active-inquiry'&&!suppressed.has((c.email_address||'').toLowerCase())&&!(contacted[c.id]&&now-contacted[c.id]<30*86400000)).slice(0,limit).forEach(c=>{
+    queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',riskFlags:[],status:'pending',campaign:camId});
   });
-  saveQueueToStore(); updateBadges(); showTab('queue');
+  saveQueue();updateBadges();showTab('queue');
 }
-function queueCompany(safeKey){
-  const entry=Object.entries(companies).find(([k])=>k.replace(/[^a-z0-9]/g,'')==safeKey); if(!entry) return;
-  const [,co]=entry, inQ=new Set(queue.map(q=>String(q.id)));
-  co.contacts.filter(c=>c.email_address&&!inQ.has(String(c.id))).slice(0,10).forEach(c=>{
-    queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',status:'pending',campaign:'corporate'});
+function queueCompany(sk){
+  const entry=Object.entries(companies).find(([k])=>k.replace(/[^a-z0-9]/g,'').slice(0,30)===sk);if(!entry)return;
+  const [,co]=entry,inQ=new Set(queue.map(q=>String(q.id)));
+  co.contacts.filter(c=>c.email_address&&!inQ.has(String(c.id))&&c._status!=='active-upcoming'&&c._status!=='active-inquiry').slice(0,10).forEach(c=>{
+    queue.push({id:String(c.id),contact:c,name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',email:c.email_address||'',subject:'',body:'',riskFlags:[],status:'pending',campaign:'corporate'});
   });
-  saveQueueToStore(); updateBadges(); showTab('queue');
+  saveQueue();updateBadges();showTab('queue');
 }
-function skipContact(contactId){contacted[String(contactId)]=Date.now();saveContactedToStore();renderTab(activeTab);}
-function clearQueue(){if(!confirm('Clear all queued emails?')) return;queue=[];saveQueueToStore();updateBadges();renderQueue();}
-function approveAll(){queue.filter(q=>q.status==='ready').forEach(q=>{q.status='approved';markContacted(q.id);});saveQueueToStore();updateBadges();renderQueue();}
-function approveItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='approved';markContacted(i.id);saveQueueToStore();updateBadges();renderQueue();}}
-function skipItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='skipped';saveQueueToStore();renderQueue();}}
-function removeItem(id){queue=queue.filter(q=>q.id!==id);saveQueueToStore();updateBadges();renderQueue();}
-function markContacted(contactId){contacted[String(contactId)]=Date.now();saveContactedToStore();}
+function skipContact(cId){contacted[String(cId)]=Date.now();saveContacted();renderTab(activeTab);}
+function clearQueue(){if(!confirm('Clear all queued emails?'))return;queue=[];saveQueue();updateBadges();renderQueue();}
+function approveAll(){queue.filter(q=>q.status==='ready').forEach(q=>{q.status='approved';markContacted(q.id);});saveQueue();updateBadges();renderQueue();}
+function approveItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='approved';markContacted(i.id);saveQueue();updateBadges();renderQueue();}}
+function skipItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='skipped';saveQueue();renderQueue();}}
+function removeItem(id){queue=queue.filter(q=>q.id!==id);saveQueue();updateBadges();renderQueue();}
+function markContacted(cId){contacted[String(cId)]=Date.now();saveContacted();}
 
-// ── EMAIL GENERATION ──────────────────────────────────────────────────────────
+// ── SUPPRESSION ────────────────────────────────────────────────────────────
+function addToSuppressed(email){if(!email)return;suppressed.add(email.toLowerCase());saveSuppressed();queue=queue.filter(q=>q.email.toLowerCase()!==email);saveQueue();updateBadges();}
+function addToSuppressedManual(){const v=document.getElementById('supp-inp')?.value?.trim()?.toLowerCase();if(!v)return;addToSuppressed(v);document.getElementById('supp-inp').value='';renderSuppressed();}
+function removeSuppressed(email){suppressed.delete(email.toLowerCase());saveSuppressed();renderSuppressed();}
+
+// ── EMAIL GENERATION ───────────────────────────────────────────────────────
 async function generateOne(itemId){
-  const item=queue.find(q=>q.id===itemId); if(!item) return;
-  item.status='generating'; renderQueue();
+  const item=queue.find(q=>q.id===itemId);if(!item)return;
+  item.status='generating';renderQueue();
   try{
-    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:item.contact,campaign:item.campaign})});
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:item.contact,campaign:item.campaign,accountStatus:item.contact._status})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||`HTTP ${res.status}`);
     item.subject=data.subject||'Following up from Saddleback Catering';
-    item.body=data.body||'Unable to generate.';
+    item.body=data.body||'Unable to generate email body.';
+    item.riskFlags=data.riskFlags||[];
     item.status='ready';
-  }catch(err){item.body=`Error: ${err.message}`;item.status='error';}
-  saveQueueToStore(); renderQueue(); updateBadges();
+  }catch(err){item.body=`Error: ${err.message}`;item.riskFlags=[];item.status='error';}
+  saveQueue();renderQueue();updateBadges();
 }
 async function generateAll(){
-  const pending=queue.filter(q=>q.status==='pending'); if(!pending.length) return;
+  const pending=queue.filter(q=>q.status==='pending');if(!pending.length)return;
   const btn=document.querySelector('[onclick="generateAll()"]');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Generating…';}
-  for(let i=0;i<pending.length;i++){await generateOne(pending[i].id);if(i<pending.length-1)await new Promise(r=>setTimeout(r,250));}
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Generating…';}
+  for(let i=0;i<pending.length;i++){await generateOne(pending[i].id);if(i<pending.length-1)await new Promise(r=>setTimeout(r,300));}
   if(btn){btn.disabled=false;btn.innerHTML='✨ Generate emails';}
 }
 
-// ── MODAL ─────────────────────────────────────────────────────────────────────
+// ── MODAL ──────────────────────────────────────────────────────────────────
 function openModal(itemId){
-  const item=queue.find(q=>q.id===itemId); if(!item) return;
+  const item=queue.find(q=>q.id===itemId);if(!item)return;
   modalQueueId=itemId;
-  document.getElementById('modal-title').textContent=`Email to ${item.name}`;
-  document.getElementById('modal-subject').value=item.subject||'';
-  document.getElementById('modal-email').value=item.body||'';
-  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('mt').textContent=`Email to ${item.name}`;
+  document.getElementById('msub').value=item.subject||'';
+  document.getElementById('memail').value=item.body||'';
+  const flagsEl=document.getElementById('risk-flags-display');
+  const flags=(item.riskFlags||[]).filter(f=>f&&f!=='none');
+  flagsEl.innerHTML=flags.length?flags.map(f=>`<div class="risk-flag">⚠ ${esc(f)}</div>`).join(''):'';
+  document.getElementById('mo').classList.add('open');
 }
 function closeModal(){
-  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-subject').value;i.body=document.getElementById('modal-email').value;}}
-  document.getElementById('modal-overlay').classList.remove('open');modalQueueId=null;saveQueueToStore();renderQueue();
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('msub').value;i.body=document.getElementById('memail').value;}}
+  document.getElementById('mo').classList.remove('open');modalQueueId=null;saveQueue();renderQueue();
 }
 function approveFromModal(){
-  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-subject').value;i.body=document.getElementById('modal-email').value;i.status='approved';markContacted(i.id);}}
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('msub').value;i.body=document.getElementById('memail').value;i.status='approved';markContacted(i.id);}}
   closeModal();
 }
 function copyModal(){
-  const t=document.getElementById('modal-email').value;
-  navigator.clipboard.writeText(`Subject: ${document.getElementById('modal-subject').value}\n\n${t}`).then(()=>{
-    const btn=document.getElementById('btn-copy-modal');btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy to clipboard',2000);
+  const t=document.getElementById('memail').value;
+  navigator.clipboard.writeText(`Subject: ${document.getElementById('msub').value}\n\n${t}`).then(()=>{
+    const btn=document.getElementById('bcm');btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy',2000);
   });
 }
-document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
+// ── UTILS ──────────────────────────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function noContacts(){return `<div class="emp"><div class="emp-i">👥</div><h3>No contacts loaded</h3><p>Click "↻ Sync" to import from Tripleseat.</p></div>`;}
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── INIT ───────────────────────────────────────────────────────────────────
 loadFromStore();
 </script>
 </body>
