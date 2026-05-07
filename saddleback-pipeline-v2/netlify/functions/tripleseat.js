@@ -1,6 +1,13 @@
+// tripleseat.js — Fetches from ALL relevant Tripleseat endpoints
+// Endpoints: leads, bookings, events, accounts, contacts
+// Uses OAuth 2.0 client_credentials (Consumer Key + Secret → Bearer token)
+
 const https = require('https');
+
 const CONSUMER_KEY    = 'JrpAFIveyQLLQE3dyQmMPlGdiJN6RiKdLf8FX8JQ';
 const CONSUMER_SECRET = 'CuEe00aoUotCJqNk2KZmhgNEEg34A760xi123Tf5';
+const TS_HOST         = 'api.tripleseat.com';
+
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -8,7 +15,8 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
-function httpsRequest(options, body) {
+// ── HTTPS helper ──────────────────────────────────────────────────────────────
+function httpsReq(options, body) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, res => {
       let data = '';
@@ -21,125 +29,100 @@ function httpsRequest(options, body) {
   });
 }
 
+// ── Get OAuth 2.0 bearer token ────────────────────────────────────────────────
+let cachedToken = null, tokenExpiry = 0;
 async function getToken() {
-  const payload = JSON.stringify({
-    client_id:     CONSUMER_KEY,
-    client_secret: CONSUMER_SECRET,
-    grant_type:    'client_credentials',
-  });
-  const res = await httpsRequest({
-    hostname: 'api.tripleseat.com',
-    path:     '/oauth/token',
-    method:   'POST',
-    headers: {
-      'Content-Type':   'application/json',
-      'Content-Length': Buffer.byteLength(payload),
-      'Accept':         'application/json',
-    },
+  if (cachedToken && Date.now() < tokenExpiry) return cachedToken;
+  const payload = JSON.stringify({ client_id: CONSUMER_KEY, client_secret: CONSUMER_SECRET, grant_type: 'client_credentials' });
+  const res = await httpsReq({
+    hostname: TS_HOST, path: '/oauth/token', method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload), 'Accept': 'application/json' }
   }, payload);
-  console.log('Token status:', res.status, '| body:', res.body.substring(0, 200));
-  if (res.status !== 200) throw new Error(`Token failed ${res.status}: ${res.body}`);
-  return JSON.parse(res.body).access_token;
+  if (res.status !== 200) throw new Error(`Token failed ${res.status}: ${res.body.slice(0,200)}`);
+  const data = JSON.parse(res.body);
+  cachedToken = data.access_token;
+  tokenExpiry = Date.now() + 50 * 60 * 1000; // 50min
+  return cachedToken;
 }
 
+// ── Tripleseat GET ────────────────────────────────────────────────────────────
 async function tsGet(path, token) {
-  const res = await httpsRequest({
-    hostname: 'api.tripleseat.com',
-    path,
-    method:  'GET',
-    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' },
+  const res = await httpsReq({
+    hostname: TS_HOST, path, method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
   });
-  console.log(`GET ${path} → ${res.status}`);
-  return res;
+  if (res.status === 401) { cachedToken = null; throw new Error('Token expired — retry'); }
+  return { status: res.status, body: res.body };
 }
+
+// ── Valid endpoints and their response key ────────────────────────────────────
+const ENDPOINTS = {
+  leads:     { path: '/v1/leads.json',              key: 'results' },
+  bookings:  { path: '/v1/bookings/search.json',    key: 'results' },
+  events:    { path: '/v1/events/search.json',      key: 'results' },
+  accounts:  { path: '/v1/accounts.json',           key: 'results' },
+  contacts:  { path: '/v1/contacts.json',           key: 'results' },
+  locations: { path: '/v1/locations.json',          key: 'locations' },
+};
 
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
 
-  const ep    = (event.queryStringParameters?.endpoint || 'leads');
-  const limit = event.queryStringParameters?.limit || '100';
+  const params   = event.queryStringParameters || {};
+  const endpoint = params.endpoint || 'leads';
+  const page     = params.page    || '1';
+  const limit    = params.limit   || '100';
+
+  if (!ENDPOINTS[endpoint]) {
+    return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Unknown endpoint: ' + endpoint }) };
+  }
 
   try {
     const token = await getToken();
+    const cfg   = ENDPOINTS[endpoint];
 
-    // ── LEADS: fetch last 2 pages (most recent) ──────────────────────────────
-    if (ep === 'leads') {
-      const firstRes  = await tsGet(`/v1/leads.json?page=1&limit=${limit}`, token);
-      const firstData = JSON.parse(firstRes.body);
-      const totalPages = firstData.total_pages || 1;
+    // Build query string — different endpoints have different param names
+    let qs = `page=${page}&limit=${limit}`;
+    if (endpoint === 'bookings' || endpoint === 'events') {
+      qs += '&sort_direction=desc&order=updated_at';
+    }
 
-      const pagesToFetch = [];
-      if (totalPages > 1) pagesToFetch.push(totalPages - 1);
-      pagesToFetch.push(totalPages);
+    const path = `${cfg.path}?${qs}`;
+    const res  = await tsGet(path, token);
 
-      const allResults = [];
-      for (const p of pagesToFetch) {
-        const r = await tsGet(`/v1/leads.json?page=${p}&limit=${limit}`, token);
-        const d = JSON.parse(r.body);
-        allResults.push(...(d.results || []));
-      }
-      allResults.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-
+    if (res.status !== 200) {
+      console.error(`TS ${endpoint} ${res.status}:`, res.body.slice(0, 300));
       return {
-        statusCode: 200, headers: CORS,
-        body: JSON.stringify({ total_pages: totalPages, results: allResults }),
+        statusCode: res.status, headers: CORS,
+        body: JSON.stringify({ error: `Tripleseat ${res.status}`, detail: res.body.slice(0, 300), results: [], total_pages: 0 })
       };
     }
 
-    // ── BOOKINGS: fetch ALL future prospect/tentative bookings ───────────────
-    if (ep === 'bookings') {
-      const today = new Date().toISOString().split('T')[0];
+    const data = JSON.parse(res.body);
 
-      // Page 1 to get total
-      const firstRes  = await tsGet(`/v1/bookings.json?page=1&limit=${limit}`, token);
-      const firstData = JSON.parse(firstRes.body);
-      const totalPages = firstData.total_pages || 1;
+    // Normalize response — Tripleseat sometimes wraps items in their own key
+    // e.g. { leads: [{lead: {...}}, ...] } or { results: [...] }
+    let items = data[cfg.key] || data[endpoint] || data.results || data || [];
 
-      // Fetch last 4 pages to capture all upcoming/recent bookings
-      const pagesToFetch = [];
-      for (let p = Math.max(1, totalPages - 3); p <= totalPages; p++) {
-        pagesToFetch.push(p);
-      }
+    // Unwrap nested objects: [{lead: {...}}] → [{...}]
+    items = items.map(item => {
+      const singular = endpoint.replace(/s$/, ''); // leads→lead, bookings→booking
+      return item[singular] || item;
+    });
 
-      const allResults = [];
-      for (const p of pagesToFetch) {
-        const r = await tsGet(`/v1/bookings.json?page=${p}&limit=${limit}`, token);
-        const d = JSON.parse(r.body);
-        allResults.push(...(d.results || []));
-      }
-
-      // Filter: future events, prospect or tentative status, not deleted
-      const filtered = allResults.filter(b => {
-        if (b.deleted_at) return false;
-        if (!['PROSPECT', 'TENTATIVE'].includes(b.status)) return false;
-        const startDate = b.start_date || '';
-        return startDate >= today;
-      });
-
-      filtered.sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
-
-      return {
-        statusCode: 200, headers: CORS,
-        body: JSON.stringify({ total_pages: totalPages, results: filtered }),
-      };
-    }
-
-    // ── OTHER ENDPOINTS ──────────────────────────────────────────────────────
-    const pathMap = {
-      events:    `/v1/events/search.json?page=1&limit=${limit}&sort_direction=desc&order=updated_at`,
-      contacts:  `/v1/contacts.json?page=1&limit=${limit}`,
-      locations: `/v1/locations.json`,
+    return {
+      statusCode: 200, headers: CORS,
+      body: JSON.stringify({
+        results:     items,
+        total_pages: data.total_pages || 1,
+        total_count: data.total_count || items.length,
+        endpoint,
+        page: parseInt(page),
+      })
     };
-    const path = pathMap[ep];
-    if (!path) return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid endpoint' }) };
-    const result = await tsGet(path, token);
-    return { statusCode: 200, headers: CORS, body: result.body };
 
   } catch (err) {
-    console.error('Error:', err.message);
-    return {
-      statusCode: 500, headers: CORS,
-      body: JSON.stringify({ error: err.message, results: [] }),
-    };
+    console.error('Tripleseat function error:', err.message);
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: err.message, results: [], total_pages: 0 }) };
   }
 };
