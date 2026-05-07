@@ -1,21 +1,61 @@
-// store.js — Netlify KV / Blobs persistence
-// Uses @netlify/blobs which is available as a built-in in Netlify's Node 18+ runtime
-// If blobs fail, gracefully returns empty data with a clear error
+// store.js — Supabase REST API backend
+// Env vars needed in Netlify:
+//   SUPABASE_URL = https://yourproject.supabase.co
+//   SUPABASE_KEY = service_role key (NOT anon key)
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
   'Content-Type': 'application/json',
 };
 
-const CHUNK_SIZE = 300; // contacts per blob chunk — smaller = more reliable
+function sb(path, opts = {}) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_KEY;
+  if (!url || !key) throw new Error('SUPABASE_URL / SUPABASE_KEY not set in Netlify environment variables');
+  return fetch(`${url}/rest/v1${path}`, {
+    headers: {
+      'apikey': key, 'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers || {}),
+    },
+    method: opts.method || 'GET',
+    body: opts.body,
+  });
+}
 
-async function getStore() {
-  // Netlify Blobs is available natively in Netlify functions
-  // It requires NETLIFY_BLOBS_CONTEXT env var which Netlify injects automatically
-  const { getStore } = await import('@netlify/blobs');
-  return getStore({ name: 'saddleback-crm', consistency: 'strong' });
+async function query(table, qs = '') {
+  const res = await sb(`/${table}?${qs}`);
+  if (!res.ok) throw new Error(`Supabase GET ${table}: ${res.status} ${await res.text()}`);
+  return res.json();
+}
+
+async function upsert(table, rows) {
+  if (!rows || !rows.length) return;
+  for (let i = 0; i < rows.length; i += 200) {
+    const res = await sb(`/${table}`, {
+      method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal',
+      headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify(rows.slice(i, i + 200)),
+    });
+    if (!res.ok) throw new Error(`Supabase UPSERT ${table}: ${res.status} ${await res.text()}`);
+  }
+}
+
+async function patch(table, filter, data) {
+  const res = await sb(`/${table}?${filter}`, {
+    method: 'PATCH', prefer: 'return=minimal',
+    headers: { 'Prefer': 'return=minimal' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Supabase PATCH ${table}: ${res.status} ${await res.text()}`);
+}
+
+async function del(table, filter) {
+  const res = await sb(`/${table}?${filter}`, { method: 'DELETE', prefer: 'return=minimal', headers: {'Prefer':'return=minimal'} });
+  if (!res.ok) throw new Error(`Supabase DELETE ${table}: ${res.status} ${await res.text()}`);
 }
 
 exports.handler = async (event) => {
@@ -23,94 +63,78 @@ exports.handler = async (event) => {
 
   const action = (event.queryStringParameters || {}).action;
 
-  let store;
-  try {
-    store = await getStore();
-  } catch (importErr) {
-    // Netlify Blobs not available in this environment
-    console.error('Blobs import error:', importErr.message);
+  // Config check
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
     return {
-      statusCode: 200,
-      headers: CORS,
+      statusCode: 200, headers: CORS,
       body: JSON.stringify({
-        ok: false,
-        blobsAvailable: false,
-        error: 'Netlify Blobs not available: ' + importErr.message,
-        contacts: [], queue: [], metadata: { totalContacts: 0, totalChunks: 0, lastSync: null }
+        ok: false, configured: false,
+        error: 'Add SUPABASE_URL and SUPABASE_KEY in Netlify → Site Configuration → Environment Variables, then redeploy.',
       })
     };
   }
 
   try {
+
     // ── GET ──────────────────────────────────────────────────────────────────
     if (event.httpMethod === 'GET') {
 
       if (action === 'debug') {
-        // Debug endpoint — shows storage status
-        let meta = null, blobsList = null;
-        try { meta = await store.get('metadata', { type: 'json' }); } catch(e) {}
-        try { const l = await store.list(); blobsList = l.blobs?.map(b=>b.key) || []; } catch(e) {}
+        const [meta, counts] = await Promise.all([
+          query('sync_metadata', 'select=key,value').catch(() => []),
+          Promise.all([
+            query('ts_leads',          'select=count').catch(() => [{ count: 0 }]),
+            query('ts_bookings',       'select=count').catch(() => [{ count: 0 }]),
+            query('ts_accounts',       'select=count').catch(() => [{ count: 0 }]),
+            query('ts_contacts',       'select=count').catch(() => [{ count: 0 }]),
+            query('ts_events',         'select=count').catch(() => [{ count: 0 }]),
+            query('outreach_contacts', 'select=count').catch(() => [{ count: 0 }]),
+            query('email_queue',       'select=count').catch(() => [{ count: 0 }]),
+          ]),
+        ]);
         return {
           statusCode: 200, headers: CORS,
           body: JSON.stringify({
-            blobsAvailable: true,
-            metadata: meta || 'not found',
-            blobKeys: blobsList || 'could not list',
-            environment: {
-              hasContext: !!process.env.NETLIFY_BLOBS_CONTEXT,
-              siteId: process.env.SITE_ID || 'not set',
-              nodeVersion: process.version,
-            }
+            configured: true, supabaseConnected: true,
+            syncMetadata: Object.fromEntries((meta || []).map(r => [r.key, r.value])),
+            tableCounts: {
+              leads:           counts[0]?.[0]?.count ?? 0,
+              bookings:        counts[1]?.[0]?.count ?? 0,
+              accounts:        counts[2]?.[0]?.count ?? 0,
+              contacts:        counts[3]?.[0]?.count ?? 0,
+              events:          counts[4]?.[0]?.count ?? 0,
+              outreach:        counts[5]?.[0]?.count ?? 0,
+              queue:           counts[6]?.[0]?.count ?? 0,
+            },
           })
         };
       }
 
       if (action === 'get-metadata') {
-        let meta = null;
-        try { meta = await store.get('metadata', { type: 'json' }); } catch(e) {}
-        return {
-          statusCode: 200, headers: CORS,
-          body: JSON.stringify(meta || { totalContacts: 0, totalChunks: 0, lastSync: null, blobsAvailable: true })
-        };
+        const rows = await query('sync_metadata', 'select=key,value');
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ configured: true, ...Object.fromEntries((rows || []).map(r => [r.key, r.value])) }) };
       }
 
       if (action === 'get-contacts') {
-        let meta = null;
-        try { meta = await store.get('metadata', { type: 'json' }); } catch(e) {}
-
-        if (!meta || !meta.totalChunks || meta.totalChunks === 0) {
-          return { statusCode: 200, headers: CORS, body: JSON.stringify({ contacts: [], lastSync: null, totalContacts: 0 }) };
-        }
-
-        // Load all chunks in parallel
-        const chunkPromises = Array.from({ length: meta.totalChunks }, (_, i) =>
-          store.get(`contacts-chunk-${i}`, { type: 'json' }).catch(() => [])
-        );
-        const chunks = await Promise.all(chunkPromises);
-        const contacts = chunks.flat().filter(Boolean);
-
-        return {
-          statusCode: 200, headers: CORS,
-          body: JSON.stringify({ contacts, lastSync: meta.lastSync, totalContacts: contacts.length })
-        };
+        const limit  = parseInt(event.queryStringParameters?.limit  || '3000');
+        const offset = parseInt(event.queryStringParameters?.offset || '0');
+        const rows = await query('outreach_contacts', `select=*&limit=${limit}&offset=${offset}&order=last_event_date.desc.nullslast`);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ contacts: rows || [] }) };
       }
 
       if (action === 'get-queue') {
-        let data = null;
-        try { data = await store.get('email-queue', { type: 'json' }); } catch(e) {}
-        return { statusCode: 200, headers: CORS, body: JSON.stringify(data || { queue: [] }) };
-      }
-
-      if (action === 'get-contacted') {
-        let data = null;
-        try { data = await store.get('contacted-history', { type: 'json' }); } catch(e) {}
-        return { statusCode: 200, headers: CORS, body: JSON.stringify(data || {}) };
+        const rows = await query('email_queue', 'select=*&order=created_at.desc&limit=500');
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ queue: rows || [] }) };
       }
 
       if (action === 'get-suppressed') {
-        let data = null;
-        try { data = await store.get('suppressed', { type: 'json' }); } catch(e) {}
-        return { statusCode: 200, headers: CORS, body: JSON.stringify(data || { list: [] }) };
+        const rows = await query('suppression_list', 'select=email');
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ list: (rows || []).map(r => r.email) }) };
+      }
+
+      if (action === 'get-sent-history') {
+        const rows = await query('sent_history', 'select=*&order=sent_at.desc&limit=200');
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ history: rows || [] }) };
       }
     }
 
@@ -118,42 +142,126 @@ exports.handler = async (event) => {
     if (event.httpMethod === 'POST') {
       const body = JSON.parse(event.body || '{}');
 
+      if (action === 'save-leads') {
+        const leads = (body.leads || []).map(l => ({
+          id: l.id, first_name: l.first_name, last_name: l.last_name,
+          email: (l.email_address || l.email || '').toLowerCase().trim() || null,
+          phone: l.phone_number || l.phone,
+          company: l.company, event_date: l.event_date || null,
+          event_description: l.event_description, event_style: l.event_style,
+          guest_count: l.guest_count || null, location_name: l.location?.name,
+          additional_information: l.additional_information,
+          turned_down_at: l.turned_down_at || null, turned_down_reason: l.turned_down_reason,
+          created_at: l.created_at, updated_at: l.updated_at,
+          raw: l, synced_at: new Date().toISOString(),
+        }));
+        await upsert('ts_leads', leads);
+        await upsert('sync_metadata', [{ key: 'last_leads_sync', value: new Date().toISOString() }, { key: 'total_leads', value: String(leads.length) }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: leads.length }) };
+      }
+
+      if (action === 'save-bookings') {
+        const bookings = (body.bookings || []).map(b => ({
+          id: b.id, name: b.name, account_id: b.account_id || null, contact_id: b.contact_id || null,
+          location_name: b.location_name || b.location?.name,
+          status: (b.status || '').toUpperCase(),
+          start_date: b.start_date || null, end_date: b.end_date || null,
+          guest_count: b.guest_count || null, total_amount: b.total_amount || null,
+          description: b.description || b.name,
+          created_at: b.created_at, updated_at: b.updated_at,
+          raw: b, synced_at: new Date().toISOString(),
+        }));
+        await upsert('ts_bookings', bookings);
+        await upsert('sync_metadata', [{ key: 'last_bookings_sync', value: new Date().toISOString() }, { key: 'total_bookings', value: String(bookings.length) }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: bookings.length }) };
+      }
+
+      if (action === 'save-accounts') {
+        const accounts = (body.accounts || []).map(a => ({
+          id: a.id, name: a.name, description: a.description,
+          email: (a.email_address || a.email || '').toLowerCase().trim() || null,
+          phone: a.phone_number || a.phone, website: a.website,
+          created_at: a.created_at, updated_at: a.updated_at,
+          raw: a, synced_at: new Date().toISOString(),
+        }));
+        await upsert('ts_accounts', accounts);
+        await upsert('sync_metadata', [{ key: 'last_accounts_sync', value: new Date().toISOString() }, { key: 'total_accounts', value: String(accounts.length) }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: accounts.length }) };
+      }
+
       if (action === 'save-contacts') {
-        const contacts = body.contacts || [];
-        const totalChunks = Math.ceil(contacts.length / CHUNK_SIZE) || 1;
-
-        // Save in batches of 5 concurrent writes
-        for (let batch = 0; batch < totalChunks; batch += 5) {
-          const writes = [];
-          for (let i = batch; i < Math.min(batch + 5, totalChunks); i++) {
-            const chunk = contacts.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-            writes.push(store.set(`contacts-chunk-${i}`, JSON.stringify(chunk)));
-          }
-          await Promise.all(writes);
-        }
-
-        const metadata = {
-          lastSync: new Date().toISOString(),
-          totalContacts: contacts.length,
-          totalChunks,
-          version: 3,
-        };
-        await store.set('metadata', JSON.stringify(metadata));
-        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: contacts.length, chunks: totalChunks }) };
+        const contacts = (body.contacts || []).map(c => ({
+          id: c.id, account_id: c.account_id || null,
+          first_name: c.first_name, last_name: c.last_name,
+          email: (c.email_address || c.email || '').toLowerCase().trim() || null,
+          phone: c.phone_number || c.phone, company: c.company,
+          created_at: c.created_at, updated_at: c.updated_at,
+          raw: c, synced_at: new Date().toISOString(),
+        }));
+        await upsert('ts_contacts', contacts);
+        await upsert('sync_metadata', [{ key: 'last_contacts_sync', value: new Date().toISOString() }, { key: 'total_contacts', value: String(contacts.length) }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: contacts.length }) };
       }
 
-      if (action === 'save-queue') {
-        await store.set('email-queue', JSON.stringify({ queue: body.queue || [], updatedAt: new Date().toISOString() }));
+      if (action === 'save-events') {
+        const events = (body.events || []).map(e => ({
+          id: e.id, booking_id: e.booking_id || null,
+          account_id: e.account_id || null, contact_id: e.contact_id || null,
+          name: e.name, status: (e.status || '').toUpperCase(),
+          event_start: e.event_start || null, event_end: e.event_end || null,
+          guest_count: e.guest_count || null, room: e.room,
+          location_name: e.location_name || e.location?.name,
+          created_at: e.created_at, updated_at: e.updated_at,
+          raw: e, synced_at: new Date().toISOString(),
+        }));
+        await upsert('ts_events', events);
+        await upsert('sync_metadata', [{ key: 'last_events_sync', value: new Date().toISOString() }, { key: 'total_events', value: String(events.length) }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: events.length }) };
+      }
+
+      if (action === 'save-outreach-contacts') {
+        const oc = body.contacts || [];
+        await upsert('outreach_contacts', oc);
+        await upsert('sync_metadata', [
+          { key: 'total_outreach', value: String(oc.length) },
+          { key: 'last_full_sync', value: new Date().toISOString() },
+        ]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: oc.length }) };
+      }
+
+      if (action === 'bulk-save-queue') {
+        await upsert('email_queue', body.queue || []);
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
 
-      if (action === 'save-contacted') {
-        await store.set('contacted-history', JSON.stringify(body));
+      if (action === 'update-queue-item') {
+        await patch('email_queue', `id=eq.${body.id}`, {
+          status: body.status, subject: body.subject, body: body.body,
+          risk_flags: body.risk_flags,
+          approved_at: body.approved_at || null,
+          updated_at: new Date().toISOString(),
+        });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
 
-      if (action === 'save-suppressed') {
-        await store.set('suppressed', JSON.stringify({ list: body.list || [], updatedAt: new Date().toISOString() }));
+      if (action === 'record-sent') {
+        await upsert('sent_history', [{
+          contact_email: body.email, contact_name: body.name,
+          campaign_id: body.campaign, subject: body.subject, body: body.body,
+        }]);
+        await patch('outreach_contacts', `id=eq.${encodeURIComponent(body.email)}`, {
+          last_contacted_at: new Date().toISOString(), last_campaign: body.campaign,
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      if (action === 'suppress') {
+        await upsert('suppression_list', [{ email: (body.email || '').toLowerCase(), reason: body.reason || 'manual' }]);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      if (action === 'unsuppress') {
+        await del('suppression_list', `email=eq.${encodeURIComponent((body.email || '').toLowerCase())}`);
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
     }
@@ -161,10 +269,9 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Unknown action: ' + action }) };
 
   } catch (err) {
-    console.error('Store handler error:', err);
-    return {
-      statusCode: 500, headers: CORS,
-      body: JSON.stringify({ error: err.message, stack: err.stack?.split('\n').slice(0,3).join(' | ') })
-    };
+    console.error('Store error:', err.message);
+    // Clear error message — tell the user exactly what to do
+    const msg = err.message.includes('SUPABASE') ? err.message : `Database error: ${err.message}`;
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: msg }) };
   }
 };
