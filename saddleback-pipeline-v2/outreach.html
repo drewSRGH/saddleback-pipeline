@@ -319,8 +319,30 @@ function buildOpportunities() {
   contacts.forEach(c=>contactMap[c.id]=c);
 
   const opps=[];
+  // Central status extraction — checks all possible field names
+  function getStatus(r){
+    if(!r) return 'UNKNOWN';
+    // Events use 'status' field directly: TENTATIVE, DEFINITE, CLOSED, PROSPECT, LOST
+    const s = r.status || r.event_status || r.booking_status || '';
+    const norm = s.toString().toUpperCase().trim();
+    if(['TENTATIVE','DEFINITE','CLOSED','PROSPECT','LOST'].includes(norm)) return norm;
+    // Common variations
+    if(norm==='DEFINITIVE') return 'DEFINITE';
+    if(norm==='CANCELLED'||norm==='CANCELED') return 'LOST';
+    if(norm==='WON') return 'CLOSED';
+    return norm||'UNKNOWN';
+  }
+
+  // Field normalization — events use event_start, bookings use start_date
+  function getEventDate(r){
+    return r.event_start||r.start_date||r.event_date||null;
+  }
+  function getEventEnd(r){
+    return r.event_end||r.end_date||null;
+  }
+
   bookings.forEach(b=>{
-    const status=(b.status||'').toUpperCase();
+    const status=getStatus(b);
     const contact=b.contact_id?contactMap[b.contact_id]:null;
     const account=b.account_id?accountMap[b.account_id]:null;
     const allForContact=[...(bookingsByContact[b.contact_id]||[]),...(bookingsByAccount[b.account_id]||[])];
@@ -351,8 +373,7 @@ function buildOpportunities() {
     opps.push({
       id:String(b.id), bookingId:b.id, status,
       name, company, email, phone,
-      eventDate:b.start_date, eventYear:b.start_date?new Date(b.start_date).getFullYear():null,
-      guests:parseInt(b.guest_count)||0,
+      eventDate:getEventDate(b), eventYear:getEventDate(b)?new Date(getEventDate(b)).getFullYear():null,      guests:parseInt(b.guest_count)||0,
       description:b.description||b.name||'',
       location:b.location_name||'',
       updatedAt:b.updated_at||b.created_at,
@@ -409,10 +430,16 @@ async function loadFromDB() {
       renderTab(activeTab); return;
     }
 
-    // Load bookings (primary — has status data)
-    if(totalBookings>0){
-      debug.step='get-bookings';
-      setProgress(15,'Loading bookings from Supabase…');
+    // Load events from Supabase (events have the status field)
+    const totalEvents=parseInt(meta.total_events||'0');
+    debug.step='get-events';
+    setProgress(15,'Loading events from Supabase…');
+    if(totalEvents>0){
+      const eRows=await loadAllRows('ts_events','*','event_start.desc.nullslast');
+      bookings=eRows; // use events as primary "bookings" since they have status
+      debug.eventsLoaded=bookings.length;
+    } else if(parseInt(meta.total_bookings||'0')>0){
+      // Fallback to bookings table if events not synced yet
       const bRows=await loadAllRows('ts_bookings','*','start_date.desc.nullslast');
       bookings=bRows;
       debug.bookingsLoaded=bookings.length;
@@ -454,8 +481,8 @@ async function loadFromDB() {
     setTimeout(()=>setStatus('',''),5000);
     updateBadges(); renderTab(activeTab);
 
-    if(totalBookings===0&&lastSync){
-      setStatus('Contacts loaded but booking status data is missing. Click "↻ Full Sync" to get Prospect/Tentative/Definite/Closed/Lost data.','wa');
+    if(totalEvents===0&&lastSync){
+      setStatus('Events not synced yet. Click "↻ Full Sync" to get real Prospect/Tentative/Definite/Closed/Lost status data from Tripleseat.','wa');
     }
     if(syncDate&&(Date.now()-syncDate.getTime())>3*86400000){
       setTimeout(()=>setStatus(`Data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider a Full Sync for latest status data.`,'wa'),5500);
@@ -497,10 +524,17 @@ async function doFullSync(){
     const lSave=await sbPost('save-leads',{leads:allLeads});
     if(lSave?.ok===false) throw new Error('save-leads: '+lSave.error);
 
-    // 2. Bookings — CRITICAL (Prospect/Tentative/Definite/Closed/Lost)
-    setProgress(13,'Fetching bookings (status data)…');
+    // 2. Events — STATUS LIVES HERE (TENTATIVE/DEFINITE/CLOSED/PROSPECT/LOST)
+    setProgress(13,'Fetching events (status: Tentative/Definite/Closed/Prospect/Lost)…');
+    const allEvents=await fetchAllPages('events');
+    setProgress(35,`${allEvents.length} events — saving…`);
+    const eSave=await sbPost('save-events',{events:allEvents});
+    if(eSave?.ok===false) throw new Error('save-events: '+eSave.error);
+
+    // Also fetch bookings for account/contact linking
+    setProgress(36,'Fetching bookings (account/contact links)…');
     const allBookings=await fetchAllPages('bookings');
-    setProgress(35,`${allBookings.length} bookings — saving…`);
+    setProgress(40,`${allBookings.length} bookings — saving…`);
     const bSave=await sbPost('save-bookings',{bookings:allBookings});
     if(bSave?.ok===false) throw new Error('save-bookings: '+bSave.error);
 
@@ -520,7 +554,9 @@ async function doFullSync(){
 
     // 5. Build + save outreach_contacts
     setProgress(72,'Building opportunity profiles…');
-    bookings=allBookings; accounts=allAccounts; contacts=allContacts; leads=allLeads;
+    // Use events (with status) as primary, bookings as supplement
+    bookings=allEvents.length>0?allEvents:allBookings;
+    accounts=allAccounts; contacts=allContacts; leads=allLeads;
     const outreach=buildLegacyOutreachContacts(allLeads,allBookings,allAccounts,allContacts);
     setProgress(80,`${outreach.length} profiles — saving…`);
     for(let i=0;i<outreach.length;i+=300){
@@ -902,10 +938,26 @@ async function loadDebug(){
   try{
     const res=await fetch(`${API_ST}?action=debug`);
     const data=await res.json();
-    el.textContent=JSON.stringify({
+    // Show status inspector prominently
+    const si=data.statusInspector||{};
+    const siHtml=si.eventStatusBreakdown?`
+      <div style="background:rgba(91,141,238,.08);border:1px solid rgba(91,141,238,.2);border-radius:7px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:.8rem;font-weight:600;color:var(--bl);margin-bottom:8px">Tripleseat Status Inspector</div>
+        <div style="font-size:.72rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:6px">Total events inspected: ${si.totalEvents||0}</div>
+        <div style="font-size:.72rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:6px">Status field: ts_events.status</div>
+        ${Object.entries(si.eventStatusBreakdown||{}).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--b);font-size:.75rem;font-family:'DM Mono',monospace">
+            <span style="color:${k==='TENTATIVE'?'var(--y)':k==='DEFINITE'?'var(--g)':k==='CLOSED'?'var(--bl)':k==='PROSPECT'?'var(--pu)':k==='LOST'?'var(--r)':'var(--m)'}">${k}</span>
+            <span style="color:var(--t);font-weight:600">${v}</span>
+          </div>`).join('')}
+      </div>`:'';
+    el.innerHTML=siHtml;
+    const pre=document.createElement('pre');
+    pre.style.cssText='font-size:.71rem;color:var(--m);white-space:pre-wrap;line-height:1.6';
+    pre.textContent=JSON.stringify({
       supabase:data,
       frontend:{
-        bookingsInMemory:bookings.length,
+        eventsInMemory:bookings.length,
         contactsInMemory:contacts.length,
         accountsInMemory:accounts.length,
         leadsInMemory:leads.length,
@@ -916,7 +968,7 @@ async function loadDebug(){
         loadDebug:window._loadDebug||'none',
       }
     },null,2);
-  }catch(e){el.textContent='Error: '+e.message;}
+  }catch(e){if(el){el.textContent='Error: '+e.message;}}
 }
 
 // ── QUEUE ACTIONS ─────────────────────────────────────────────────────────────
