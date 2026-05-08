@@ -252,6 +252,34 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: items.length }) };
       }
 
+      // ── SAVE EVENTS (has real status: TENTATIVE/DEFINITE/CLOSED/PROSPECT/LOST) ──
+      if (action === 'save-events') {
+        const items = (body.events || []).map(e => ({
+          id: e.id,
+          booking_id: e.booking_id || null,
+          account_id: e.account_id || null,
+          contact_id: e.contact_id || null,
+          name: e.name || null,
+          // Status lives on events — normalize all possible field names
+          status: (e.status || e.event_status || e.booking_status || '').toString().toUpperCase().trim() || null,
+          event_start: e.event_start || e.start_time || e.start_date || null,
+          event_end:   e.event_end   || e.end_time   || e.end_date   || null,
+          guest_count: e.guest_count || null,
+          room:        e.room || e.room_name || null,
+          location_name: e.location_name || e.location?.name || null,
+          created_at: e.created_at,
+          updated_at: e.updated_at,
+          raw: e,
+          synced_at: new Date().toISOString(),
+        }));
+        await upsertRows(url, key, 'ts_events', items);
+        await setMeta(url, key, {
+          last_events_sync: new Date().toISOString(),
+          total_events: items.length,
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: items.length }) };
+      }
+
       // ── SAVE OUTREACH CONTACTS (deduped profiles) ──
       // This is the critical table. Saved last, sets total_outreach and last_full_sync.
       if (action === 'save-outreach-contacts') {
