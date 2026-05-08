@@ -3,145 +3,146 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Saddleback — Outreach</title>
+  <title>Saddleback — Sales Command Center</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#0f0f0e;--s:#181817;--s2:#1f1f1d;--b:#2a2a27;--b2:#333330;--t:#f0ede8;--m:#8a8780;--m2:#5a5855;--a:#e8772a;--a2:#f5a623;--g:#4caf7d;--r:#e05252;--y:#f5a623;--bl:#5b8dee;--pu:#9b7edb;--te:#3dbdb0;}
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;font-size:14px;line-height:1.5}
-    a{text-decoration:none;color:inherit}
-    nav{display:flex;align-items:center;padding:0 24px;background:var(--s);border-bottom:1px solid var(--b);height:52px;position:sticky;top:0;z-index:50}
-    .nb{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--a2);margin-right:28px}
+    nav{display:flex;align-items:center;padding:0 22px;background:var(--s);border-bottom:1px solid var(--b);height:52px;position:sticky;top:0;z-index:50}
+    .nb{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--a2);margin-right:24px;text-decoration:none}
     .nt{display:flex}
-    .ntb{padding:0 14px;height:52px;display:flex;align-items:center;font-size:.82rem;font-weight:500;color:var(--m);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+    .ntb{padding:0 13px;height:52px;display:flex;align-items:center;font-size:.81rem;font-weight:500;color:var(--m);border-bottom:2px solid transparent;transition:color .15s,border-color .15s;text-decoration:none}
     .ntb:hover{color:var(--t)}
     .ntb.active{color:var(--t);border-bottom-color:var(--a)}
-    .nr{margin-left:auto;display:flex;align-items:center;gap:10px}
-    .page{padding:18px 24px;max-width:1400px;margin:0 auto}
-    /* TABS */
-    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--b);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-    .tab{padding:10px 15px;font-size:.81rem;font-weight:500;color:var(--m);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:color .15s,border-color .15s}
+    .nr{margin-left:auto;display:flex;align-items:center;gap:9px}
+    .page{padding:16px 22px;max-width:1500px;margin:0 auto}
+    .tabs{display:flex;gap:1px;border-bottom:1px solid var(--b);margin-bottom:18px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .tab{padding:9px 14px;font-size:.79rem;font-weight:500;color:var(--m);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:color .15s,border-color .15s}
     .tab:hover{color:var(--t)}
     .tab.active{color:var(--t);border-bottom-color:var(--a);font-weight:600}
-    .bg{display:inline-block;background:rgba(232,119,42,.15);color:var(--a);border-radius:20px;padding:1px 6px;font-size:.65rem;font-family:'DM Mono',monospace;margin-left:4px}
-    .bg.g{background:rgba(76,175,125,.15);color:var(--g)}
-    .bg.r{background:rgba(224,82,82,.15);color:var(--r)}
-    .bg.y{background:rgba(245,166,35,.15);color:var(--y)}
+    .bge{display:inline-block;border-radius:20px;padding:1px 6px;font-size:.63rem;font-family:'DM Mono',monospace;margin-left:3px}
+    .bge.g{background:rgba(76,175,125,.15);color:var(--g)}
+    .bge.y{background:rgba(245,166,35,.15);color:var(--y)}
+    .bge.r{background:rgba(224,82,82,.15);color:var(--r)}
+    .bge.b{background:rgba(91,141,238,.15);color:var(--bl)}
+    .bge.m{background:rgba(90,88,85,.2);color:var(--m)}
+    .bge.a{background:rgba(232,119,42,.15);color:var(--a)}
     /* STATS */
-    .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin-bottom:20px}
-    .sc_{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:13px 15px}
-    .sn{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;line-height:1}
-    .sl_{font-size:.66rem;color:var(--m);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:4px}
+    .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:18px}
+    .sc{background:var(--s);border:1px solid var(--b);border-radius:9px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+    .sc:hover{border-color:var(--b2)}
+    .sn{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;line-height:1}
+    .sl{font-size:.64rem;color:var(--m);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:3px}
     /* PROGRESS */
-    .pw{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:13px 16px;margin-bottom:18px}
-    .pl_{font-size:.76rem;color:var(--m);margin-bottom:7px;font-family:'DM Mono',monospace}
-    .pb_{background:var(--s2);border-radius:4px;height:5px;overflow:hidden}
-    .pf_{height:100%;background:var(--a);border-radius:4px;transition:width .3s}
+    .pw{background:var(--s);border:1px solid var(--b);border-radius:7px;padding:11px 15px;margin-bottom:16px}
+    .pl{font-size:.74rem;color:var(--m);margin-bottom:6px;font-family:'DM Mono',monospace}
+    .pb{background:var(--s2);border-radius:3px;height:4px;overflow:hidden}
+    .pf{height:100%;background:var(--a);border-radius:3px;transition:width .3s}
     /* STATUS MSG */
-    .sm_{font-size:.78rem;padding:9px 13px;border-radius:7px;margin-bottom:14px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:8px}
-    .sm_.ld{background:rgba(91,141,238,.1);color:var(--bl);border:1px solid rgba(91,141,238,.2)}
-    .sm_.ok{background:rgba(76,175,125,.1);color:var(--g);border:1px solid rgba(76,175,125,.2)}
-    .sm_.er{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
-    .sm_.wa{background:rgba(245,166,35,.1);color:var(--y);border:1px solid rgba(245,166,35,.2)}
+    .sm{font-size:.76rem;padding:8px 12px;border-radius:7px;margin-bottom:13px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:7px}
+    .sm.ld{background:rgba(91,141,238,.1);color:var(--bl);border:1px solid rgba(91,141,238,.2)}
+    .sm.ok{background:rgba(76,175,125,.1);color:var(--g);border:1px solid rgba(76,175,125,.2)}
+    .sm.er{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
+    .sm.wa{background:rgba(245,166,35,.1);color:var(--y);border:1px solid rgba(245,166,35,.2)}
     /* BUTTONS */
-    .btn{border:none;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-    .ba{background:var(--a);color:#fff;padding:7px 14px;font-size:.8rem}
+    .btn{border:none;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+    .ba{background:var(--a);color:#fff;padding:6px 13px;font-size:.79rem}
     .ba:hover{background:#f08030}
     .ba:disabled{background:var(--b2);color:var(--m2);cursor:not-allowed}
-    .bgh{background:transparent;color:var(--m);border:1px solid var(--b2);padding:6px 11px;font-size:.76rem}
+    .bgh{background:transparent;color:var(--m);border:1px solid var(--b2);padding:5px 10px;font-size:.74rem}
     .bgh:hover{color:var(--t);border-color:var(--m)}
-    .bge{background:var(--g);color:#fff;padding:6px 13px;font-size:.78rem}
-    .bge:hover{background:#3d9d6a}
-    .br{background:transparent;color:var(--r);border:1px solid rgba(224,82,82,.3);padding:5px 9px;font-size:.73rem}
-    .bs{padding:5px 9px;font-size:.72rem}
-    /* CARDS */
-    .card{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:15px;margin-bottom:9px;transition:border-color .15s}
-    .card:hover{border-color:var(--b2)}
-    .card.approved{border-color:rgba(76,175,125,.4)}
-    .card.skipped{opacity:.4}
-    .card.active-lead{border-left:3px solid var(--g)}
-    .card.past{border-left:3px solid var(--a)}
-    .card.lost{border-left:3px solid var(--r);opacity:.7}
-    .card.never-booked{border-left:3px solid var(--m2)}
-    .ch{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:9px}
-    .cn{font-weight:600;font-size:.9rem;color:var(--t)}
-    .cs{font-size:.72rem;color:var(--m);margin-top:2px}
-    .cm{display:flex;gap:12px;flex-wrap:wrap;font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:7px}
-    .cm span{color:var(--m)}
-    .ct{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:9px}
-    .tag{font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
-    .tc_{background:rgba(91,141,238,.12);color:var(--bl)}
-    .tq{background:rgba(224,82,82,.12);color:var(--r)}
-    .ta{background:rgba(155,126,219,.12);color:var(--pu)}
-    .tn{background:rgba(90,88,85,.2);color:var(--m)}
-    .th{background:rgba(245,166,35,.12);color:var(--y)}
-    .tm{background:rgba(61,189,176,.12);color:var(--te)}
-    .tp{background:rgba(232,119,42,.12);color:var(--a)}
-    .tg{background:rgba(76,175,125,.12);color:var(--g)}
-    .cb_{background:var(--s2);border-radius:7px;padding:11px 13px;font-size:.78rem;line-height:1.7;color:var(--m);white-space:pre-wrap;max-height:150px;overflow-y:auto;border-left:3px solid var(--b2);margin-bottom:11px}
-    .cf{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:9px;border-top:1px solid var(--b)}
-    .sp_{font-size:.66rem;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap}
-    /* RISK FLAG */
-    .rf{background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.25);border-radius:6px;padding:6px 10px;font-size:.72rem;color:var(--r);margin-bottom:5px}
-    /* COMPANY */
-    .cc{background:var(--s);border:1px solid var(--b);border-radius:11px;padding:15px;margin-bottom:9px;cursor:pointer;transition:border-color .15s}
-    .cc:hover{border-color:var(--b2)}
-    .cc.exp{border-color:var(--a)}
-    .ccc{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--b)}
-    .cc.exp .ccc{display:block}
-    .cm2{background:var(--s2);border-radius:7px;padding:9px 11px;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    /* WORKFLOW STATUS LEGEND */
-    .wf-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-    .wf-item{font-size:.68rem;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:20px}
+    .bgg{background:var(--g);color:#fff;padding:6px 12px;font-size:.76rem}
+    .bgg:hover{background:#3d9d6a}
+    .br{background:transparent;color:var(--r);border:1px solid rgba(224,82,82,.3);padding:4px 8px;font-size:.71rem}
+    .bs{padding:4px 9px;font-size:.71rem}
+    /* STATUS PILLS */
+    .pill{font-size:.63rem;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    .pill-tent{background:rgba(245,166,35,.15);color:var(--y);border:1px solid rgba(245,166,35,.3)}
+    .pill-def{background:rgba(76,175,125,.15);color:var(--g);border:1px solid rgba(76,175,125,.3)}
+    .pill-closed{background:rgba(91,141,238,.15);color:var(--bl);border:1px solid rgba(91,141,238,.3)}
+    .pill-prosp{background:rgba(155,126,219,.15);color:var(--pu);border:1px solid rgba(155,126,219,.3)}
+    .pill-lost{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
+    .pill-lead{background:rgba(61,189,176,.12);color:var(--te);border:1px solid rgba(61,189,176,.2)}
+    /* OPPORTUNITY CARDS */
+    .opp{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:8px;transition:border-color .15s}
+    .opp:hover{border-color:var(--b2)}
+    .opp.urgent{border-left:3px solid var(--y)}
+    .opp.high{border-left:3px solid var(--a)}
+    .opp.med{border-left:3px solid var(--bl)}
+    .opp.low{border-left:3px solid var(--m2)}
+    .opp.closed-past{border-left:3px solid var(--g)}
+    .opp-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+    .opp-name{font-weight:600;font-size:.9rem}
+    .opp-co{font-size:.72rem;color:var(--m);margin-top:1px}
+    .opp-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.69rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:8px}
+    .opp-meta span{color:var(--m)}
+    .opp-action{background:rgba(232,119,42,.06);border:1px solid rgba(232,119,42,.15);border-radius:6px;padding:7px 10px;font-size:.75rem;color:var(--m);margin-bottom:9px;line-height:1.5}
+    .opp-action strong{color:var(--a2)}
+    .opp-footer{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--b)}
+    /* SCORE BADGE */
+    .score{font-size:.65rem;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px}
+    .score-high{background:rgba(245,166,35,.15);color:var(--y)}
+    .score-med{background:rgba(91,141,238,.12);color:var(--bl)}
+    .score-low{background:rgba(90,88,85,.2);color:var(--m)}
+    /* SECTION HEADERS */
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+    .sec-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--t)}
+    /* YEAR GRID */
+    .yr-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+    .yr-col{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px}
+    .yr-col-hdr{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--b)}
+    /* DRAFT CARD */
+    .draft-body{background:var(--s2);border-radius:6px;padding:10px 12px;font-size:.78rem;line-height:1.65;color:var(--m);white-space:pre-wrap;max-height:140px;overflow-y:auto;border-left:3px solid var(--b2);margin:8px 0}
+    .risk{background:rgba(224,82,82,.07);border:1px solid rgba(224,82,82,.2);border-radius:5px;padding:5px 9px;font-size:.7rem;color:var(--r);margin-bottom:5px}
+    /* SETUP */
+    .setup{background:rgba(91,141,238,.07);border:1px solid rgba(91,141,238,.2);border-radius:10px;padding:17px 20px;margin-bottom:18px}
+    .setup h3{font-size:.92rem;font-weight:600;color:var(--bl);margin-bottom:9px}
+    .setup ol{padding-left:16px;font-size:.8rem;color:var(--m);line-height:2.1}
+    code{background:var(--s2);padding:1px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t)}
     /* EMPTY */
-    .emp{text-align:center;padding:50px 20px;color:var(--m2)}
-    .emp-i{font-size:1.8rem;margin-bottom:10px;opacity:.4}
-    .emp h3{font-size:.92rem;color:var(--m);margin-bottom:5px}
-    .sp2{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+    .emp{text-align:center;padding:40px 20px;color:var(--m2)}
+    .emp-i{font-size:1.6rem;margin-bottom:8px;opacity:.4}
+    .emp h3{font-size:.88rem;color:var(--m);margin-bottom:4px}
+    .sp2{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
     @keyframes spin{to{transform:rotate(360deg)}}
-    input[type=text]{background:var(--s);border:1px solid var(--b);color:var(--t);padding:7px 11px;border-radius:7px;font-size:.79rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+    input[type=text]{background:var(--s);border:1px solid var(--b);color:var(--t);padding:6px 10px;border-radius:6px;font-size:.77rem;font-family:'DM Sans',sans-serif;outline:none}
     input[type=text]:focus{border-color:var(--a)}
     input::placeholder{color:var(--m2)}
-    select{background:var(--s);border:1px solid var(--b);color:var(--t);padding:7px 11px;border-radius:7px;font-size:.79rem;font-family:'DM Sans',sans-serif;outline:none}
+    select{background:var(--s);border:1px solid var(--b);color:var(--t);padding:6px 10px;border-radius:6px;font-size:.77rem;font-family:'DM Sans',sans-serif;outline:none}
+    .dbg{background:var(--s);border:1px solid var(--b2);border-radius:7px;padding:13px;font-family:'DM Mono',monospace;font-size:.71rem;color:var(--m);white-space:pre-wrap;line-height:1.6;max-height:500px;overflow-y:auto}
+    /* WF LEGEND */
+    .wfl{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
+    .wfi{font-size:.65rem;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:20px}
     /* MODAL */
     #mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
     #mo.open{display:flex}
-    #md{background:var(--s);border:1px solid var(--b2);border-radius:15px;width:100%;max-width:660px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.5)}
-    .mh{padding:16px 22px 13px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
-    .mh h2{font-family:'Fraunces',serif;font-size:.98rem;font-weight:600;color:var(--t)}
-    .mc_{background:none;border:none;color:var(--m);cursor:pointer;font-size:1.1rem;line-height:1}
-    .ms{padding:9px 22px;border-bottom:1px solid var(--b)}
-    .ms-l{font-size:.63rem;text-transform:uppercase;letter-spacing:.08em;color:var(--m2);margin-bottom:3px;font-weight:700}
-    #msub{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--t);padding:7px 11px;font-size:.83rem;font-family:'DM Sans',sans-serif;outline:none}
-    #msub:focus{border-color:var(--a)}
-    .mb{padding:13px 22px;flex:1;overflow-y:auto}
-    #memail{width:100%;min-height:240px;background:var(--s2);border:1px solid var(--b);border-radius:7px;color:var(--t);padding:13px;font-size:.81rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none}
-    #memail:focus{border-color:var(--a)}
-    .mf{padding:11px 22px;border-top:1px solid var(--b);display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
-    .mf button{padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
+    #md{background:var(--s);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:640px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+    .mh{padding:15px 20px 12px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+    .mh h2{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600}
+    .mc{background:none;border:none;color:var(--m);cursor:pointer;font-size:1rem}
+    .ms-w{padding:8px 20px;border-bottom:1px solid var(--b)}
+    .ms-l{font-size:.61rem;text-transform:uppercase;letter-spacing:.08em;color:var(--m2);margin-bottom:3px;font-weight:700}
+    #msub{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:5px;color:var(--t);padding:6px 10px;font-size:.81rem;font-family:'DM Sans',sans-serif;outline:none}
+    .mb{padding:12px 20px;flex:1;overflow-y:auto}
+    #memail{width:100%;min-height:220px;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--t);padding:12px;font-size:.79rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none}
+    .mf{padding:10px 20px;border-top:1px solid var(--b);display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+    .mf button{padding:7px 15px;border-radius:6px;font-size:.79rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
     #bam{background:var(--g);color:#fff}
     #bcm{background:var(--a);color:#fff}
-    #bcm:hover{background:#f08030}
     #bclm{background:var(--s2);color:var(--m);border:1px solid var(--b2)}
-    /* DEBUG */
-    .dbg{background:var(--s);border:1px solid var(--b2);border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:.73rem;color:var(--m);white-space:pre-wrap;line-height:1.6}
-    /* SETUP BANNER */
-    .setup-banner{background:rgba(91,141,238,.08);border:1px solid rgba(91,141,238,.25);border-radius:10px;padding:18px 22px;margin-bottom:20px}
-    .setup-banner h3{font-size:.95rem;font-weight:600;color:var(--bl);margin-bottom:10px}
-    .setup-banner ol{padding-left:18px;font-size:.82rem;color:var(--m);line-height:2}
-    .setup-banner code{background:var(--s2);padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--t)}
   </style>
 </head>
 <body>
 <nav>
   <a class="nb" href="/">🔥 Saddleback SRG</a>
   <div class="nt">
-    <a href="/"            class="ntb">Pipeline</a>
+    <a href="/" class="ntb">Pipeline</a>
     <a href="/analytics.html" class="ntb">Analytics</a>
-    <a href="/outreach.html"  class="ntb active">Outreach</a>
+    <a href="/outreach.html" class="ntb active">Outreach</a>
   </div>
   <div class="nr">
-    <span style="font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace" id="last-sync-label"></span>
+    <span style="font-size:.68rem;color:var(--m2);font-family:'DM Mono',monospace" id="last-sync-label"></span>
     <button class="btn bgh bs" onclick="doFullSync()" id="btn-sync">↻ Full Sync</button>
   </div>
 </nav>
@@ -149,42 +150,39 @@
 <div class="page">
   <div id="status-msg" style="display:none"></div>
   <div id="progress-wrap" style="display:none" class="pw">
-    <div class="pl_" id="pl">Loading…</div>
-    <div class="pb_"><div class="pf_" id="pf" style="width:0%"></div></div>
+    <div class="pl" id="pl">Loading…</div>
+    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="showTab('today')"      id="tab-today">Today</button>
-    <button class="tab"        onclick="showTab('open')"       id="tab-open">Open Pipeline <span class="bg g" id="bg-open">—</span></button>
-    <button class="tab"        onclick="showTab('past')"       id="tab-past">Past / Reactivation <span class="bg"  id="bg-past">—</span></button>
-    <button class="tab"        onclick="showTab('never')"      id="tab-never">Never Booked <span class="bg"  id="bg-never">—</span></button>
-    <button class="tab"        onclick="showTab('companies')"  id="tab-companies">Companies <span class="bg"  id="bg-companies">—</span></button>
-    <button class="tab"        onclick="showTab('campaigns')"  id="tab-campaigns">Campaigns</button>
-    <button class="tab"        onclick="showTab('queue')"      id="tab-queue">Email Queue <span class="bg g" id="bg-queue">0</span></button>
-    <button class="tab"        onclick="showTab('suppressed')" id="tab-suppressed">Do Not Contact</button>
-    <button class="tab"        onclick="showTab('debug')"      id="tab-debug">Debug / Sync</button>
+    <button class="tab active" onclick="showTab('cmd')"       id="tab-cmd">Command Center</button>
+    <button class="tab"        onclick="showTab('tent')"      id="tab-tent">Tentative <span class="bge y" id="bg-tent">—</span></button>
+    <button class="tab"        onclick="showTab('prospect')"  id="tab-prospect">Prospects <span class="bge b" id="bg-prospect">—</span></button>
+    <button class="tab"        onclick="showTab('definite')"  id="tab-definite">Definite <span class="bge g" id="bg-definite">—</span></button>
+    <button class="tab"        onclick="showTab('closed')"    id="tab-closed">Past Customers <span class="bge a" id="bg-closed">—</span></button>
+    <button class="tab"        onclick="showTab('lost')"      id="tab-lost">Lost / Nurture <span class="bge r" id="bg-lost">—</span></button>
+    <button class="tab"        onclick="showTab('years')"     id="tab-years">2026 / 2027</button>
+    <button class="tab"        onclick="showTab('queue')"     id="tab-queue">Email Queue <span class="bge g" id="bg-queue">0</span></button>
+    <button class="tab"        onclick="showTab('debug')"     id="tab-debug">Debug / Sync</button>
   </div>
 
-  <div id="pane-today"></div>
-  <div id="pane-open"       style="display:none"></div>
-  <div id="pane-past"       style="display:none"></div>
-  <div id="pane-never"      style="display:none"></div>
-  <div id="pane-companies"  style="display:none"></div>
-  <div id="pane-campaigns"  style="display:none"></div>
-  <div id="pane-queue"      style="display:none"></div>
-  <div id="pane-suppressed" style="display:none"></div>
-  <div id="pane-debug"      style="display:none"></div>
+  <div id="pane-cmd"></div>
+  <div id="pane-tent"     style="display:none"></div>
+  <div id="pane-prospect" style="display:none"></div>
+  <div id="pane-definite" style="display:none"></div>
+  <div id="pane-closed"   style="display:none"></div>
+  <div id="pane-lost"     style="display:none"></div>
+  <div id="pane-years"    style="display:none"></div>
+  <div id="pane-queue"    style="display:none"></div>
+  <div id="pane-debug"    style="display:none"></div>
 </div>
 
 <!-- MODAL -->
 <div id="mo">
   <div id="md">
-    <div class="mh"><h2 id="mt">Review Email</h2><button class="mc_" onclick="closeModal()">✕</button></div>
-    <div class="ms"><div class="ms-l">Subject line</div><input type="text" id="msub" placeholder="Subject…"></div>
-    <div class="mb">
-      <div id="risk-display" style="margin-bottom:10px"></div>
-      <textarea id="memail"></textarea>
-    </div>
+    <div class="mh"><h2 id="mt">Review Draft</h2><button class="mc" onclick="closeModal()">✕</button></div>
+    <div class="ms-w"><div class="ms-l">Subject</div><input type="text" id="msub" placeholder="Subject…"></div>
+    <div class="mb"><div id="risk-display" style="margin-bottom:8px"></div><textarea id="memail"></textarea></div>
     <div class="mf">
       <button id="bclm" onclick="closeModal()">Close</button>
       <button id="bcm"  onclick="copyModal()">Copy</button>
@@ -194,950 +192,759 @@
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────────────────────
-const API_TS = '/.netlify/functions/tripleseat';
-const API_AI = '/.netlify/functions/ai';
-const API_ST = '/.netlify/functions/store';
+const API_TS='/.netlify/functions/tripleseat', API_AI='/.netlify/functions/ai', API_ST='/.netlify/functions/store';
 
 // ── PERSONAL DOMAINS ──────────────────────────────────────────────────────────
-const PD = new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','msn.com','me.com','mac.com','comcast.net','att.net','verizon.net','sbcglobal.net','charter.net','cox.net','earthlink.net','protonmail.com','tutanota.com','ymail.com','googlemail.com','rocketmail.com','bellsouth.net','optonline.net']);
-
-const DOMAIN_MAP = {
-  'msu.edu':'Michigan State University','michigan.gov':'State of Michigan',
-  'lsd.k12.mi.us':'Lansing School District','okemos.k12.mi.us':'Okemos Public Schools',
-  'ingham.org':'Ingham County','lansingmi.gov':'City of Lansing',
-  'deltadental.com':'Delta Dental','bcbsm.com':'Blue Cross Blue Shield',
-  'sparrow.org':'Sparrow Health System','mclaren.org':'McLaren Health',
-  'cooleylaw.edu':'Cooley Law School','lcc.edu':'Lansing Community College',
-  'michiganworks.org':'Michigan Works',
-};
+const PD=new Set(['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com','aol.com','live.com','msn.com','me.com','mac.com','comcast.net','att.net','verizon.net','sbcglobal.net','charter.net','cox.net','earthlink.net','protonmail.com','ymail.com','googlemail.com','rocketmail.com','bellsouth.net']);
+const DM={'msu.edu':'Michigan State University','michigan.gov':'State of Michigan','lsd.k12.mi.us':'Lansing School District','okemos.k12.mi.us':'Okemos Public Schools','ingham.org':'Ingham County','lansingmi.gov':'City of Lansing','deltadental.com':'Delta Dental','bcbsm.com':'Blue Cross Blue Shield','sparrow.org':'Sparrow Health System','mclaren.org':'McLaren Health','lcc.edu':'Lansing Community College'};
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
-let contacts = [];     // deduped outreach_contacts from Supabase
-let companies = {};    // grouped by company/domain key
-let queue = [];        // email_queue from Supabase
-let suppressed = new Set();
-let activeTab = 'today';
-let modalQueueId = null;
-let dbConfigured = false;
+let bookings=[], contacts=[], accounts=[], leads=[];
+let opportunities=[];  // enriched, scored, deduped
+let queue=[];
+let activeTab='cmd', modalQueueId=null, dbConfigured=false;
 
-// ── CLEANUP old localStorage ──────────────────────────────────────────────────
-(function(){try{['srg-contacts','srg-lastsync','srg-queue','srg-contacted'].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){}})();
+(function(){try{['srg-contacts','srg-lastsync','srg-queue'].forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){}})();
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function setStatus(msg,type='ld'){
-  const el=document.getElementById('status-msg');
-  if(!msg){el.style.display='none';return;}
-  el.className='sm_ '+type; el.innerHTML=msg; el.style.display='flex';
-}
-function setProgress(pct,label){
-  document.getElementById('progress-wrap').style.display='block';
-  document.getElementById('pf').style.width=pct+'%';
-  document.getElementById('pl').textContent=label;
-}
-function hideProgress(){setTimeout(()=>document.getElementById('progress-wrap').style.display='none',2500);}
+function setStatus(msg,type='ld'){const el=document.getElementById('status-msg');if(!msg){el.style.display='none';return;}el.className='sm '+type;el.innerHTML=msg;el.style.display='flex';}
+function setProgress(pct,label){document.getElementById('progress-wrap').style.display='block';document.getElementById('pf').style.width=pct+'%';document.getElementById('pl').textContent=label;}
+function hideProgress(){setTimeout(()=>document.getElementById('progress-wrap').style.display='none',2000);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function getDomain(email){if(!email)return null;const m=email.toLowerCase().match(/@([^@]+)$/);return(m&&!PD.has(m[1]))?m[1]:null;}
-function domainName(d){if(!d)return null;if(DOMAIN_MAP[d])return DOMAIN_MAP[d];const b=d.replace(/\.(com|org|edu|gov|net|mil|k12\.mi\.us|mi\.us)$/,'').split('.').pop();return b?b.charAt(0).toUpperCase()+b.slice(1):null;}
+function domainName(d){if(!d)return null;if(DM[d])return DM[d];const b=d.replace(/\.(com|org|edu|gov|net|mil|k12\.mi\.us|mi\.us)$/,'').split('.').pop();return b?b.charAt(0).toUpperCase()+b.slice(1):null;}
+function daysAgo(dateStr){if(!dateStr)return null;return Math.floor((Date.now()-new Date(dateStr).getTime())/86400000);}
+function daysUntil(dateStr){if(!dateStr)return null;return Math.floor((new Date(dateStr).getTime()-Date.now())/86400000);}
+function fmtDate(d){if(!d)return null;try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(e){return d;}}
+function fmtMonth(d){if(!d)return null;try{return new Date(d).toLocaleDateString('en-US',{month:'short',year:'numeric'});}catch(e){return d;}}
 
-// ── ACCOUNT STATUS from Tripleseat booking status ─────────────────────────────
-// DEFINITE/CLOSED = confirmed/completed → past customer if date is past
-// TENTATIVE/PROSPECT = open opportunity → active pipeline
-// LOST = lost
-// lead with no booking = inquired never booked (if old enough)
-function deriveAccountStatus(c) {
-  const now = Date.now();
-  const bs = (c.last_booking_status || '').toUpperCase();
-  const eventTs = c.last_event_date ? new Date(c.last_event_date).getTime() : null;
-  const createdTs = c.created_at ? new Date(c.created_at).getTime() : null;
-  const daysSinceCreated = createdTs ? Math.floor((now - createdTs) / 86400000) : null;
+// ── STATUS HELPERS ────────────────────────────────────────────────────────────
+const STATUS_ORDER={TENTATIVE:0,PROSPECT:1,DEFINITE:2,CLOSED:3,LOST:4};
+function pillClass(s){const m={TENTATIVE:'pill-tent',PROSPECT:'pill-prosp',DEFINITE:'pill-def',CLOSED:'pill-closed',LOST:'pill-lost'};return m[s]||'pill-lead';}
+function statusColor(s){const m={TENTATIVE:'var(--y)',PROSPECT:'var(--pu)',DEFINITE:'var(--g)',CLOSED:'var(--bl)',LOST:'var(--r)'};return m[s]||'var(--m)';}
 
-  // Future event with active status = currently being worked
-  if(eventTs && eventTs > now && ['DEFINITE','TENTATIVE','PROSPECT'].includes(bs)) return 'active-upcoming';
-  // Very recent inquiry (within 14 days) = active
-  if(daysSinceCreated !== null && daysSinceCreated <= 14) return 'active-inquiry';
-  // Past event that was DEFINITE or CLOSED = completed past customer
-  if(eventTs && eventTs < now && ['DEFINITE','CLOSED'].includes(bs)) return 'past-customer';
-  // TENTATIVE/PROSPECT with past date = stale opportunity, worth reactivating
-  if(eventTs && eventTs < now && ['TENTATIVE','PROSPECT'].includes(bs)) return 'past-customer';
-  // Explicitly lost
-  if(bs === 'LOST' || c.turned_down_at) return 'lost';
-  // Booking exists but no definite status = still counts as past customer
-  if(c.booking_count > 0) return 'past-customer';
-  // Old inquiry, no bookings = never booked
-  if(daysSinceCreated !== null && daysSinceCreated > 14 && c.booking_count === 0) return 'never-booked';
-  return 'past-customer';
-}
+// ── OPPORTUNITY SCORING ───────────────────────────────────────────────────────
+function scoreOpportunity(b, contactData, allBookingsForContact) {
+  let score = 0;
+  const status = (b.status||'').toUpperCase();
+  const daysSinceUpdate = daysAgo(b.updated_at||b.created_at);
+  const daysToEvent = daysUntil(b.start_date);
+  const guests = parseInt(b.guest_count)||0;
+  const year = b.start_date ? new Date(b.start_date).getFullYear() : null;
 
-const STATUS_LABELS = {'active-upcoming':'Upcoming Event','active-inquiry':'Active Inquiry','past-customer':'Past Customer','never-booked':'Never Booked','lost':'Lost/Turned Down'};
-const STATUS_COLORS = {'active-upcoming':'var(--g)','active-inquiry':'var(--bl)','past-customer':'var(--a)','never-booked':'var(--m)','lost':'var(--r)'};
+  // Status base score
+  if(status==='TENTATIVE') score+=100;
+  else if(status==='PROSPECT') score+=60;
+  else return 0; // Definite/Closed/Lost don't need sales scoring
 
-// ── TAG CONTACTS ──────────────────────────────────────────────────────────────
-function enrichContact(c) {
-  // Use status from Supabase if already set, otherwise derive
-  if(!c.account_status) c.account_status = deriveAccountStatus(c);
-  const tags = c.tags || [];
-  const now = Date.now();
-
-  // Derive domain/company
-  const domain = getDomain(c.email);
-  c._domain = domain;
-  if(!c.company && domain) c._co = domainName(domain);
-
-  // Anniversary: use last_event_date (actual confirmed event)
-  const annDate = c.last_event_date ? new Date(c.last_event_date).getTime() : null;
-  if(annDate) {
-    const ref = new Date(annDate), yearsAgo = new Date().getFullYear() - ref.getFullYear();
-    if(yearsAgo >= 1) {
-      const ann = new Date(ref); ann.setFullYear(new Date().getFullYear());
-      const dUntil = Math.floor((ann.getTime() - now) / 86400000);
-      if(dUntil >= -7 && dUntil <= 90) {
-        c._annDays = dUntil;
-        c._annWindow = dUntil <= 30 ? '30d' : dUntil <= 60 ? '60d' : '90d';
-        if(!tags.includes('anniversary')) tags.push('anniversary');
-      }
-    }
+  // Recency urgency — stale = needs attention
+  if(status==='TENTATIVE'){
+    if(daysSinceUpdate>14) score+=40;
+    else if(daysSinceUpdate>7) score+=20;
+    else if(daysSinceUpdate>3) score+=10;
+  } else if(status==='PROSPECT'){
+    if(daysSinceUpdate>10) score+=30;
+    else if(daysSinceUpdate>5) score+=15;
+    else if(daysSinceUpdate>2) score+=8;
   }
 
-  // Ensure MSU tag for msu.edu
-  if(domain === 'msu.edu' && !tags.includes('msu')) tags.push('msu');
-  // Ensure corporate tag for business domains
-  if(domain && !tags.includes('corporate')) tags.push('corporate');
+  // Guest count
+  if(guests>=200) score+=35;
+  else if(guests>=100) score+=25;
+  else if(guests>=50) score+=15;
+  else if(guests>=25) score+=8;
 
-  c.tags = tags;
-  return c;
+  // Event timing
+  if(daysToEvent!==null){
+    if(daysToEvent>0&&daysToEvent<=90) score+=25;
+    else if(daysToEvent>0&&daysToEvent<=180) score+=15;
+    else if(daysToEvent>0&&daysToEvent<=365) score+=8;
+  }
+
+  // Year bonus — 2026 is more urgent than 2027
+  if(year===2026) score+=15;
+  else if(year===2027) score+=8;
+
+  // Prior closed history = higher value
+  const hasClosed=allBookingsForContact.some(x=>(x.status||'').toUpperCase()==='CLOSED');
+  if(hasClosed) score+=20;
+
+  // Description keywords
+  const desc=(b.description||b.name||'').toLowerCase();
+  if(/wedding|reception/.test(desc)) score+=15;
+  if(/corporate|company|office|staff/.test(desc)) score+=10;
+  if(/graduat|graduation/.test(desc)) score+=10;
+  if(/holiday|christmas|thanksgiving/.test(desc)) score+=8;
+
+  return score;
 }
 
-// ── BUILD COMPANIES ───────────────────────────────────────────────────────────
-function buildCompanies(list) {
-  const map = {};
-  list.forEach(c => {
-    const name = c.company || c._co;
-    const domain = c._domain;
-    if(!name && !domain) return;
-    if(!c.email) return;
-    const key = (name || '').toLowerCase().trim() || (domain || '');
-    if(!key) return;
-    if(!map[key]) map[key] = { name: name || domainName(domain) || key, domain, contacts: [], events: 0, guests: 0 };
-    map[key].contacts.push(c);
-    if(c.last_event_date) map[key].events++;
-    if(c.total_guests) map[key].guests += (parseInt(c.total_guests) || 0);
+// ── SUGGESTED NEXT ACTION ─────────────────────────────────────────────────────
+function suggestAction(b, score, allBookingsForContact) {
+  const status=(b.status||'').toUpperCase();
+  const daysSinceUpdate=daysAgo(b.updated_at||b.created_at);
+  const daysToEvent=daysUntil(b.start_date);
+  const guests=parseInt(b.guest_count)||0;
+  const hasClosed=allBookingsForContact.some(x=>(x.status||'').toUpperCase()==='CLOSED');
+  const yr=b.start_date?new Date(b.start_date).getFullYear():null;
+  const guestStr=guests?` (${guests} guests)`:'';
+  const dateStr=b.start_date?` on ${fmtDate(b.start_date)}`:'';
+
+  if(status==='TENTATIVE'){
+    if(daysSinceUpdate>14) return `Tentative${guestStr}${dateStr} — last updated ${daysSinceUpdate} days ago. This lead is going cold. Ryan should check in and ask about locking in the date.`;
+    if(daysSinceUpdate>7)  return `Tentative${guestStr}${dateStr} — ${daysSinceUpdate} days since last update. Good time for a warm check-in to keep momentum.`;
+    if(daysToEvent!==null&&daysToEvent<=90) return `Tentative event${dateStr} is only ${daysToEvent} days away${guestStr}. Ryan should confirm commitment and discuss next steps.`;
+    if(yr===2027)          return `2027 Tentative${guestStr}. Keep this warm — ask if they want to start planning or lock in availability.`;
+    return `Tentative booking${guestStr}${dateStr}. Follow up to move toward Definite.`;
+  }
+  if(status==='PROSPECT'){
+    if(daysSinceUpdate<=3)  return `New Prospect${guestStr}${dateStr} — created ${daysSinceUpdate} days ago. Ryan should send a first follow-up soon.`;
+    if(daysSinceUpdate>10)  return `Prospect has gone quiet for ${daysSinceUpdate} days${guestStr}. Low-pressure check-in recommended.`;
+    return `Prospect${guestStr}${dateStr} — ${daysSinceUpdate} days old. Good time for Ryan to follow up and understand their needs.`;
+  }
+  return '';
+}
+
+// ── BUILD OPPORTUNITIES ───────────────────────────────────────────────────────
+function buildOpportunities() {
+  // Group bookings by contact/account
+  const bookingsByContact={}, bookingsByAccount={};
+  bookings.forEach(b=>{
+    if(b.contact_id){bookingsByContact[b.contact_id]=bookingsByContact[b.contact_id]||[];bookingsByContact[b.contact_id].push(b);}
+    if(b.account_id){bookingsByAccount[b.account_id]=bookingsByAccount[b.account_id]||[];bookingsByAccount[b.account_id].push(b);}
   });
-  return Object.fromEntries(Object.entries(map).sort((a,b) => b[1].contacts.length - a[1].contacts.length));
-}
+  const accountMap={};
+  accounts.forEach(a=>accountMap[a.id]=a);
+  const contactMap={};
+  contacts.forEach(c=>contactMap[c.id]=c);
 
-// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
-const CAMPAIGNS = [
-  {id:'anniversary', label:'🎉 Anniversary (90d)',   color:'var(--pu)', desc:'Event anniversary within 90 days — use actual event date only.',
-    filter:c=>c.tags?.includes('anniversary') && ['past-customer'].includes(c.account_status), priority:10},
-  {id:'msu',         label:'🟢 MSU',                 color:'var(--te)', desc:'Michigan State University contacts.',
-    filter:c=>c.tags?.includes('msu') && !['active-upcoming','active-inquiry'].includes(c.account_status), priority:9},
-  {id:'gone-quiet',  label:'😶 Gone Quiet 6mo+',    color:'var(--r)',  desc:'Past customers with no activity in 6+ months.',
-    filter:c=>c.tags?.includes('gone-quiet-6mo') && c.account_status === 'past-customer', priority:8},
-  {id:'high-value',  label:'⭐ High Value',           color:'var(--y)',  desc:'75+ guest past events.',
-    filter:c=>c.tags?.includes('high-value') && c.account_status === 'past-customer', priority:7},
-  {id:'corporate',   label:'🏢 Corporate',            color:'var(--bl)', desc:'Business/org past customers.',
-    filter:c=>c.tags?.includes('corporate') && !c.tags?.includes('msu') && c.account_status === 'past-customer', priority:6},
-  {id:'graduation',  label:'🎓 Graduation',           color:'var(--a2)', desc:'Past graduation event customers.',
-    filter:c=>c.tags?.includes('graduation') && c.account_status === 'past-customer', priority:5},
-  {id:'holiday',     label:'🎄 Holiday',              color:'var(--g)',  desc:'Past holiday event customers.',
-    filter:c=>c.tags?.includes('holiday') && c.account_status === 'past-customer', priority:4},
-  {id:'no-booking',  label:'📋 Never Booked',         color:'var(--m)',  desc:'Inquired but never confirmed.',
-    filter:c=>c.account_status === 'never-booked' && c.email, priority:3},
-];
+  const opps=[];
+  bookings.forEach(b=>{
+    const status=(b.status||'').toUpperCase();
+    const contact=b.contact_id?contactMap[b.contact_id]:null;
+    const account=b.account_id?accountMap[b.account_id]:null;
+    const allForContact=[...(bookingsByContact[b.contact_id]||[]),...(bookingsByAccount[b.account_id]||[])];
+    const uniqueAll=[...new Map(allForContact.map(x=>[x.id,x])).values()];
 
-function getActiveCampaigns() {
-  const mo = new Date().getMonth();
-  const active = [];
-  if(mo>=3&&mo<=5) active.push('graduation');
-  if(mo>=6&&mo<=10) active.push('msu');
-  if(mo>=8&&mo<=11) active.push('holiday');
-  return active;
-}
+    const email=(contact?.email_address||contact?.email||account?.email||'').toLowerCase().trim();
+    const name=[contact?.first_name,contact?.last_name].filter(Boolean).join(' ')||account?.name||'Unknown';
+    const company=account?.name||contact?.company||'';
+    const phone=contact?.phone_number||contact?.phone||account?.phone||'';
 
-function buildBatch(n=50) {
-  const now = Date.now();
-  const inQ = new Set(queue.map(q=>String(q.contact_email||q.id)));
-  const scored = [];
-  contacts.forEach(c => {
-    if(!c.email || !c.email.includes('@')) return;
-    if(inQ.has(c.email)) return;
-    if(suppressed.has(c.email.toLowerCase())) return;
-    if(['active-upcoming','active-inquiry'].includes(c.account_status)) return;
-    if(c.last_contacted_at && (now - new Date(c.last_contacted_at).getTime()) < 30*86400000) return;
-    let score=0, campaign=null;
-    CAMPAIGNS.forEach(cam => {
-      if(cam.filter(c)) { score += cam.priority; if(!campaign || cam.priority > (CAMPAIGNS.find(x=>x.id===campaign)?.priority||0)) campaign = cam.id; }
+    // Count bookings by status for this contact/account
+    const statusCounts={TENTATIVE:0,PROSPECT:0,DEFINITE:0,CLOSED:0,LOST:0};
+    uniqueAll.forEach(x=>{const s=(x.status||'').toUpperCase();if(statusCounts[s]!==undefined)statusCounts[s]++;});
+    const hasClosed=statusCounts.CLOSED>0;
+    const hasDefinite=statusCounts.DEFINITE>0;
+
+    // Customer type
+    let customerType='lead_only';
+    if(hasClosed) customerType='past_customer';
+    else if(hasDefinite) customerType='past_definite';
+    else if(status==='TENTATIVE'||status==='PROSPECT') customerType='active_lead';
+    else if(status==='LOST'&&!hasClosed&&!hasDefinite) customerType='lost_only';
+
+    const score=(status==='TENTATIVE'||status==='PROSPECT')?scoreOpportunity(b,contact,uniqueAll):0;
+    const action=(status==='TENTATIVE'||status==='PROSPECT')?suggestAction(b,score,uniqueAll):'';
+    const urgency=score>=140?'urgent':score>=100?'high':score>=70?'med':'low';
+
+    opps.push({
+      id:String(b.id), bookingId:b.id, status,
+      name, company, email, phone,
+      eventDate:b.start_date, eventYear:b.start_date?new Date(b.start_date).getFullYear():null,
+      guests:parseInt(b.guest_count)||0,
+      description:b.description||b.name||'',
+      location:b.location_name||'',
+      updatedAt:b.updated_at||b.created_at,
+      createdAt:b.created_at,
+      daysSinceUpdate:daysAgo(b.updated_at||b.created_at),
+      daysToEvent:daysUntil(b.start_date),
+      score, urgency, action,
+      customerType, hasClosed, hasDefinite,
+      statusCounts,
+      totalBookings:uniqueAll.length,
+      rawBooking:b,
     });
-    if(score > 0) scored.push({contact:c, score, campaign});
   });
-  scored.sort((a,b) => b.score - a.score);
-  return scored.slice(0, n);
+
+  // Deduplicate: keep highest-score booking per email (for active leads)
+  // But keep ALL closed/definite for past customer section
+  const activeMap={};
+  const closed=[], definite=[], lostArr=[];
+  opps.forEach(o=>{
+    if(o.status==='CLOSED'){closed.push(o);return;}
+    if(o.status==='DEFINITE'){definite.push(o);return;}
+    if(o.status==='LOST'){lostArr.push(o);return;}
+    const key=o.email||o.name;
+    if(!activeMap[key]||o.score>activeMap[key].score) activeMap[key]=o;
+  });
+
+  return [...Object.values(activeMap),...definite,...closed,...lostArr]
+    .sort((a,b)=>b.score-a.score||STATUS_ORDER[a.status]-STATUS_ORDER[b.status]);
 }
 
 // ── LOAD FROM SUPABASE ────────────────────────────────────────────────────────
 async function loadFromDB() {
-  setStatus('Loading contacts from database…', 'ld');
-  let debugInfo = { step: 'start', metaResponse: null, contactsResponse: null };
+  setStatus('Loading from Supabase…','ld');
+  const debug={step:'meta'};
+  try{
+    const metaRes=await fetch(`${API_ST}?action=get-metadata`);
+    const meta=await metaRes.json().catch(()=>({}));
+    debug.meta=meta;
 
-  try {
-    // Step 1: Check metadata — are there saved contacts?
-    debugInfo.step = 'get-metadata';
-    const metaRes = await fetch(`${API_ST}?action=get-metadata`);
-    const meta = await metaRes.json().catch(e => ({ configured: false, parseError: e.message }));
-    debugInfo.metaResponse = meta;
-
-    // Not configured — show setup instructions
-    if(meta.configured === false || meta.ok === false) {
-      dbConfigured = false;
-      renderSetupBanner(meta.error || 'Supabase not configured');
+    if(meta.configured===false||meta.ok===false){
+      dbConfigured=false;
+      renderSetupBanner(meta.error);
       setStatus('','');
       return;
     }
-    dbConfigured = true;
+    dbConfigured=true;
 
-    // Check if data actually exists
-    const totalOutreach = parseInt(meta.total_outreach || '0');
-    const lastSync = meta.last_full_sync;
-    debugInfo.totalOutreach = totalOutreach;
-    debugInfo.lastSync = lastSync;
+    const totalBookings=parseInt(meta.total_bookings||'0');
+    const lastSync=meta.last_full_sync;
+    debug.totalBookings=totalBookings; debug.lastSync=lastSync;
 
-    if(!lastSync || totalOutreach === 0) {
-      setStatus('No saved contacts found. Click "↻ Full Sync" to import from Tripleseat for the first time.', 'wa');
-      renderTab(activeTab);
-      return;
+    if(!lastSync){
+      setStatus('No data found. Click "↻ Full Sync" to import from Tripleseat for the first time.','wa');
+      renderTab(activeTab); return;
     }
 
-    // Step 2: Load contacts from outreach_contacts table
-    debugInfo.step = 'get-contacts';
-    setProgress(20, `Loading ${totalOutreach.toLocaleString()} contacts from Supabase…`);
-    const cRes = await fetch(`${API_ST}?action=get-contacts&limit=10000`);
-    const cData = await cRes.json().catch(e => ({ contacts: [], loadError: e.message }));
-    debugInfo.contactsResponse = { count: cData.contacts?.length, loadedFrom: cData.loadedFrom, error: cData.loadError };
-
-    if(!cData.contacts?.length) {
-      // Data was supposed to be there (metadata said so) but isn't — this means
-      // save-outreach-contacts failed previously. Prompt re-sync with clear explanation.
-      setStatus(`⚠ Metadata says ${totalOutreach.toLocaleString()} contacts exist but outreach_contacts table returned 0 rows. The previous sync may have failed. Click "↻ Full Sync" to rebuild.`, 'er');
-      renderTab(activeTab);
-      return;
+    // Load bookings (primary — has status data)
+    if(totalBookings>0){
+      debug.step='get-bookings';
+      setProgress(15,'Loading bookings from Supabase…');
+      const bRows=await loadAllRows('ts_bookings','*','start_date.desc.nullslast');
+      bookings=bRows;
+      debug.bookingsLoaded=bookings.length;
     }
 
-    setProgress(80, 'Processing contacts…');
-    contacts = cData.contacts.map(enrichContact);
-    companies = buildCompanies(contacts);
-
-    // Step 3: Load queue and suppressed list in parallel
-    debugInfo.step = 'get-queue-and-suppressed';
-    const [qData, sData] = await Promise.all([
-      fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]})),
-      fetch(`${API_ST}?action=get-suppressed`).then(r=>r.json()).catch(()=>({list:[]})),
+    // Load accounts and contacts
+    debug.step='get-accounts-contacts';
+    setProgress(40,'Loading accounts and contacts…');
+    const [acctRows,contRows]=await Promise.all([
+      loadAllRows('ts_accounts','*','name.asc'),
+      loadAllRows('ts_contacts','*','last_name.asc'),
     ]);
-    queue = qData.queue || [];
-    suppressed = new Set((sData.list||[]).map(e=>e.toLowerCase()));
+    accounts=acctRows; contacts=contRows;
 
-    setProgress(100, `✓ ${contacts.length.toLocaleString()} contacts loaded`);
+    // Load leads (for contacts with no bookings)
+    const totalLeads=parseInt(meta.total_leads||'0');
+    if(totalLeads>0){
+      debug.step='get-leads';
+      setProgress(65,'Loading leads…');
+      leads=await loadAllRows('ts_leads','*','created_at.desc');
+    }
+
+    setProgress(80,'Building opportunity engine…');
+    opportunities=buildOpportunities();
+    debug.opportunities=opportunities.length;
+
+    // Load queue
+    debug.step='get-queue';
+    const qRes=await fetch(`${API_ST}?action=get-queue`);
+    const qData=await qRes.json().catch(()=>({queue:[]}));
+    queue=qData.queue||[];
+
+    setProgress(100,'✓ Loaded');
     hideProgress();
 
-    const syncDate = lastSync ? new Date(lastSync) : null;
-    document.getElementById('last-sync-label').textContent = syncDate ? 'Synced ' + syncDate.toLocaleDateString() : '';
-    setStatus(`✓ ${contacts.length.toLocaleString()} contacts loaded from Supabase · last synced ${syncDate ? syncDate.toLocaleDateString() : 'never'}`, 'ok');
-    setTimeout(()=>setStatus('',''), 5000);
-
+    const syncDate=lastSync?new Date(lastSync):null;
+    document.getElementById('last-sync-label').textContent=syncDate?'Synced '+syncDate.toLocaleDateString():'';
+    setStatus(`✓ ${bookings.length.toLocaleString()} bookings, ${contacts.length.toLocaleString()} contacts loaded from Supabase`,'ok');
+    setTimeout(()=>setStatus('',''),5000);
     updateBadges(); renderTab(activeTab);
 
-    // Stale data warning (only warn, don't block)
-    if(syncDate && (Date.now()-syncDate.getTime()) > 3*86400000) {
-      setTimeout(()=>setStatus(`Contact data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider clicking "↻ Full Sync" for latest Tripleseat data.`, 'wa'), 5500);
+    if(totalBookings===0&&lastSync){
+      setStatus('Contacts loaded but booking status data is missing. Click "↻ Full Sync" to get Prospect/Tentative/Definite/Closed/Lost data.','wa');
     }
-
-  } catch(err) {
-    console.error('[loadFromDB] Error at step', debugInfo.step, ':', err);
-    setStatus(`Error loading from Supabase (step: ${debugInfo.step}): ${err.message}`, 'er');
+    if(syncDate&&(Date.now()-syncDate.getTime())>3*86400000){
+      setTimeout(()=>setStatus(`Data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider a Full Sync for latest status data.`,'wa'),5500);
+    }
+  }catch(err){
+    console.error('[loadFromDB]',debug.step,err);
+    setStatus(`Load error at step "${debug.step}": ${err.message}`,'er');
     renderTab(activeTab);
   }
-  // Store debug info globally for the debug tab
-  window._lastLoadDebug = debugInfo;
+  window._loadDebug=debug;
 }
 
-// ── FULL SYNC FROM TRIPLESEAT ─────────────────────────────────────────────────
-async function doFullSync() {
-  const btn = document.getElementById('btn-sync');
-  if(btn){btn.disabled=true; btn.innerHTML='<span class="sp2"></span> Syncing…';}
-  setProgress(0, 'Starting full sync from Tripleseat…');
-
-  try {
-    // Step 1: Fetch all leads
-    setProgress(5, 'Fetching leads from Tripleseat…');
-    const allLeads = await fetchAllPages('leads');
-    setProgress(20, `${allLeads.length.toLocaleString()} leads — saving to database…`);
-    await sbPost('save-leads', {leads: allLeads});
-
-    // Step 2: Fetch all bookings (has DEFINITE/TENTATIVE/CLOSED/LOST status)
-    setProgress(25, 'Fetching bookings (status data)…');
-    const allBookings = await fetchAllPages('bookings');
-    setProgress(45, `${allBookings.length.toLocaleString()} bookings — saving…`);
-    await sbPost('save-bookings', {bookings: allBookings});
-
-    // Step 3: Fetch accounts
-    setProgress(50, 'Fetching accounts…');
-    const allAccounts = await fetchAllPages('accounts');
-    setProgress(62, `${allAccounts.length.toLocaleString()} accounts — saving…`);
-    await sbPost('save-accounts', {accounts: allAccounts});
-
-    // Step 4: Fetch contacts
-    setProgress(65, 'Fetching contacts…');
-    const allContacts = await fetchAllPages('contacts');
-    setProgress(78, `${allContacts.length.toLocaleString()} contacts — saving…`);
-    await sbPost('save-contacts', {contacts: allContacts});
-
-    // Step 5: Build outreach_contacts (deduped, enriched)
-    setProgress(82, 'Building deduplicated outreach profiles…');
-    const outreach = buildOutreachContacts(allLeads, allBookings, allAccounts, allContacts);
-    setProgress(88, `${outreach.length.toLocaleString()} unique contacts — saving to Supabase…`);
-
-    // Save outreach contacts — this is the critical step that enables page-load persistence
-    // Save in batches to avoid payload limits and get clear error feedback
-    let savedCount = 0;
-    const batchSize = 300;
-    for(let i=0; i < outreach.length; i += batchSize) {
-      const batch = outreach.slice(i, i+batchSize);
-      const pct = 88 + Math.round((i/outreach.length)*10);
-      setProgress(pct, `Saving contacts ${i+1}–${Math.min(i+batchSize, outreach.length)} of ${outreach.length.toLocaleString()}…`);
-      const result = await sbPost('save-outreach-contacts', {contacts: batch});
-      if(result && result.ok === false) {
-        throw new Error(`save-outreach-contacts failed on batch ${i/batchSize + 1}: ${result.error}`);
-      }
-      savedCount += batch.length;
-    }
-
-    // Verify the save by reading metadata back
-    setProgress(98, 'Verifying save…');
-    const verifyMeta = await fetch(`${API_ST}?action=get-metadata`).then(r=>r.json()).catch(()=>({}));
-    const savedTotal = parseInt(verifyMeta.total_outreach||'0');
-    if(savedTotal === 0) {
-      throw new Error(`Save verification failed: metadata shows 0 contacts after saving ${savedCount}. Check Supabase logs.`);
-    }
-
-    // Step 6: Load into memory from the saved data
-    contacts = outreach.map(enrichContact);
-    companies = buildCompanies(contacts);
-    updateBadges(); renderTab(activeTab);
-    dbConfigured = true;
-
-    setProgress(100, `✓ Sync complete — ${contacts.length.toLocaleString()} unique contacts saved to Supabase`);
-    hideProgress();
-    document.getElementById('last-sync-label').textContent = 'Synced ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    setStatus(`✓ Full sync complete and saved to Supabase: ${allLeads.length.toLocaleString()} leads, ${allBookings.length.toLocaleString()} bookings, ${contacts.length.toLocaleString()} unique contacts. Page will now load from database.`, 'ok');
-    setTimeout(()=>setStatus('',''), 8000);
-
-  } catch(err) {
-    console.error('[doFullSync] Error:', err);
-    setProgress(100, 'Sync error: ' + err.message);
-    setStatus(`Sync error: ${err.message}`, 'er');
-  }
-  if(btn){btn.disabled=false; btn.textContent='↻ Full Sync';}
-}
-
-async function fetchAllPages(endpoint) {
-  const all = []; let page=1, totalPages=1;
-  while(page <= Math.min(totalPages, 100)) {
-    const res = await fetch(`${API_TS}?endpoint=${endpoint}&page=${page}&limit=100`);
-    if(!res.ok) throw new Error(`Tripleseat ${endpoint} HTTP ${res.status}`);
-    const data = await res.json();
-    totalPages = data.total_pages || 1;
-    (data.results || []).forEach(r => all.push(r));
-    page++;
-    if(page <= Math.min(totalPages, 100)) await new Promise(r=>setTimeout(r,80));
+async function loadAllRows(table, select='*', order='') {
+  const all=[]; let offset=0; const limit=2000;
+  while(true){
+    let qs=`select=${select}&limit=${limit}&offset=${offset}`;
+    if(order) qs+=`&order=${order}`;
+    const res=await fetch(`${API_ST}?action=get-table&table=${table}&qs=${encodeURIComponent(qs)}`);
+    const data=await res.json().catch(()=>({rows:[]}));
+    const batch=data.rows||[];
+    all.push(...batch);
+    if(batch.length<limit) break;
+    offset+=limit;
   }
   return all;
 }
 
-async function sbPost(action, body) {
-  const res = await fetch(`${API_ST}?action=${action}`, {
-    method: 'POST', headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(body)
-  });
-  const data = await res.json().catch(()=>({}));
-  if(!res.ok || data.ok === false) console.warn(`${action} issue:`, data.error || res.status);
+// ── FULL SYNC ─────────────────────────────────────────────────────────────────
+async function doFullSync(){
+  const btn=document.getElementById('btn-sync');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Syncing…';}
+  setProgress(0,'Starting full sync…');
+
+  try{
+    // 1. Leads
+    setProgress(3,'Fetching leads…');
+    const allLeads=await fetchAllPages('leads');
+    setProgress(10,`${allLeads.length} leads — saving…`);
+    const lSave=await sbPost('save-leads',{leads:allLeads});
+    if(lSave?.ok===false) throw new Error('save-leads: '+lSave.error);
+
+    // 2. Bookings — CRITICAL (Prospect/Tentative/Definite/Closed/Lost)
+    setProgress(13,'Fetching bookings (status data)…');
+    const allBookings=await fetchAllPages('bookings');
+    setProgress(35,`${allBookings.length} bookings — saving…`);
+    const bSave=await sbPost('save-bookings',{bookings:allBookings});
+    if(bSave?.ok===false) throw new Error('save-bookings: '+bSave.error);
+
+    // 3. Accounts
+    setProgress(40,'Fetching accounts…');
+    const allAccounts=await fetchAllPages('accounts');
+    setProgress(52,`${allAccounts.length} accounts — saving…`);
+    const aSave=await sbPost('save-accounts',{accounts:allAccounts});
+    if(aSave?.ok===false) throw new Error('save-accounts: '+aSave.error);
+
+    // 4. Contacts
+    setProgress(55,'Fetching contacts…');
+    const allContacts=await fetchAllPages('contacts');
+    setProgress(68,`${allContacts.length} contacts — saving…`);
+    const cSave=await sbPost('save-contacts',{contacts:allContacts});
+    if(cSave?.ok===false) throw new Error('save-contacts: '+cSave.error);
+
+    // 5. Build + save outreach_contacts
+    setProgress(72,'Building opportunity profiles…');
+    bookings=allBookings; accounts=allAccounts; contacts=allContacts; leads=allLeads;
+    const outreach=buildLegacyOutreachContacts(allLeads,allBookings,allAccounts,allContacts);
+    setProgress(80,`${outreach.length} profiles — saving…`);
+    for(let i=0;i<outreach.length;i+=300){
+      const pct=80+Math.round((i/outreach.length)*15);
+      setProgress(pct,`Saving profiles ${i+1}-${Math.min(i+300,outreach.length)}…`);
+      const r=await sbPost('save-outreach-contacts',{contacts:outreach.slice(i,i+300)});
+      if(r?.ok===false) throw new Error('save-outreach-contacts batch: '+r.error);
+    }
+
+    // 6. Verify
+    setProgress(97,'Verifying…');
+    const vm=await fetch(`${API_ST}?action=get-metadata`).then(r=>r.json()).catch(()=>({}));
+    if(parseInt(vm.total_bookings||'0')===0) console.warn('Warning: bookings still 0 after sync');
+
+    // 7. Build opportunities in memory
+    opportunities=buildOpportunities();
+    updateBadges(); renderTab(activeTab); dbConfigured=true;
+
+    setProgress(100,`✓ ${allBookings.length} bookings with real status data synced`);
+    hideProgress();
+    document.getElementById('last-sync-label').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setStatus(`✓ Sync complete: ${allBookings.length} bookings, ${allLeads.length} leads, ${allContacts.length} contacts. Page will load from database going forward.`,'ok');
+    setTimeout(()=>setStatus('',''),8000);
+
+  }catch(err){
+    console.error('[doFullSync]',err);
+    setProgress(100,'Sync error: '+err.message);
+    setStatus('Sync error: '+err.message,'er');
+  }
+  if(btn){btn.disabled=false;btn.textContent='↻ Full Sync';}
+}
+
+async function fetchAllPages(endpoint){
+  const all=[];let page=1,total=1;
+  while(page<=Math.min(total,100)){
+    const res=await fetch(`${API_TS}?endpoint=${endpoint}&page=${page}&limit=100`);
+    if(!res.ok) throw new Error(`TS ${endpoint} HTTP ${res.status}`);
+    const data=await res.json();
+    total=data.total_pages||1;
+    (data.results||[]).forEach(r=>all.push(r));
+    page++;
+    if(page<=Math.min(total,100)) await new Promise(r=>setTimeout(r,80));
+  }
+  return all;
+}
+
+async function sbPost(action,body){
+  const res=await fetch(`${API_ST}?action=${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok||data.ok===false) console.error(`[sbPost] ${action} failed:`,data.error||res.status);
   return data;
 }
 
-// ── DEDUP + ENRICH for outreach_contacts table ────────────────────────────────
-function buildOutreachContacts(leads, bookings, accounts, contacts) {
-  const now = Date.now();
-  const map = {}; // email → record
-
-  // Index bookings by account_id and contact_id for quick lookup
-  const bookingsByContact = {};
-  const bookingsByAccount = {};
-  bookings.forEach(b => {
-    const bs = (b.status||'').toUpperCase();
-    if(b.contact_id) { bookingsByContact[b.contact_id] = bookingsByContact[b.contact_id]||[]; bookingsByContact[b.contact_id].push(b); }
-    if(b.account_id) { bookingsByAccount[b.account_id] = bookingsByAccount[b.account_id]||[]; bookingsByAccount[b.account_id].push(b); }
+// Legacy outreach contacts builder (for outreach_contacts table compatibility)
+function buildLegacyOutreachContacts(leads,bookings,accounts,contacts){
+  const map={};
+  const bookingsByContact={},bookingsByAccount={};
+  bookings.forEach(b=>{
+    if(b.contact_id){bookingsByContact[b.contact_id]=bookingsByContact[b.contact_id]||[];bookingsByContact[b.contact_id].push(b);}
+    if(b.account_id){bookingsByAccount[b.account_id]=bookingsByAccount[b.account_id]||[];bookingsByAccount[b.account_id].push(b);}
   });
+  const accountMap={};accounts.forEach(a=>accountMap[a.id]=a);
 
-  // Index accounts
-  const accountMap = {};
-  accounts.forEach(a => { accountMap[a.id] = a; });
-
-  // Process TS contacts (real CRM contacts — best source)
-  contacts.forEach(c => {
-    const email = (c.email_address || c.email || '').toLowerCase().trim();
+  contacts.forEach(c=>{
+    const email=(c.email_address||c.email||'').toLowerCase().trim();
     if(!email) return;
-    const cBookings = bookingsByContact[c.id] || (c.account_id ? bookingsByAccount[c.account_id] : []) || [];
-    const account = c.account_id ? accountMap[c.account_id] : null;
-    const company = account?.name || c.company || '';
-    const domain = getDomain(email);
-
-    // Find best booking info
-    const confirmedBookings = cBookings.filter(b => ['DEFINITE','CLOSED'].includes((b.status||'').toUpperCase()));
-    const latestBooking = cBookings.sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0];
-    const latestConfirmed = confirmedBookings.sort((a,b)=>new Date(b.start_date||0)-new Date(a.start_date||0))[0];
-    const lastEventDate = latestConfirmed?.start_date || latestBooking?.start_date || null;
-    const totalGuests = cBookings.reduce((s,b)=>s+(b.guest_count||0), 0);
-    const days = lastEventDate ? Math.floor((now-new Date(lastEventDate).getTime())/86400000) : null;
-
-    const tags = buildTags(c, email, company, domain, cBookings, lastEventDate, days);
-    const status = deriveStatusFromBookings(cBookings, lastEventDate, c.created_at);
-
-    const record = {
-      id: email,
-      ts_contact_id: c.id, ts_account_id: c.account_id || null,
-      first_name: c.first_name, last_name: c.last_name,
-      email, company, domain,
-      account_status: status,
-      booking_statuses: [...new Set(cBookings.map(b=>(b.status||'').toUpperCase()))],
-      booking_count: cBookings.length,
-      last_event_date: lastEventDate,
-      last_booking_status: (latestBooking?.status||'').toUpperCase() || null,
-      total_guests: totalGuests,
-      tags, days_since_event: days,
-      updated_at: new Date().toISOString(),
-    };
-
-    if(!map[email] || cBookings.length > (map[email]?.booking_count||0)) map[email] = record;
-  });
-
-  // Process leads — fill gaps for anyone not in TS contacts
-  leads.forEach(l => {
-    const email = (l.email_address || l.email || '').toLowerCase().trim();
-    if(!email || map[email]) return; // already have a better record
-    const domain = getDomain(email);
-    const company = l.company || '';
-    const days = l.event_date ? Math.floor((now-new Date(l.event_date).getTime())/86400000) : (l.created_at ? Math.floor((now-new Date(l.created_at).getTime())/86400000) : null);
-    const tags = buildTags(l, email, company, domain, [], l.event_date, days);
-    const status = l.turned_down_at ? 'lost' : (days!==null&&days<=14?'active-inquiry':days!==null&&days<0?'active-upcoming':'never-booked');
-
-    map[email] = {
-      id: email, ts_contact_id: null, ts_account_id: null,
-      first_name: l.first_name, last_name: l.last_name,
-      email, company, domain, account_status: status,
-      booking_statuses: [], booking_count: 0,
-      last_event_date: l.event_date||null, last_booking_status: null,
-      total_guests: l.guest_count||0, tags, days_since_event: days,
-      updated_at: new Date().toISOString(),
+    const acct=c.account_id?accountMap[c.account_id]:null;
+    const cBookings=[...(bookingsByContact[c.id]||[]),...(c.account_id?bookingsByAccount[c.account_id]||[]:[])] ;
+    const unique=[...new Map(cBookings.map(x=>[x.id,x])).values()];
+    const closed=unique.filter(b=>(b.status||'').toUpperCase()==='CLOSED');
+    const definite=unique.filter(b=>(b.status||'').toUpperCase()==='DEFINITE');
+    const latest=unique.sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0];
+    const lastEventDate=closed[0]?.start_date||definite[0]?.start_date||latest?.start_date||null;
+    const domain=getDomain(email);
+    map[email]={
+      id:email,ts_contact_id:c.id,ts_account_id:c.account_id||null,
+      first_name:c.first_name,last_name:c.last_name,email,
+      company:acct?.name||c.company||null,domain,
+      account_status:closed.length?'past_customer':definite.length?'past_definite':unique.length?'active_lead':'never_booked',
+      booking_statuses:[...new Set(unique.map(b=>(b.status||'').toUpperCase()))],
+      booking_count:unique.length,
+      last_event_date:lastEventDate,
+      last_booking_status:(latest?.status||'').toUpperCase()||null,
+      total_guests:unique.reduce((s,b)=>s+(parseInt(b.guest_count)||0),0),
+      tags:[],updated_at:new Date().toISOString(),
     };
   });
 
+  leads.forEach(l=>{
+    const email=(l.email_address||l.email||'').toLowerCase().trim();
+    if(!email||map[email]) return;
+    const domain=getDomain(email);
+    map[email]={
+      id:email,ts_contact_id:null,ts_account_id:null,
+      first_name:l.first_name,last_name:l.last_name,email,
+      company:l.company||null,domain,account_status:'never_booked',
+      booking_statuses:[],booking_count:0,
+      last_event_date:l.event_date||null,last_booking_status:null,
+      total_guests:parseInt(l.guest_count)||0,tags:[],
+      updated_at:new Date().toISOString(),
+    };
+  });
   return Object.values(map);
 }
 
-function deriveStatusFromBookings(bookings, lastEventDate, createdAt) {
-  const now = Date.now();
-  if(!bookings.length) {
-    const days = createdAt ? Math.floor((now-new Date(createdAt).getTime())/86400000) : null;
-    return days!==null&&days<=14 ? 'active-inquiry' : 'never-booked';
-  }
-  const hasActive = bookings.some(b=>['TENTATIVE','PROSPECT','DEFINITE'].includes((b.status||'').toUpperCase()) && (!b.start_date||new Date(b.start_date).getTime()>now));
-  if(hasActive) return new Date(lastEventDate||0).getTime() > now ? 'active-upcoming' : 'active-inquiry';
-  if(bookings.some(b=>(b.status||'').toUpperCase()==='LOST')) return 'lost';
-  return 'past-customer';
-}
-
-function buildTags(record, email, company, domain, bookings, lastEventDate, days) {
-  const tags=[], desc=(record.event_description||record.additional_information||record.description||'').toLowerCase();
-  const now = Date.now();
-  if(days!==null&&days>=180) tags.push('gone-quiet-6mo');
-  if(days!==null&&days>=365) tags.push('gone-quiet-12mo');
-  if((company&&company.trim())||domain) tags.push('corporate');
-  if(domain==='msu.edu'||(company||'').toLowerCase().includes('michigan state')||(company||'').toLowerCase().match(/\bmsu\b/)) tags.push('msu');
-  if(bookings.some(b=>(b.guest_count||0)>=75)||(record.guest_count||0)>=75) tags.push('high-value');
-  if(/graduat|commencement|class of/.test(desc)) tags.push('graduation');
-  if(/holiday|christmas|xmas|thanksgiving|new year|year.end/.test(desc)) tags.push('holiday');
-  if(/wedding|reception|bride|groom/.test(desc)) tags.push('wedding');
-  if(/football|spartan|game day|tailgate|watch party/.test(desc)) tags.push('msu-football');
-  // Anniversary uses lastEventDate
-  if(lastEventDate) {
-    const ref=new Date(lastEventDate), yr=new Date().getFullYear()-ref.getFullYear();
-    if(yr>=1){
-      const ann=new Date(ref); ann.setFullYear(new Date().getFullYear());
-      const dU=Math.floor((ann.getTime()-now)/86400000);
-      if(dU>=-7&&dU<=90) tags.push('anniversary');
-    }
-  }
-  return tags;
-}
-
-// ── RENDER TABS ───────────────────────────────────────────────────────────────
-function showTab(t) {
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(t){
   activeTab=t;
-  ['today','open','past','never','companies','campaigns','queue','suppressed','debug'].forEach(x=>{
+  ['cmd','tent','prospect','definite','closed','lost','years','queue','debug'].forEach(x=>{
     document.getElementById('pane-'+x).style.display=x===t?'block':'none';
     document.getElementById('tab-'+x).classList.toggle('active',x===t);
   });
   renderTab(t);
 }
-function renderTab(t) {
-  if(t==='today')     renderToday();
-  else if(t==='open')      renderOpen();
-  else if(t==='past')      renderPast();
-  else if(t==='never')     renderNever();
-  else if(t==='companies') renderCompanies();
-  else if(t==='campaigns') renderCampaigns();
-  else if(t==='queue')     renderQueue();
-  else if(t==='suppressed')renderSuppressed();
-  else if(t==='debug')     renderDebug();
+function renderTab(t){
+  if(t==='cmd')       renderCmd();
+  else if(t==='tent')     renderStatus('TENTATIVE');
+  else if(t==='prospect') renderStatus('PROSPECT');
+  else if(t==='definite') renderStatus('DEFINITE');
+  else if(t==='closed')   renderStatus('CLOSED');
+  else if(t==='lost')     renderStatus('LOST');
+  else if(t==='years')    renderYears();
+  else if(t==='queue')    renderQueue();
+  else if(t==='debug')    renderDebug();
 }
-function updateBadges() {
-  const open = contacts.filter(c=>['active-upcoming','active-inquiry'].includes(c.account_status)).length;
-  const past = contacts.filter(c=>c.account_status==='past-customer').length;
-  const never = contacts.filter(c=>c.account_status==='never-booked').length;
-  document.getElementById('bg-open').textContent     = open.toLocaleString();
-  document.getElementById('bg-past').textContent     = past.toLocaleString();
-  document.getElementById('bg-never').textContent    = never.toLocaleString();
-  document.getElementById('bg-companies').textContent = Object.keys(companies).length.toLocaleString();
-  document.getElementById('bg-queue').textContent    = queue.filter(q=>['needs_review','approved','ready_to_send'].includes(q.status)).length;
+function updateBadges(){
+  const byStatus={TENTATIVE:0,PROSPECT:0,DEFINITE:0,CLOSED:0,LOST:0};
+  opportunities.forEach(o=>{ if(byStatus[o.status]!==undefined) byStatus[o.status]++; });
+  document.getElementById('bg-tent').textContent=byStatus.TENTATIVE;
+  document.getElementById('bg-prospect').textContent=byStatus.PROSPECT;
+  document.getElementById('bg-definite').textContent=byStatus.DEFINITE;
+  document.getElementById('bg-closed').textContent=byStatus.CLOSED;
+  document.getElementById('bg-lost').textContent=byStatus.LOST;
+  document.getElementById('bg-queue').textContent=queue.filter(q=>['needs_review','approved','ready_to_send'].includes(q.status)).length;
 }
 
-// ── TODAY ─────────────────────────────────────────────────────────────────────
-function renderToday() {
-  const p=document.getElementById('pane-today');
-  if(!dbConfigured) { renderSetupPane('pane-today'); return; }
-  if(!contacts.length) { p.innerHTML=noData(); return; }
-  const batch=buildBatch(50), activeCamps=getActiveCampaigns();
-  const ann=contacts.filter(c=>c.tags?.includes('anniversary')&&c.account_status==='past-customer').length;
-  p.innerHTML=`<div class="sg">
-    ${sc_(batch.length,'Recommended today','var(--a)')}
-    ${sc_(contacts.filter(c=>['active-upcoming','active-inquiry'].includes(c.account_status)).length,'Open / Active','var(--g)')}
-    ${sc_(contacts.filter(c=>c.account_status==='past-customer').length,'Past customers','var(--a)')}
-    ${sc_(contacts.filter(c=>c.account_status==='never-booked').length,'Never booked','var(--m)')}
-    ${sc_(ann,'Anniversaries (90d)','var(--pu)')}
-    ${sc_(queue.filter(q=>q.status==='needs_review').length,'Needs review','var(--y)')}
-    ${sc_(queue.filter(q=>q.status==='approved'||q.status==='ready_to_send').length,'Ready to send','var(--g)')}
+// ── COMMAND CENTER ────────────────────────────────────────────────────────────
+function renderCmd(){
+  const p=document.getElementById('pane-cmd');
+  if(!dbConfigured){renderSetupPane('pane-cmd');return;}
+
+  if(!bookings.length&&!contacts.length){
+    p.innerHTML=`<div class="emp"><div class="emp-i">⟳</div><h3>No data loaded</h3><p>Click "↻ Full Sync" to import from Tripleseat.</p><br><button class="btn ba" onclick="doFullSync()">Full Sync now</button></div>`;
+    return;
+  }
+
+  const tent=opportunities.filter(o=>o.status==='TENTATIVE');
+  const prosp=opportunities.filter(o=>o.status==='PROSPECT');
+  const def=opportunities.filter(o=>o.status==='DEFINITE');
+  const closed=opportunities.filter(o=>o.status==='CLOSED');
+  const lost=opportunities.filter(o=>o.status==='LOST');
+  const staleTent=tent.filter(o=>o.daysSinceUpdate>7).sort((a,b)=>b.daysSinceUpdate-a.daysSinceUpdate);
+  const staleProsp=prosp.filter(o=>o.daysSinceUpdate>5).sort((a,b)=>b.daysSinceUpdate-a.daysSinceUpdate);
+  const urgentTent=tent.filter(o=>o.urgency==='urgent'||o.urgency==='high').sort((a,b)=>b.score-a.score);
+  const yr2026=tent.concat(prosp).filter(o=>o.eventYear===2026);
+  const yr2027=tent.concat(prosp).filter(o=>o.eventYear===2027);
+  const tenGuests=tent.reduce((s,o)=>s+o.guests,0);
+  const readyDrafts=queue.filter(q=>q.status==='needs_review'||q.status==='approved').length;
+
+  p.innerHTML=`
+  <div style="margin-bottom:18px">
+    <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;color:var(--t);margin-bottom:4px">Ryan Sales Command Center</div>
+    <div style="font-size:.76rem;color:var(--m)">Status-based opportunity engine — powered by real Tripleseat data</div>
   </div>
-  ${activeCamps.length?`<div style="background:rgba(232,119,42,.08);border:1px solid rgba(232,119,42,.2);border-radius:8px;padding:9px 13px;margin-bottom:16px;font-size:.77rem;color:var(--a)">📅 Active seasonal campaigns: ${activeCamps.join(', ')}</div>`:''}
+
+  <div class="sg">
+    ${sc_(tent.length,'Tentative','var(--y)','tent')}
+    ${sc_(prosp.length,'Prospects','var(--pu)','prospect')}
+    ${sc_(def.length,'Definite','var(--g)','definite')}
+    ${sc_(closed.length,'Past Customers','var(--bl)','closed')}
+    ${sc_(lost.length,'Lost','var(--r)','lost')}
+    ${sc_(staleTent.length,'Stale Tentative','var(--r)','tent')}
+    ${sc_(tenGuests?tenGuests.toLocaleString()+' guests':0,'Tent. Guest Total','var(--y)',null)}
+    ${sc_(readyDrafts,'Drafts Ready','var(--g)','queue')}
+  </div>
+
+  ${bookings.length===0?`<div class="sm wa">⚠ No booking status data loaded. Click "↻ Full Sync" to get Prospect/Tentative/Definite/Closed/Lost data from Tripleseat.</div>`:''}
+
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
     <div>
-      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:14px">Campaign breakdown</div>
-      ${CAMPAIGNS.map(cam=>{
-        const cnt=contacts.filter(cam.filter).length; if(!cnt) return '';
-        const bCnt=batch.filter(b=>b.campaign===cam.id).length;
-        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b)">
-          <div><div style="font-size:.85rem;font-weight:500;color:${cam.color}">${cam.label}</div><div style="font-size:.7rem;color:var(--m)">${cam.desc}</div></div>
-          <div style="text-align:right;flex-shrink:0">
-            <div style="font-family:'Fraunces',serif;font-size:1.1rem;font-weight:600;color:${cam.color}">${cnt.toLocaleString()}</div>
-            <div style="font-size:.65rem;color:var(--m2);font-family:'DM Mono',monospace">${bCnt} in batch</div>
-          </div>
-        </div>`;
-      }).join('')}
-      <div style="margin-top:14px;display:flex;gap:7px">
-        <button class="btn ba" onclick="queueBatch()">Queue batch (${batch.length})</button>
-        <button class="btn bgh" onclick="showTab('queue')">View queue →</button>
-      </div>
+      <div class="sec-hdr"><div class="sec-title">🔥 Urgent Follow-Ups</div><button class="btn bgh bs" onclick="showTab('tent')">All Tentative →</button></div>
+      ${urgentTent.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>No urgent items</h3></div>`:
+      urgentTent.slice(0,6).map(o=>oppCard(o,true)).join('')}
+
+      <div class="sec-hdr" style="margin-top:20px"><div class="sec-title">📋 Stale Prospects</div><button class="btn bgh bs" onclick="showTab('prospect')">All Prospects →</button></div>
+      ${staleProsp.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>All caught up</h3></div>`:
+      staleProsp.slice(0,5).map(o=>oppCard(o,true)).join('')}
     </div>
     <div>
-      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:13px">Top contacts today</div>
-      ${batch.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>All done</h3><p>No contacts need outreach today.</p></div>`:
-      batch.slice(0,15).map(({contact:c,campaign})=>{
-        const cam=CAMPAIGNS.find(x=>x.id===campaign);
-        const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-        const co=c.company||c._co||'';
-        return `<div class="card">
-          <div class="ch"><div><div class="cn">${esc(name)}</div>${co?`<div class="cs">${esc(co)}</div>`:''}</div>${cam?`<span class="tag tp">${cam.label.split(' ').slice(0,2).join(' ')}</span>`:''}</div>
-          <div class="cm">
-            ${c.email?`<div><span>Email</span> ${esc(c.email)}</div>`:''}
-            ${c.last_event_date?`<div><span>Event</span> ${new Date(c.last_event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})}</div>`:''}
-            ${c.last_booking_status?`<div><span>Status</span> ${c.last_booking_status}</div>`:''}
-            ${c._annDays!==undefined?`<div><span>Ann in</span> ${c._annDays}d</div>`:''}
-          </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn ba bs" onclick="queueOne('${esc(c.email)}','${campaign||''}')">+ Queue</button>
-            <button class="btn bgh bs" onclick="skipContact('${esc(c.email)}')">Skip 30d</button>
-          </div>
-        </div>`;
-      }).join('')}
-      ${batch.length>15?`<div style="text-align:center;padding:10px;color:var(--m2);font-size:.72rem">${batch.length-15} more — click "Queue batch" to add all</div>`:''}
+      <div class="sec-hdr"><div class="sec-title">📅 2026 Active Leads</div><span style="font-size:.72rem;color:var(--m)">${yr2026.length} total</span></div>
+      ${yr2026.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No 2026 leads</h3></div>`:
+      yr2026.slice(0,5).map(o=>oppCard(o,false)).join('')}
+      ${yr2026.length>5?`<button class="btn bgh bs" style="margin-top:6px" onclick="showTab('years')">+ ${yr2026.length-5} more →</button>`:''}
+
+      <div class="sec-hdr" style="margin-top:20px"><div class="sec-title">🗓 2027 Active Leads</div><span style="font-size:.72rem;color:var(--m)">${yr2027.length} total</span></div>
+      ${yr2027.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No 2027 leads</h3></div>`:
+      yr2027.slice(0,5).map(o=>oppCard(o,false)).join('')}
+      ${yr2027.length>5?`<button class="btn bgh bs" style="margin-top:6px" onclick="showTab('years')">+ ${yr2027.length-5} more →</button>`:''}
     </div>
   </div>`;
 }
-function sc_(n,l,color){return `<div class="sc_"><div class="sn" style="color:${color}">${typeof n==='number'?n.toLocaleString():n}</div><div class="sl_">${l}</div></div>`;}
+function sc_(n,l,color,tab){return `<div class="sc" onclick="${tab?`showTab('${tab}')`:''}"><div class="sn" style="color:${color}">${typeof n==='number'?n.toLocaleString():n}</div><div class="sl">${l}</div></div>`;}
 
-// ── OPEN PIPELINE ─────────────────────────────────────────────────────────────
-function renderOpen() {
-  const p=document.getElementById('pane-open');
-  const list=contacts.filter(c=>['active-upcoming','active-inquiry'].includes(c.account_status));
-  p.innerHTML=`<div style="background:rgba(76,175,125,.08);border:1px solid rgba(76,175,125,.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.77rem;color:var(--g)">
-    ⚠ These ${list.length} contacts are active/open. They are <strong>excluded from all automated outreach campaigns</strong>. Ryan handles these directly.
+// ── STATUS VIEWS ──────────────────────────────────────────────────────────────
+function renderStatus(status){
+  const paneMap={TENTATIVE:'tent',PROSPECT:'prospect',DEFINITE:'definite',CLOSED:'closed',LOST:'lost'};
+  const p=document.getElementById('pane-'+paneMap[status]);
+  const list=opportunities.filter(o=>o.status===status).sort((a,b)=>b.score-a.score||(new Date(a.updatedAt)-new Date(b.updatedAt)));
+
+  const labels={TENTATIVE:'Tentative Events — Active Sales Opportunities',PROSPECT:'Prospect Leads — Pipeline Opportunities',DEFINITE:'Definite Events — Booked Business',CLOSED:'Closed Events — Past Customers',LOST:'Lost / Turned Down'};
+  const notes={
+    TENTATIVE:'These are your highest-value leads. They are actively talking to you but have not committed. Follow up regularly to move toward Definite.',
+    PROSPECT:'Active inquiries that need timely follow-up. New prospects should hear back within 1-2 days.',
+    DEFINITE:'Booked events with deposits or commitments. Do not send generic sales emails to these contacts.',
+    CLOSED:'Completed past events. Real past customers — best candidates for reactivation, anniversaries, and seasonal outreach.',
+    LOST:'Lost, cancelled, or turned down. Soft nurture only. Never imply they were a customer unless they have Closed history.',
+  };
+  const totGuests=list.reduce((s,o)=>s+o.guests,0);
+  const avg=list.length?Math.round(totGuests/list.filter(o=>o.guests>0).length)||0:0;
+  const yr2026=list.filter(o=>o.eventYear===2026).length;
+  const yr2027=list.filter(o=>o.eventYear===2027).length;
+  const stale=list.filter(o=>o.daysSinceUpdate>7).length;
+
+  p.innerHTML=`
+  <div style="background:${statusColor(status)}0f;border:1px solid ${statusColor(status)}33;border-radius:8px;padding:10px 14px;margin-bottom:16px">
+    <div style="font-size:.82rem;font-weight:600;color:${statusColor(status)};margin-bottom:3px">${labels[status]}</div>
+    <div style="font-size:.75rem;color:var(--m)">${notes[status]}</div>
   </div>
-  ${list.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>No active leads</h3></div>`:''}
-  ${list.map(c=>cCard(c,false)).join('')}`;
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:.74rem;font-family:'DM Mono',monospace;color:var(--m2)">
+    <span><span style="color:var(--m)">${list.length}</span> total</span>
+    ${totGuests?`<span><span style="color:var(--m)">${totGuests.toLocaleString()}</span> total guests</span>`:''}
+    ${avg?`<span><span style="color:var(--m)">${avg}</span> avg guests</span>`:''}
+    ${yr2026?`<span><span style="color:var(--y)">${yr2026}</span> in 2026</span>`:''}
+    ${yr2027?`<span><span style="color:var(--y)">${yr2027}</span> in 2027</span>`:''}
+    ${stale?`<span><span style="color:var(--r)">${stale}</span> stale (7d+)</span>`:''}
+  </div>
+  ${list.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No ${status.toLowerCase()} events</h3><p>Sync from Tripleseat to get latest data.</p></div>`:''}
+  ${list.map(o=>oppCard(o,status==='TENTATIVE'||status==='PROSPECT')).join('')}`;
 }
 
-// ── PAST / REACTIVATION ───────────────────────────────────────────────────────
-function renderPast(search='',filter='') {
-  const p=document.getElementById('pane-past');
-  const s=search.toLowerCase();
-  let list=contacts.filter(c=>c.account_status==='past-customer'||c.account_status==='lost');
-  if(filter) list=list.filter(c=>c.tags?.includes(filter));
-  if(s) list=list.filter(c=>[c.first_name,c.last_name,c.company,c.email,c._co].join(' ').toLowerCase().includes(s));
-  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;flex-wrap:wrap;gap:8px">
-    <div><span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${list.length.toLocaleString()}</span> <span style="font-size:.76rem;color:var(--m)">past customers and reactivation opportunities</span></div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap">
-      <input type="text" placeholder="Search…" value="${esc(search)}" oninput="renderPast(this.value,'${filter}')">
-      <select onchange="renderPast('${search}',this.value)">
-        <option value="">All past</option>
-        ${CAMPAIGNS.map(c=>`<option value="${c.id}" ${filter===c.id?'selected':''}>${c.label}</option>`).join('')}
-      </select>
-    </div>
-  </div>
-  ${list.slice(0,80).map(c=>cCard(c,true)).join('')}
-  ${list.length>80?`<div style="text-align:center;padding:14px;color:var(--m2);font-size:.73rem">${list.length-80} more — search to narrow</div>`:''}`;
-}
+// ── 2026 / 2027 VIEW ─────────────────────────────────────────────────────────
+function renderYears(){
+  const p=document.getElementById('pane-years');
+  const activeStatuses=['TENTATIVE','PROSPECT','DEFINITE'];
+  const yr2026=opportunities.filter(o=>o.eventYear===2026&&activeStatuses.includes(o.status));
+  const yr2027=opportunities.filter(o=>o.eventYear===2027&&activeStatuses.includes(o.status));
 
-// ── NEVER BOOKED ──────────────────────────────────────────────────────────────
-function renderNever(search='') {
-  const p=document.getElementById('pane-never');
-  const s=search.toLowerCase();
-  let list=contacts.filter(c=>c.account_status==='never-booked');
-  if(s) list=list.filter(c=>[c.first_name,c.last_name,c.company,c.email].join(' ').toLowerCase().includes(s));
-  p.innerHTML=`<div style="background:rgba(90,88,85,.1);border:1px solid var(--b2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.77rem;color:var(--m)">
-    These ${list.length} contacts submitted inquiries but never had a confirmed Definite/Closed booking. Good candidates for a single follow-up.
-  </div>
-  <div style="margin-bottom:13px"><input type="text" placeholder="Search…" value="${esc(search)}" oninput="renderNever(this.value)"></div>
-  ${list.slice(0,80).map(c=>cCard(c,true)).join('')}
-  ${list.length>80?`<div style="text-align:center;padding:14px;color:var(--m2);font-size:.73rem">${list.length-80} more — search to narrow</div>`:''}`;
-}
-
-// ── COMPANIES ─────────────────────────────────────────────────────────────────
-function renderCompanies(search='') {
-  const p=document.getElementById('pane-companies');
-  if(!contacts.length){p.innerHTML=noData();return;}
-  const s=search.toLowerCase();
-  const entries=Object.entries(companies).filter(([k,v])=>!s||v.name.toLowerCase().includes(s)||k.includes(s));
-  p.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${Object.keys(companies).length.toLocaleString()} companies / accounts</span>
-    <input type="text" placeholder="Search companies…" value="${esc(search)}" oninput="renderCompanies(this.value)" style="width:200px">
-  </div>
-  ${entries.slice(0,60).map(([key,co])=>{
-    const sk=key.replace(/[^a-z0-9]/g,'').slice(0,30);
-    const active=co.contacts.filter(c=>['active-upcoming','active-inquiry'].includes(c.account_status)).length;
-    const past=co.contacts.filter(c=>c.account_status==='past-customer').length;
-    return `<div class="cc" id="co-${sk}" onclick="toggleCo('${sk}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-        <div>
-          <div style="font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:7px">
-            ${esc(co.name)}
-            ${co.domain==='msu.edu'?`<span class="tag tm">MSU</span>`:''}
-            ${active?`<span class="tag tg">${active} active</span>`:''}
-            ${past?`<span class="tag tp">${past} past</span>`:''}
-          </div>
-          <div style="font-size:.71rem;color:var(--m);margin-top:2px">${co.domain||''}</div>
-        </div>
-        <div style="text-align:right"><div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700">${co.contacts.length}</div><div style="font-size:.63rem;color:var(--m2);font-family:'DM Mono',monospace">contacts</div></div>
-      </div>
-      <div style="display:flex;gap:12px;margin-top:7px;font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace">
-        <span>${co.contacts.filter(c=>c.email).length} with email</span>
-        <span>${co.events} events</span>
-        ${co.guests>0?`<span>${co.guests.toLocaleString()} total guests</span>`:''}
-      </div>
-      <div class="ccc" id="coc-${sk}">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
-          <span style="font-size:.76rem;color:var(--m);font-weight:600">Contacts at ${esc(co.name)}</span>
-          <button class="btn ba bs" onclick="event.stopPropagation();queueCompany('${sk}')">Queue for outreach</button>
-        </div>
-        ${co.contacts.slice(0,15).map(c=>{
-          const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-          const inQ=queue.some(q=>q.contact_email===c.email);
-          const sc=STATUS_COLORS[c.account_status]||'var(--m)';
-          return `<div class="cm2">
-            <div>
-              <div style="font-size:.83rem;font-weight:500">${esc(name)}</div>
-              <div style="font-size:.7rem;color:var(--m2);font-family:'DM Mono',monospace">${esc(c.email||'no email')} · <span style="color:${sc}">${STATUS_LABELS[c.account_status]||'?'}</span></div>
-              ${c.last_event_date?`<div style="font-size:.66rem;color:var(--m2);margin-top:2px">${new Date(c.last_event_date).toLocaleDateString('en-US',{month:'short',year:'numeric'})} · ${c.last_booking_status||''}</div>`:''}
+  function yearSection(yr,list){
+    const byStatus={TENTATIVE:list.filter(o=>o.status==='TENTATIVE'),PROSPECT:list.filter(o=>o.status==='PROSPECT'),DEFINITE:list.filter(o=>o.status==='DEFINITE')};
+    return `
+    <div style="margin-bottom:24px">
+      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--a2)">${yr} Active Leads <span style="font-size:.76rem;font-family:'DM Sans',sans-serif;color:var(--m);font-weight:400">${list.length} total · ${list.reduce((s,o)=>s+o.guests,0).toLocaleString()} guests</span></div>
+      <div class="yr-grid">
+        ${['TENTATIVE','PROSPECT','DEFINITE'].map(st=>`
+        <div class="yr-col">
+          <div class="yr-col-hdr" style="color:${statusColor(st)}">${st} <span style="color:var(--m2)">(${byStatus[st].length})</span></div>
+          ${byStatus[st].length===0?`<div style="font-size:.74rem;color:var(--m2);padding:8px 0">None</div>`:''}
+          ${byStatus[st].slice(0,20).map(o=>`
+          <div style="padding:8px 0;border-bottom:1px solid var(--b);last-child:border-none">
+            <div style="font-size:.84rem;font-weight:600">${esc(o.name)}</div>
+            ${o.company?`<div style="font-size:.7rem;color:var(--m)">${esc(o.company)}</div>`:''}
+            <div style="font-size:.68rem;color:var(--m2);font-family:'DM Mono',monospace;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">
+              ${o.eventDate?`<span>${fmtDate(o.eventDate)}</span>`:''}
+              ${o.guests?`<span>${o.guests} guests</span>`:''}
+              ${o.daysSinceUpdate!==null?`<span style="color:${o.daysSinceUpdate>7?'var(--r)':'var(--m2)'}">${o.daysSinceUpdate}d ago</span>`:''}
             </div>
-            ${['active-upcoming','active-inquiry'].includes(c.account_status)
-              ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">Active</span>`
-              :inQ?`<span style="font-size:.7rem;color:var(--g)">✓ Queued</span>`
-              :`<button class="btn ba bs" onclick="event.stopPropagation();queueOne('${esc(c.email)}','corporate')">Queue</button>`}
-          </div>`;
-        }).join('')}
-        ${co.contacts.length>15?`<div style="font-size:.7rem;color:var(--m2);text-align:center;padding:7px">+${co.contacts.length-15} more</div>`:''}
+            <div style="margin-top:5px;display:flex;gap:5px">
+              <button class="btn ba bs" onclick="queueOne('${esc(o.id)}','${o.status.toLowerCase()}')">Draft</button>
+              ${o.email?`<a href="mailto:${esc(o.email)}" class="btn bgh bs">Email</a>`:''}
+            </div>
+          </div>`).join('')}
+          ${byStatus[st].length>20?`<div style="font-size:.7rem;color:var(--m2);padding:8px 0">+${byStatus[st].length-20} more</div>`:''}
+        </div>`).join('')}
       </div>
     </div>`;
-  }).join('')}
-  ${entries.length>60?`<div style="text-align:center;padding:14px;color:var(--m2);font-size:.73rem">${entries.length-60} more — search to narrow</div>`:''}`;
-}
-function toggleCo(k){const c=document.getElementById('co-'+k);if(c)c.classList.toggle('exp');}
+  }
 
-// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
-function renderCampaigns() {
-  const p=document.getElementById('pane-campaigns');
-  if(!contacts.length){p.innerHTML=noData();return;}
-  p.innerHTML=CAMPAIGNS.map(cam=>{
-    const list=contacts.filter(cam.filter); if(!list.length) return '';
-    const preview=list.slice(0,5).map(c=>`<span style="background:var(--s2);border:1px solid var(--b);border-radius:5px;padding:2px 8px;font-size:.7rem;color:var(--m)">${esc([c.first_name,c.last_name].filter(Boolean).join(' ')||'?')}</span>`).join('');
-    return `<div style="background:var(--s);border:1px solid var(--b);border-radius:11px;padding:16px;margin-bottom:12px">
-      <div style="font-size:.92rem;font-weight:600;color:${cam.color};display:flex;align-items:center;gap:10px;margin-bottom:4px">
-        ${cam.label} <span style="font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700">${list.length.toLocaleString()}</span>
+  p.innerHTML=yearSection(2026,yr2026)+yearSection(2027,yr2027)+(yr2026.length===0&&yr2027.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No 2026/2027 leads</h3><p>Sync from Tripleseat to get event date data.</p></div>`:'');
+}
+
+// ── OPPORTUNITY CARD ──────────────────────────────────────────────────────────
+function oppCard(o, showAction){
+  const inQ=queue.some(q=>q.booking_id===o.id||q.contact_email===o.email);
+  return `<div class="opp ${o.urgency||'low'}">
+    <div class="opp-header">
+      <div>
+        <div class="opp-name">${esc(o.name)}</div>
+        ${o.company?`<div class="opp-co">${esc(o.company)}</div>`:''}
       </div>
-      <div style="font-size:.76rem;color:var(--m);margin-bottom:10px">${cam.desc} · ${list.filter(c=>c.email).length} with valid email</div>
-      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${preview}${list.length>5?`<span style="font-size:.7rem;color:var(--m2);padding:2px 6px">+${list.length-5} more</span>`:''}</div>
-      <div style="display:flex;gap:7px">
-        <button class="btn ba bs" onclick="queueCampaign('${cam.id}',20)">Queue top 20</button>
-        <button class="btn bgh bs" onclick="showTab('past');renderPast('','${cam.id}')">View all →</button>
+      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+        ${o.score>0?`<span class="score ${o.urgency==='urgent'||o.urgency==='high'?'score-high':'score-med'}">${o.score}</span>`:''}
+        <span class="pill ${pillClass(o.status)}">${o.status}</span>
       </div>
-    </div>`;
-  }).join('');
+    </div>
+    <div class="opp-meta">
+      ${o.email?`<div><span>Email</span> ${esc(o.email)}</div>`:''}
+      ${o.phone?`<div><span>Phone</span> ${esc(o.phone)}</div>`:''}
+      ${o.eventDate?`<div><span>Event</span> ${fmtDate(o.eventDate)}</div>`:''}
+      ${o.guests?`<div><span>Guests</span> ${o.guests}</div>`:''}
+      ${o.location?`<div><span>Location</span> ${esc(o.location)}</div>`:''}
+      ${o.description?`<div><span>Type</span> ${esc(o.description.slice(0,50))}</div>`:''}
+      ${o.daysSinceUpdate!==null?`<div style="color:${o.daysSinceUpdate>7?'var(--r)':o.daysSinceUpdate>3?'var(--y)':'var(--m2)'}"><span>Updated</span> ${o.daysSinceUpdate}d ago</div>`:''}
+    </div>
+    ${showAction&&o.action?`<div class="opp-action"><strong>Suggested:</strong> ${esc(o.action)}</div>`:''}
+    <div class="opp-footer">
+      ${inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ In queue</span>`:
+      `<button class="btn ba bs" onclick="queueOne('${esc(o.id)}','${o.status.toLowerCase()}')">✨ Draft message</button>`}
+      ${o.email?`<a href="mailto:${esc(o.email)}" class="btn bgh bs">Email</a>`:''}
+      ${o.phone?`<a href="tel:${esc(o.phone)}" class="btn bgh bs">Call</a>`:''}
+    </div>
+  </div>`;
 }
 
 // ── QUEUE ─────────────────────────────────────────────────────────────────────
-// Status workflow: draft_needed → draft_generated → needs_review → approved → ready_to_send → sent/skipped/failed
-const WF_COLORS = {draft_needed:'var(--m2)',draft_generated:'var(--bl)',needs_review:'var(--y)',approved:'var(--a)',ready_to_send:'var(--g)',sent:'var(--g)',skipped:'var(--m2)',failed:'var(--r)'};
-const WF_LABELS = {draft_needed:'Draft needed',draft_generated:'Draft generated',needs_review:'Needs review',approved:'Approved',ready_to_send:'Ready to send',sent:'Sent',skipped:'Skipped',failed:'Failed'};
+const WFC={draft_needed:'var(--m2)',draft_generated:'var(--bl)',needs_review:'var(--y)',approved:'var(--a)',ready_to_send:'var(--g)',sent:'var(--g)',skipped:'var(--m2)',failed:'var(--r)'};
+const WFL={draft_needed:'Draft needed',draft_generated:'Generated',needs_review:'Needs review',approved:'Approved',ready_to_send:'Ready to send',sent:'Sent',skipped:'Skipped',failed:'Failed'};
 
-function renderQueue() {
+function renderQueue(){
   const p=document.getElementById('pane-queue');
-  const byStatus={};
-  queue.forEach(q=>{byStatus[q.status]=(byStatus[q.status]||0)+1;});
+  const byS={};queue.forEach(q=>{byS[q.status]=(byS[q.status]||0)+1;});
   const needDraft=queue.filter(q=>q.status==='draft_needed').length;
   const needReview=queue.filter(q=>q.status==='needs_review'||q.status==='draft_generated').length;
-  const approved=queue.filter(q=>q.status==='approved'||q.status==='ready_to_send').length;
 
-  if(!queue.length){
-    p.innerHTML=`<div class="emp"><div class="emp-i">✉</div><h3>Queue is empty</h3><p>Go to Today or Campaigns and queue some contacts.</p></div>`;
-    updateBadges(); return;
-  }
+  if(!queue.length){p.innerHTML=`<div class="emp"><div class="emp-i">✉</div><h3>Queue is empty</h3><p>Go to Command Center and click "Draft message" on any opportunity.</p></div>`;updateBadges();return;}
 
   p.innerHTML=`
-    <div class="wf-legend">
-      ${Object.entries(WF_LABELS).map(([k,v])=>`<span class="wf-item" style="color:${WF_COLORS[k]};background:${WF_COLORS[k]}1a">${v} (${byStatus[k]||0})</span>`).join('')}
+  <div class="wfl">${Object.entries(WFL).map(([k,v])=>`<span class="wfi" style="color:${WFC[k]};background:${WFC[k]}1a">${v} (${byS[k]||0})</span>`).join('')}</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+    <span style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600">${queue.length} in queue</span>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${needDraft?`<button class="btn ba" onclick="generateAll()">✨ Generate ${needDraft}</button>`:''}
+      ${needReview?`<button class="btn bgg" onclick="approveAllReady()">✓ Approve all reviewed</button>`:''}
+      <button class="btn bgh" onclick="clearQueue()">Clear</button>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:9px">
-      <div><span style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600">${queue.length}</span> <span style="font-size:.76rem;color:var(--m)">in queue</span></div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap">
-        ${needDraft>0?`<button class="btn ba" onclick="generateAll()">✨ Generate ${needDraft} draft${needDraft>1?'s':''}</button>`:''}
-        ${needReview>0?`<button class="btn bge" onclick="approveAllReady()">✓ Approve all reviewed</button>`:''}
-        <button class="btn bgh" onclick="clearQueue()">Clear queue</button>
+  </div>
+  <div style="background:rgba(91,141,238,.07);border:1px solid rgba(91,141,238,.2);border-radius:7px;padding:8px 12px;margin-bottom:13px;font-size:.74rem;color:var(--bl)">
+    📨 Email provider not configured yet. Approved emails must be copied and sent manually. Mark as "Sent" after sending.
+  </div>
+  ${queue.map(item=>{
+    const sc_=WFC[item.status]||'var(--m)',sl=WFL[item.status]||item.status;
+    const hasRisks=item.risk_flags?.some(f=>f&&f!=='none');
+    return `<div class="opp ${item.status==='approved'||item.status==='ready_to_send'?'high':''}" id="qc-${item.id}">
+      <div class="opp-header">
+        <div><div class="opp-name">${esc(item.contact_name||'Unknown')} ${item.company?`<span style="font-size:.71rem;color:var(--m);font-weight:400">${esc(item.company)}</span>`:''}</div>
+        <div class="opp-co">${esc(item.contact_email)} ${item.subject?' · '+esc(item.subject):''}</div></div>
+        <div style="display:flex;align-items:center;gap:5px">
+          ${hasRisks?`<span style="font-size:.63rem;color:var(--y);background:rgba(245,166,35,.1);padding:2px 6px;border-radius:20px">⚠ review</span>`:''}
+          <span class="pill" style="color:${sc_};background:${sc_}1a;border-color:${sc_}44">${sl}</span>
+        </div>
       </div>
-    </div>
-    <div style="background:rgba(91,141,238,.08);border:1px solid rgba(91,141,238,.2);border-radius:8px;padding:9px 13px;margin-bottom:14px;font-size:.75rem;color:var(--bl)">
-      📨 Email provider: <strong>Not configured yet.</strong> Approved emails show as "Ready to send" but cannot be sent automatically until an email provider (Resend, SendGrid, or Gmail API) is connected. Each email must be copied and sent manually for now.
-    </div>
-    ${queue.map(item=>{
-      const sc_=WF_COLORS[item.status]||'var(--m)',sl=WF_LABELS[item.status]||item.status;
-      const hasRisks=item.risk_flags?.length>0&&item.risk_flags[0]!=='none'&&item.risk_flags[0];
-      return `<div class="card ${item.status==='approved'||item.status==='ready_to_send'?'approved':item.status==='skipped'?'skipped':''}" id="qc-${item.id}">
-        <div class="ch">
-          <div>
-            <div class="cn">${esc(item.contact_name||'Unknown')}${item.company?` <span style="font-size:.71rem;color:var(--m);font-weight:400">${esc(item.company)}</span>`:''}</div>
-            <div class="cs">${esc(item.contact_email)}${item.subject?' · '+esc(item.subject):''}</div>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            ${hasRisks?`<span style="font-size:.65rem;color:var(--y);background:rgba(245,166,35,.1);padding:2px 7px;border-radius:20px;font-family:'DM Mono',monospace">⚠ review</span>`:''}
-            <span class="sp_" style="color:${sc_};background:${sc_}1a">${sl}</span>
-          </div>
-        </div>
-        ${item.body?`<div class="cb_">${esc(item.body)}</div>`:''}
-        <div class="cf">
-          ${item.status==='draft_needed'?`<button class="btn ba bs" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
-          ${['draft_generated','needs_review'].includes(item.status)?`
-            <button class="btn bgh bs" onclick="openModal('${item.id}')">👁 Review${hasRisks?' ⚠':''}</button>
-            <button class="btn bge bs"  onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
-          ${item.status==='approved'?`
-            <button class="btn bge bs" onclick="markReadyToSend('${item.id}')">→ Mark ready to send</button>
-            <button class="btn bgh bs" onclick="openModal('${item.id}')">👁 View</button>`:''}
-          ${item.status==='ready_to_send'?`
-            <button class="btn bgh bs" onclick="openModal('${item.id}')">👁 Copy & send manually</button>
-            <button class="btn bge bs" onclick="markSent('${item.id}')">✓ Mark as sent</button>`:''}
-          ${!['sent','skipped'].includes(item.status)?`<button class="btn bgh bs" onclick="skipItem('${item.id}')">Skip</button>`:''}
-          <button class="btn br bs" onclick="removeItem('${item.id}')">Remove</button>
-        </div>
-      </div>`;
-    }).join('')}`;
+      ${item.body?`<div class="draft-body">${esc(item.body)}</div>`:''}
+      <div class="opp-footer">
+        ${item.status==='draft_needed'?`<button class="btn ba bs" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
+        ${['draft_generated','needs_review'].includes(item.status)?`<button class="btn bgh bs" onclick="openModal('${item.id}')">👁 Review${hasRisks?' ⚠':''}</button><button class="btn bgg bs" onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
+        ${item.status==='approved'?`<button class="btn bgg bs" onclick="markReady('${item.id}')">→ Ready to send</button><button class="btn bgh bs" onclick="openModal('${item.id}')">👁 View</button>`:''}
+        ${item.status==='ready_to_send'?`<button class="btn bgh bs" onclick="openModal('${item.id}')">📋 Copy & send</button><button class="btn bgg bs" onclick="markSent('${item.id}')">✓ Mark sent</button>`:''}
+        ${!['sent','skipped'].includes(item.status)?`<button class="btn bgh bs" onclick="skipItem('${item.id}')">Skip</button>`:''}
+        <button class="btn br bs" onclick="removeItem('${item.id}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('')}`;
   updateBadges();
 }
 
-// ── SUPPRESSED ────────────────────────────────────────────────────────────────
-function renderSuppressed() {
-  const p=document.getElementById('pane-suppressed');
-  const list=[...suppressed].sort();
-  p.innerHTML=`<div style="margin-bottom:14px"><div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:4px">Do Not Contact</div><div style="font-size:.76rem;color:var(--m)">These emails are permanently excluded from all outreach.</div></div>
-  <div style="display:flex;gap:7px;margin-bottom:14px"><input type="text" id="supp-inp" placeholder="email@domain.com" style="flex:1"><button class="btn ba" onclick="addSuppressedManual()">Add</button></div>
-  ${list.length===0?`<div class="emp"><div class="emp-i">✓</div><h3>None suppressed</h3></div>`:''}
-  ${list.map(email=>`<div style="background:var(--s);border:1px solid var(--b);border-radius:8px;padding:10px 13px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
-    <span style="font-size:.82rem;font-family:'DM Mono',monospace;color:var(--m)">${esc(email)}</span>
-    <button class="btn bgh bs" onclick="removeSuppressed('${esc(email)}')">Remove</button>
-  </div>`).join('')}`;
-}
-
 // ── DEBUG ─────────────────────────────────────────────────────────────────────
-function renderDebug() {
+function renderDebug(){
   const p=document.getElementById('pane-debug');
-  p.innerHTML=`<div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;margin-bottom:14px">Debug / Storage Status</div>
+  p.innerHTML=`<div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600;margin-bottom:13px">Debug / Storage Status</div>
   <div class="dbg" id="dbg-content">Loading…</div>
-  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-    <button class="btn ba" onclick="loadDebug()">Refresh debug</button>
+  <div style="margin-top:11px;display:flex;gap:7px;flex-wrap:wrap">
+    <button class="btn ba" onclick="loadDebug()">Refresh</button>
     <button class="btn bgh" onclick="doFullSync()">↻ Full Sync</button>
-    <button class="btn br" onclick="confirmClear()">⚠ Clear all data</button>
+    <button class="btn br" onclick="if(confirm('Clear all?')){doFullSync();}">⚠ Re-sync all</button>
   </div>`;
   loadDebug();
 }
-async function loadDebug() {
+async function loadDebug(){
   const el=document.getElementById('dbg-content');if(!el)return;
-  el.textContent='Loading debug info from Supabase…';
   try{
-    const [debugRes] = await Promise.all([
-      fetch(`${API_ST}?action=debug`).then(r=>r.json()).catch(e=>({error:e.message})),
-    ]);
+    const res=await fetch(`${API_ST}?action=debug`);
+    const data=await res.json();
     el.textContent=JSON.stringify({
-      supabase: debugRes,
-      frontend: {
-        contactsInMemory: contacts.length,
-        companiesBuilt: Object.keys(companies).length,
-        queueLength: queue.length,
-        suppressedCount: suppressed.size,
+      supabase:data,
+      frontend:{
+        bookingsInMemory:bookings.length,
+        contactsInMemory:contacts.length,
+        accountsInMemory:accounts.length,
+        leadsInMemory:leads.length,
+        opportunitiesBuilt:opportunities.length,
+        statusBreakdown:['TENTATIVE','PROSPECT','DEFINITE','CLOSED','LOST'].reduce((m,s)=>{m[s]=opportunities.filter(o=>o.status===s).length;return m;},{}),
+        queueLength:queue.length,
         dbConfigured,
-        activeTab,
-        lastPageLoadDebug: window._lastLoadDebug || 'no load debug info yet',
-      },
-      persistence: {
-        storageProvider: dbConfigured ? 'Supabase' : 'none (not configured)',
-        totalOutreach: debugRes?.syncMetadata?.total_outreach || '0',
-        lastFullSync: debugRes?.syncMetadata?.last_full_sync || 'never',
-        readyToLoad: debugRes?.readyToLoad,
-        note: contacts.length > 0
-          ? `Loaded ${contacts.length} contacts from ${dbConfigured ? 'Supabase' : 'session memory only'}`
-          : 'No contacts in memory — page load found no data',
+        loadDebug:window._loadDebug||'none',
       }
     },null,2);
-  }catch(err){el.textContent='Debug error: '+err.message;}
+  }catch(e){el.textContent='Error: '+e.message;}
 }
-function confirmClear(){
-  if(!confirm('Clear ALL stored data in Supabase? Cannot be undone.'))return;
-  fetch(`${API_ST}?action=save-outreach-contacts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contacts:[]})});
-  contacts=[];companies={};queue=[];suppressed=new Set();
-  updateBadges();renderTab(activeTab);
-  setStatus('All data cleared — sync from Tripleseat to reload','wa');
-}
-
-// ── SETUP BANNER ──────────────────────────────────────────────────────────────
-function renderSetupBanner(errorMsg) {
-  document.getElementById('pane-today').innerHTML = `<div class="setup-banner">
-    <h3>⚙ Supabase not configured${errorMsg ? ': '+errorMsg : ''}</h3>
-    <p style="font-size:.82rem;color:var(--m);margin-bottom:12px">To persist contacts across browsers and devices, add these in Netlify:</p>
-    <ol>
-      <li>Go to <strong>supabase.com</strong> → New project → name it <code>saddleback-crm</code></li>
-      <li>Wait ~2 min → go to <strong>Settings → API</strong></li>
-      <li>Copy <strong>Project URL</strong> → add to Netlify as <code>SUPABASE_URL</code></li>
-      <li>Copy <strong>service_role key</strong> (not anon key) → add to Netlify as <code>SUPABASE_KEY</code></li>
-      <li>In Supabase → <strong>SQL Editor</strong> → run the <code>supabase_schema.sql</code> file</li>
-      <li>In Netlify → <strong>Deploys → Trigger deploy</strong></li>
-      <li>Come back here and click <strong>↻ Full Sync</strong></li>
-    </ol>
-    <div style="background:rgba(224,82,82,.08);border:1px solid rgba(224,82,82,.2);border-radius:6px;padding:9px 12px;margin:12px 0;font-size:.76rem;color:var(--r)">
-      If you already set SUPABASE_URL and SUPABASE_KEY: make sure you triggered a redeploy in Netlify after adding the vars, and check the Debug tab to confirm both are present.
-    </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn ba" onclick="doFullSync()">↻ Full Sync (session only, no DB)</button>
-      <button class="btn bgh" onclick="showTab('debug')">Debug / status →</button>
-    </div>
-  </div>`;
-}
-function renderSetupPane(paneId){document.getElementById(paneId).innerHTML=`<div class="emp"><div class="emp-i">⚙</div><h3>Database not configured</h3><p>See the Today tab for setup instructions.</p></div>`;}
-
-// ── CONTACT CARD ──────────────────────────────────────────────────────────────
-function cCard(c,showActions) {
-  const name=[c.first_name,c.last_name].filter(Boolean).join(' ')||'Unknown';
-  const co=c.company||c._co||'';
-  const inQ=queue.some(q=>q.contact_email===c.email);
-  const sc_=STATUS_COLORS[c.account_status]||'var(--m)';
-  const isActive=['active-upcoming','active-inquiry'].includes(c.account_status);
-  return `<div class="card ${isActive?'active-lead':c.account_status==='past-customer'?'past':c.account_status==='lost'?'lost':'never-booked'}">
-    <div class="ch">
-      <div><div class="cn">${esc(name)}</div>${co?`<div class="cs">${esc(co)}</div>`:''}</div>
-      <span class="sp_" style="color:${sc_};background:${sc_}1a">${STATUS_LABELS[c.account_status]||'?'}</span>
-    </div>
-    <div class="cm">
-      ${c.email?`<div><span>Email</span> ${esc(c.email)}</div>`:''}
-      ${c.last_event_date?`<div><span>Last event</span> ${new Date(c.last_event_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>`:''}
-      ${c.last_booking_status?`<div><span>Status</span> ${c.last_booking_status}</div>`:''}
-      ${c.total_guests?`<div><span>Guests</span> ${c.total_guests}</div>`:''}
-      ${c.booking_count?`<div><span>Bookings</span> ${c.booking_count}</div>`:''}
-    </div>
-    <div class="ct">${(c.tags||[]).map(t=>`<span class="tag ${tCls(t)}">${t.replace(/-/g,' ')}</span>`).join('')}</div>
-    ${showActions&&!isActive?`<div style="display:flex;gap:6px">
-      ${inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ Queued</span>`:`<button class="btn ba bs" onclick="queueOne('${esc(c.email)}','')">+ Queue</button>`}
-      <button class="btn bgh bs" onclick="addSuppressed('${esc(c.email)}')">Suppress</button>
-    </div>`:''}
-  </div>`;
-}
-function tCls(t){if(t.includes('quiet'))return'tq';if(t==='corporate')return'tc_';if(t==='anniversary')return'ta';if(t==='no-booking'||t==='never-booked')return'tn';if(t==='high-value')return'th';if(t==='msu')return'tm';return'tn';}
-function noData(){return `<div class="emp"><div class="emp-i">⟳</div><h3>No contacts loaded</h3><p>Click "↻ Full Sync" to import from Tripleseat.</p><br><button class="btn ba" onclick="doFullSync()">Full Sync now</button></div>`;}
 
 // ── QUEUE ACTIONS ─────────────────────────────────────────────────────────────
-function queueOne(email,campaign) {
-  const c=contacts.find(x=>x.email===email);
-  if(!c||queue.find(q=>q.contact_email===email)) return;
-  if(['active-upcoming','active-inquiry'].includes(c.account_status)){alert('Active account — Ryan handles this directly.');return;}
-  if(suppressed.has(email.toLowerCase())){alert('This contact is on the Do Not Contact list.');return;}
+function queueOne(oppId, campaign){
+  const o=opportunities.find(x=>x.id===oppId);
+  if(!o) return;
+  if(queue.find(q=>q.booking_id===oppId||q.contact_email===o.email)){
+    alert('Already in queue.');return;
+  }
+  if(o.status==='DEFINITE'){alert('Definite bookings are booked business — do not send sales emails.');return;}
   const item={
-    id:'q_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-    contact_email:email, contact_name:[c.first_name,c.last_name].filter(Boolean).join(' ')||'Contact',
-    company:c.company||c._co||'', campaign_id:campaign||'',
-    subject:'', body:'', risk_flags:[], status:'draft_needed',
+    id:'q_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+    booking_id:oppId, contact_email:o.email||'',
+    contact_name:o.name, company:o.company||'',
+    campaign_id:campaign||o.status.toLowerCase(),
+    subject:'',body:'',risk_flags:[],status:'draft_needed',
+    ts_status:o.status, has_closed:o.hasClosed, has_definite:o.hasDefinite,
+    _opp:o,
     created_at:new Date().toISOString(), updated_at:new Date().toISOString(),
-    _contact:c, // temp in-memory ref
   };
   queue.push(item);
-  saveQueueItem(item);
-  updateBadges(); renderTab(activeTab);
+  saveQueueItem(item); updateBadges(); showTab('queue');
 }
-function queueBatch(){
-  const batch=buildBatch(50);let added=0;
-  batch.forEach(({contact:c,campaign})=>{
-    if(!queue.find(q=>q.contact_email===c.email)){
-      queueOne(c.email,campaign); added++;
-    }
-  });
-  if(added>0) showTab('queue');
-}
-function queueCampaign(camId,limit){
-  const cam=CAMPAIGNS.find(c=>c.id===camId);if(!cam)return;
-  const now=Date.now();
-  contacts.filter(cam.filter).filter(c=>c.email&&!queue.find(q=>q.contact_email===c.email)&&!suppressed.has((c.email||'').toLowerCase())&&!(c.last_contacted_at&&now-new Date(c.last_contacted_at).getTime()<30*86400000)).slice(0,limit).forEach(c=>queueOne(c.email,camId));
-  showTab('queue');
-}
-function queueCompany(sk){
-  const entry=Object.entries(companies).find(([k])=>k.replace(/[^a-z0-9]/g,'').slice(0,30)===sk);if(!entry)return;
-  const [,co]=entry;
-  co.contacts.filter(c=>c.email&&!queue.find(q=>q.contact_email===c.email)&&!['active-upcoming','active-inquiry'].includes(c.account_status)).slice(0,10).forEach(c=>queueOne(c.email,'corporate'));
-  showTab('queue');
-}
-function skipContact(email){
-  const c=contacts.find(x=>x.email===email);if(!c)return;
-  const now=new Date().toISOString();
-  fetch(`${API_ST}?action=update-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:email,status:'skipped'})}).catch(()=>{});
-  // Mark last contacted so 30-day rule kicks in
-  c.last_contacted_at=now;
-  renderTab(activeTab);
-}
-function clearQueue(){if(!confirm('Clear all queued emails?'))return;queue=[];fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue:[]})}).catch(()=>{});updateBadges();renderQueue();}
+function clearQueue(){if(!confirm('Clear all?'))return;queue=[];fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue:[]})}).catch(()=>{});updateBadges();renderQueue();}
 function approveAllReady(){queue.filter(q=>q.status==='needs_review'||q.status==='draft_generated').forEach(q=>{q.status='approved';q.updated_at=new Date().toISOString();updateQueueItem(q);});updateBadges();renderQueue();}
 function approveItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='approved';i.updated_at=new Date().toISOString();updateQueueItem(i);updateBadges();renderQueue();}}
 function skipItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='skipped';i.updated_at=new Date().toISOString();updateQueueItem(i);renderQueue();}}
-function removeItem(id){queue=queue.filter(q=>q.id!==id);fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue})}).catch(()=>{});updateBadges();renderQueue();}
-function markReadyToSend(id){const i=queue.find(q=>q.id===id);if(i){i.status='ready_to_send';i.updated_at=new Date().toISOString();updateQueueItem(i);renderQueue();}}
+function markReady(id){const i=queue.find(q=>q.id===id);if(i){i.status='ready_to_send';i.updated_at=new Date().toISOString();updateQueueItem(i);renderQueue();}}
 function markSent(id){
   const i=queue.find(q=>q.id===id);if(!i)return;
   i.status='sent';i.sent_at=new Date().toISOString();i.updated_at=new Date().toISOString();
@@ -1145,48 +952,45 @@ function markSent(id){
   fetch(`${API_ST}?action=record-sent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:i.contact_email,name:i.contact_name,campaign:i.campaign_id,subject:i.subject,body:i.body})}).catch(()=>{});
   renderQueue();
 }
+function removeItem(id){queue=queue.filter(q=>q.id!==id);fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue})}).catch(()=>{});updateBadges();renderQueue();}
 async function saveQueueItem(item){await fetch(`${API_ST}?action=save-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
 async function updateQueueItem(item){await fetch(`${API_ST}?action=update-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
 
-// ── SUPPRESSION ───────────────────────────────────────────────────────────────
-function addSuppressed(email){if(!email)return;suppressed.add(email.toLowerCase());fetch(`${API_ST}?action=suppress`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})}).catch(()=>{});queue=queue.filter(q=>q.contact_email.toLowerCase()!==email.toLowerCase());updateBadges();}
-function addSuppressedManual(){const v=document.getElementById('supp-inp')?.value?.trim()?.toLowerCase();if(!v)return;addSuppressed(v);document.getElementById('supp-inp').value='';renderSuppressed();}
-function removeSuppressed(email){suppressed.delete(email.toLowerCase());fetch(`${API_ST}?action=unsuppress`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})}).catch(()=>{});renderSuppressed();}
-
 // ── EMAIL GENERATION ──────────────────────────────────────────────────────────
-async function generateOne(itemId) {
+async function generateOne(itemId){
   const item=queue.find(q=>q.id===itemId);if(!item)return;
-  item.status='draft_generated'; renderQueue();
-  const c=item._contact||contacts.find(x=>x.email===item.contact_email)||{email:item.contact_email,first_name:item.contact_name?.split(' ')[0]};
+  item.status='draft_generated';renderQueue();
+  const o=item._opp||opportunities.find(x=>x.id===item.booking_id)||{email:item.contact_email};
   try{
-    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:c,campaign:item.campaign_id})});
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contact:{first_name:o.name?.split(' ')[0],last_name:o.name?.split(' ').slice(1).join(' '),email:o.email,company:o.company,event_date:o.eventDate,event_description:o.description,guest_count:o.guests,location_name:o.location,last_booking_status:o.status,booking_count:o.totalBookings,hasClosed:o.hasClosed,hasDefinite:o.hasDefinite},campaign:item.campaign_id||o.status?.toLowerCase()})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||`HTTP ${res.status}`);
-    item.subject=data.subject||'Following up from Saddleback Catering';
-    item.body=data.body||'Unable to generate.';
+    item.subject=data.subject||'Following up';
+    item.body=data.body||'Could not generate.';
     item.risk_flags=data.riskFlags||[];
     item.status='needs_review';
   }catch(err){item.body=`Error: ${err.message}`;item.risk_flags=[];item.status='needs_review';}
   item.updated_at=new Date().toISOString();
-  updateQueueItem(item); renderQueue(); updateBadges();
+  updateQueueItem(item);renderQueue();updateBadges();
 }
 async function generateAll(){
   const pending=queue.filter(q=>q.status==='draft_needed');if(!pending.length)return;
   const btn=document.querySelector('[onclick="generateAll()"]');
   if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Generating…';}
   for(let i=0;i<pending.length;i++){await generateOne(pending[i].id);if(i<pending.length-1)await new Promise(r=>setTimeout(r,300));}
-  if(btn){btn.disabled=false;btn.innerHTML='✨ Generate drafts';}
+  if(btn){btn.disabled=false;btn.innerHTML='✨ Generate';}
 }
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function openModal(itemId){
   const item=queue.find(q=>q.id===itemId);if(!item)return;
   modalQueueId=itemId;
-  document.getElementById('mt').textContent=`Review: ${item.contact_name||item.contact_email}`;
+  document.getElementById('mt').textContent=`Draft: ${item.contact_name}`;
   document.getElementById('msub').value=item.subject||'';
   document.getElementById('memail').value=item.body||'';
   const flags=(item.risk_flags||[]).filter(f=>f&&f!=='none');
-  document.getElementById('risk-display').innerHTML=flags.map(f=>`<div class="rf">⚠ ${esc(f)}</div>`).join('');
+  document.getElementById('risk-display').innerHTML=flags.map(f=>`<div class="risk">⚠ ${esc(f)}</div>`).join('');
   document.getElementById('mo').classList.add('open');
 }
 function closeModal(){
@@ -1198,15 +1002,28 @@ function approveFromModal(){
   closeModal();
 }
 function copyModal(){
-  const t=document.getElementById('memail').value;
-  navigator.clipboard.writeText(`Subject: ${document.getElementById('msub').value}\n\n${t}`).then(()=>{
-    const btn=document.getElementById('bcm');btn.textContent='✓ Copied!';setTimeout(()=>btn.textContent='Copy',2000);
-  });
+  navigator.clipboard.writeText(`Subject: ${document.getElementById('msub').value}\n\n${document.getElementById('memail').value}`).then(()=>{const b=document.getElementById('bcm');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy',2000);});
 }
 document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+function renderSetupBanner(errMsg){
+  document.getElementById('pane-cmd').innerHTML=`<div class="setup">
+    <h3>⚙ Supabase not connected${errMsg?' — '+errMsg:''}</h3>
+    <ol>
+      <li>Go to <strong>supabase.com</strong> → open your <code>saddleback-crm</code> project</li>
+      <li>Settings → API → copy <strong>Project URL</strong> → set as <code>SUPABASE_URL</code> in Netlify (no trailing slash, no /rest/v1/)</li>
+      <li>Copy <strong>service_role key</strong> (starts with eyJ) → set as <code>SUPABASE_KEY</code></li>
+      <li>Netlify → Deploys → Trigger deploy</li>
+      <li>Refresh this page → click ↻ Full Sync</li>
+    </ol>
+    <div style="margin-top:12px;display:flex;gap:7px">
+      <button class="btn ba" onclick="doFullSync()">↻ Full Sync (session only)</button>
+      <button class="btn bgh" onclick="showTab('debug')">Debug →</button>
+    </div>
+  </div>`;
+}
+function renderSetupPane(paneId){document.getElementById(paneId).innerHTML=`<div class="emp"><div class="emp-i">⚙</div><h3>Supabase not connected</h3><p>See Command Center for setup steps.</p></div>`;}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadFromDB();
