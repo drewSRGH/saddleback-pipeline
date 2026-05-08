@@ -17,7 +17,8 @@ function getSupabase() {
 }
 
 async function sbFetch(url, key, path, opts = {}) {
-  const res = await fetch(`${url}/rest/v1${path}`, {
+  const cleanUrl = url.replace(/\/+$/, ''); // strip any trailing slashes
+  const res = await fetch(`${cleanUrl}/rest/v1${path}`, {
     method: opts.method || 'GET',
     headers: {
       'apikey': key,
