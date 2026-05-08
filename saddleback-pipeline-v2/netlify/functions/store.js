@@ -155,6 +155,18 @@ exports.handler = async (event) => {
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ list: (rows||[]).map(r=>r.email) }) };
       }
 
+      if (action === 'get-table') {
+        // Generic table read — used by frontend to load bookings, accounts, contacts
+        const table = event.queryStringParameters?.table;
+        const qs = event.queryStringParameters?.qs || 'select=*&limit=2000';
+        const allowedTables = ['ts_bookings','ts_accounts','ts_contacts','ts_leads','ts_events','outreach_contacts'];
+        if (!table || !allowedTables.includes(table)) {
+          return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid table: ' + table }) };
+        }
+        const rows = await query(url, key, table, decodeURIComponent(qs));
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ rows: rows || [], count: rows?.length || 0 }) };
+      }
+
       if (action === 'get-sent-history') {
         const rows = await query(url, key, 'sent_history', 'select=*&order=sent_at.desc&limit=200');
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ history: rows || [] }) };
