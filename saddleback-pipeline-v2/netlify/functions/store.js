@@ -8,6 +8,15 @@ const CORS = {
   'Content-Type': 'application/json',
 };
 
+// ── Date parser ───────────────────────────────────────────────────────────────
+// TripleSeat timestamps come as "12/27/2018 12:08 AM" — not valid for Postgres.
+// Use ISO 8601 fields when available, fall back to native Date parse.
+function safeDate(s) {
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}/.test(String(s))) return String(s);
+  try { const d = new Date(s); return isNaN(d.getTime()) ? null : d.toISOString(); } catch(e) { return null; }
+}
+
 // ── Supabase helpers ──────────────────────────────────────────────────────────
 function getSupabase() {
   const url = process.env.SUPABASE_URL;
@@ -17,7 +26,7 @@ function getSupabase() {
 }
 
 async function sbFetch(url, key, path, opts = {}) {
-  const cleanUrl = url.replace(/\/+$/, ''); // strip any trailing slashes
+  const cleanUrl = url.replace(/\/+$/, '');
   const res = await fetch(`${cleanUrl}/rest/v1${path}`, {
     method: opts.method || 'GET',
     headers: {
@@ -43,7 +52,6 @@ async function query(url, key, table, qs = '') {
 
 async function upsertRows(url, key, table, rows) {
   if (!rows || rows.length === 0) return;
-  // Batch in groups of 150 to stay well under payload limits
   for (let i = 0; i < rows.length; i += 150) {
     const chunk = rows.slice(i, i + 150);
     await sbFetch(url, key, `/${table}`, {
@@ -66,17 +74,15 @@ exports.handler = async (event) => {
 
   const action = (event.queryStringParameters || {}).action;
 
-  // Always check config first
   let SB;
   try {
     SB = getSupabase();
   } catch (e) {
-    // Not configured — return clear message for every action
     return {
       statusCode: 200, headers: CORS,
       body: JSON.stringify({
         ok: false, configured: false,
-        error: 'SUPABASE_URL and SUPABASE_KEY are not set. Add them in Netlify → Site Configuration → Environment Variables, then trigger a redeploy.',
+        error: 'SUPABASE_URL and SUPABASE_KEY are not set.',
         supabaseUrlPresent: !!process.env.SUPABASE_URL,
         supabaseKeyPresent: !!process.env.SUPABASE_KEY,
       })
@@ -87,10 +93,9 @@ exports.handler = async (event) => {
 
   try {
 
-    // ── GET ──────────────────────────────────────────────────────────────────
+    // ── GET ───────────────────────────────────────────────────────────────────
     if (event.httpMethod === 'GET') {
 
-      // ── DEBUG ──
       if (action === 'debug') {
         let metaRows = [], tableCounts = {};
         try { metaRows = await query(url, key, 'sync_metadata', 'select=key,value&order=key.asc'); } catch(e) { metaRows = [{key:'error', value:e.message}]; }
@@ -104,45 +109,20 @@ exports.handler = async (event) => {
           tables.forEach((t,i) => tableCounts[t] = results[i]);
         } catch(e) { tableCounts.error = e.message; }
         const meta = Object.fromEntries(metaRows.map(r=>[r.key,r.value]));
-        return {
-          statusCode: 200, headers: CORS,
-          body: JSON.stringify({
-            configured: true,
-            supabaseConnected: true,
-            supabaseUrl: url.replace(/^https:\/\//, '').split('.')[0] + '.supabase.co (redacted)',
-            syncMetadata: meta,
-            tableCounts,
-            loadedFrom: 'supabase',
-            readyToLoad: !!(meta.total_outreach && meta.total_outreach !== '0' && meta.last_full_sync),
-          })
-        };
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ configured: true, supabaseConnected: true, syncMetadata: meta, tableCounts }) };
       }
 
-      // ── GET METADATA ── (called on every page load)
       if (action === 'get-metadata') {
         const rows = await query(url, key, 'sync_metadata', 'select=key,value');
         const meta = Object.fromEntries((rows||[]).map(r=>[r.key,r.value]));
-        return {
-          statusCode: 200, headers: CORS,
-          body: JSON.stringify({
-            configured: true,
-            loadedFrom: 'supabase',
-            ...meta,
-          })
-        };
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ configured: true, loadedFrom: 'supabase', ...meta }) };
       }
 
-      // ── GET CONTACTS ── (the main page-load query)
       if (action === 'get-contacts') {
         const limit  = Math.min(parseInt(event.queryStringParameters?.limit  || '5000'), 10000);
         const offset = parseInt(event.queryStringParameters?.offset || '0');
-        const rows = await query(url, key, 'outreach_contacts',
-          `select=*&limit=${limit}&offset=${offset}&order=last_event_date.desc.nullslast`
-        );
-        return {
-          statusCode: 200, headers: CORS,
-          body: JSON.stringify({ contacts: rows || [], count: rows?.length || 0, loadedFrom: 'supabase' })
-        };
+        const rows = await query(url, key, 'outreach_contacts', `select=*&limit=${limit}&offset=${offset}&order=last_event_date.desc.nullslast`);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ contacts: rows || [], count: rows?.length || 0, loadedFrom: 'supabase' }) };
       }
 
       if (action === 'get-queue') {
@@ -156,7 +136,6 @@ exports.handler = async (event) => {
       }
 
       if (action === 'get-table') {
-        // Generic table read — used by frontend to load bookings, accounts, contacts
         const table = event.queryStringParameters?.table;
         const qs = event.queryStringParameters?.qs || 'select=*&limit=2000';
         const allowedTables = ['ts_bookings','ts_accounts','ts_contacts','ts_leads','ts_events','outreach_contacts'];
@@ -173,17 +152,18 @@ exports.handler = async (event) => {
       }
     }
 
-    // ── POST ─────────────────────────────────────────────────────────────────
+    // ── POST ──────────────────────────────────────────────────────────────────
     if (event.httpMethod === 'POST') {
       const body = JSON.parse(event.body || '{}');
 
       // ── SAVE LEADS ──
+      // NOTE: no synced_at — column does not exist in ts_leads
       if (action === 'save-leads') {
         const items = (body.leads || []).map(l => ({
           id: l.id,
           first_name: l.first_name, last_name: l.last_name,
           email: (l.email_address || '').toLowerCase().trim() || null,
-          phone: l.phone_number,
+          phone: l.phone_number || null,
           company: l.company || null,
           event_date: l.event_date || null,
           event_description: l.event_description || null,
@@ -193,8 +173,9 @@ exports.handler = async (event) => {
           additional_information: l.additional_information || null,
           turned_down_at: l.turned_down_at || null,
           turned_down_reason: l.turned_down_reason || null,
-          created_at: l.created_at, updated_at: l.updated_at,
-          raw: l, synced_at: new Date().toISOString(),
+          created_at: safeDate(l.created_at),
+          updated_at: safeDate(l.updated_at),
+          raw: l,
         }));
         await upsertRows(url, key, 'ts_leads', items);
         await setMeta(url, key, { last_leads_sync: new Date().toISOString(), total_leads: items.length });
@@ -202,18 +183,23 @@ exports.handler = async (event) => {
       }
 
       // ── SAVE BOOKINGS ──
+      // NOTE: no synced_at — column does not exist in ts_bookings
       if (action === 'save-bookings') {
         const items = (body.bookings || []).map(b => ({
-          id: b.id, name: b.name,
-          account_id: b.account_id || null, contact_id: b.contact_id || null,
+          id: b.id,
+          name: b.name,
+          account_id: b.account_id || null,
+          contact_id: b.contact_id || null,
           location_name: b.location_name || b.location?.name || null,
           status: (b.status || '').toUpperCase() || null,
-          start_date: b.start_date || null, end_date: b.end_date || null,
+          start_date: b.start_date || null,
+          end_date: b.end_date || null,
           guest_count: b.guest_count || null,
           total_amount: b.total_amount || null,
           description: b.description || b.name || null,
-          created_at: b.created_at, updated_at: b.updated_at,
-          raw: b, synced_at: new Date().toISOString(),
+          created_at: safeDate(b.created_at),
+          updated_at: safeDate(b.updated_at),
+          raw: b,
         }));
         await upsertRows(url, key, 'ts_bookings', items);
         await setMeta(url, key, { last_bookings_sync: new Date().toISOString(), total_bookings: items.length });
@@ -221,15 +207,18 @@ exports.handler = async (event) => {
       }
 
       // ── SAVE ACCOUNTS ──
+      // NOTE: no synced_at — column does not exist in ts_accounts
       if (action === 'save-accounts') {
         const items = (body.accounts || []).map(a => ({
-          id: a.id, name: a.name || 'Unknown',
+          id: a.id,
+          name: a.name || 'Unknown',
           description: a.description || null,
           email: (a.email_address || a.email || '').toLowerCase().trim() || null,
           phone: a.phone_number || a.phone || null,
           website: a.website || null,
-          created_at: a.created_at, updated_at: a.updated_at,
-          raw: a, synced_at: new Date().toISOString(),
+          created_at: safeDate(a.created_at),
+          updated_at: safeDate(a.updated_at),
+          raw: a,
         }));
         await upsertRows(url, key, 'ts_accounts', items);
         await setMeta(url, key, { last_accounts_sync: new Date().toISOString(), total_accounts: items.length });
@@ -237,117 +226,105 @@ exports.handler = async (event) => {
       }
 
       // ── SAVE CONTACTS ──
+      // NOTE: no synced_at — column does not exist in ts_contacts
       if (action === 'save-contacts') {
         const items = (body.contacts || []).map(c => ({
-          id: c.id, account_id: c.account_id || null,
-          first_name: c.first_name || null, last_name: c.last_name || null,
+          id: c.id,
+          account_id: c.account_id || null,
+          first_name: c.first_name || null,
+          last_name: c.last_name || null,
           email: (c.email_address || c.email || '').toLowerCase().trim() || null,
           phone: c.phone_number || c.phone || null,
           company: c.company || null,
-          created_at: c.created_at, updated_at: c.updated_at,
-          raw: c, synced_at: new Date().toISOString(),
+          created_at: safeDate(c.created_at),
+          updated_at: safeDate(c.updated_at),
+          raw: c,
         }));
         await upsertRows(url, key, 'ts_contacts', items);
         await setMeta(url, key, { last_contacts_sync: new Date().toISOString(), total_contacts: items.length });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: items.length }) };
       }
 
-      // ── SAVE EVENTS (has real status: TENTATIVE/DEFINITE/CLOSED/PROSPECT/LOST) ──
+      // ── SAVE EVENTS ──
+      // KEY FIXES vs old version:
+      // 1. No synced_at (column doesn't exist in ts_events)
+      // 2. Uses event_start_iso8601 instead of event_start (which is "1/1/2000 2:00 PM" format — invalid for Postgres timestamp)
+      // 3. Uses safeDate() for created_at/updated_at (TripleSeat sends "12/27/2018 12:08 AM" — invalid for Postgres)
       if (action === 'save-events') {
         const items = (body.events || []).map(e => ({
           id: e.id,
-          booking_id: e.booking_id || null,
-          account_id: e.account_id || null,
-          contact_id: e.contact_id || null,
-          name: e.name || null,
-          // Status lives on events — normalize all possible field names
-          status: (e.status || e.event_status || e.booking_status || '').toString().toUpperCase().trim() || null,
-          event_start: e.event_start || e.start_time || e.start_date || null,
-          event_end:   e.event_end   || e.end_time   || e.end_date   || null,
-          guest_count: e.guest_count || null,
-          room:        e.room || e.room_name || null,
-          location_name: e.location_name || e.location?.name || null,
-          created_at: e.created_at,
-          updated_at: e.updated_at,
-          raw: e,
-          synced_at: new Date().toISOString(),
+          booking_id:    e.booking_id    || null,
+          account_id:    e.account_id    || null,
+          contact_id:    e.contact_id    || null,
+          name:          e.name          || null,
+          status:        (e.status || e.event_status || e.booking_status || '').toString().toUpperCase().trim() || null,
+          event_start:   e.event_start_iso8601 || (e.start_date ? e.start_date : null),
+          event_end:     e.event_end_iso8601   || (e.end_date   ? e.end_date   : null),
+          guest_count:   e.guest_count   || null,
+          room:          (e.rooms && e.rooms[0]?.name) || e.room || null,
+          location_name: e.location?.name || null,
+          created_at:    safeDate(e.created_at) || new Date().toISOString(),
+          updated_at:    safeDate(e.updated_at) || new Date().toISOString(),
+          raw:           e,
         }));
         await upsertRows(url, key, 'ts_events', items);
-        await setMeta(url, key, {
-          last_events_sync: new Date().toISOString(),
-          total_events: items.length,
-        });
+        await setMeta(url, key, { last_events_sync: new Date().toISOString(), total_events: items.length });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: items.length }) };
       }
 
-      // ── SAVE OUTREACH CONTACTS (deduped profiles) ──
-      // This is the critical table. Saved last, sets total_outreach and last_full_sync.
+      // ── SAVE SYNC CHECKPOINT ──
+      // Written after every successful sync. Page load checks this to know data exists.
+      // Decoupled from outreach_contacts so a failed profile build doesn't block page load.
+      if (action === 'save-sync-checkpoint') {
+        await setMeta(url, key, {
+          last_full_sync:  new Date().toISOString(),
+          total_events:    body.total_events    || 0,
+          total_bookings:  body.total_bookings  || 0,
+          total_contacts:  body.total_contacts  || 0,
+          total_accounts:  body.total_accounts  || 0,
+          total_leads:     body.total_leads     || 0,
+          total_outreach:  body.total_events    || body.total_bookings || 0,
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      // ── SAVE OUTREACH CONTACTS ──
       if (action === 'save-outreach-contacts') {
         const items = body.contacts || [];
-        if (items.length === 0) {
-          return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: 0, warning: 'Empty contacts array' }) };
-        }
-        // Clean items — ensure no null primary keys
+        if (items.length === 0) return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: 0 }) };
         const clean = items.filter(c => c.id && c.id.trim && c.id.trim() !== '' && c.id.includes('@'));
-        if (clean.length === 0) {
-          return { statusCode: 400, headers: CORS, body: JSON.stringify({ ok: false, error: 'No valid contacts (id must be a non-empty email address)' }) };
-        }
+        if (clean.length === 0) return { statusCode: 400, headers: CORS, body: JSON.stringify({ ok: false, error: 'No valid contacts (id must be email)' }) };
         await upsertRows(url, key, 'outreach_contacts', clean);
-        // This is the flag that tells page load "data exists"
-        await setMeta(url, key, {
-          total_outreach: clean.length,
-          last_full_sync: new Date().toISOString(),
-        });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, saved: clean.length }) };
       }
 
-      // ── QUEUE OPERATIONS ──
+      // ── QUEUE ──
       if (action === 'save-queue-item') {
         await upsertRows(url, key, 'email_queue', [body]);
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
-
       if (action === 'bulk-save-queue') {
         if ((body.queue||[]).length > 0) await upsertRows(url, key, 'email_queue', body.queue);
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
-
       if (action === 'update-queue-item') {
         await sbFetch(url, key, `/email_queue?id=eq.${encodeURIComponent(body.id)}`, {
-          method: 'PATCH', prefer: 'return=minimal',
-          headers: { 'Prefer': 'return=minimal' },
-          body: JSON.stringify({
-            status: body.status,
-            subject: body.subject,
-            body: body.body,
-            risk_flags: body.risk_flags || [],
-            approved_at: body.approved_at || null,
-            sent_at: body.sent_at || null,
-            updated_at: new Date().toISOString(),
-          }),
+          method: 'PATCH', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ status: body.status, subject: body.subject, body: body.body, risk_flags: body.risk_flags || [], approved_at: body.approved_at || null, sent_at: body.sent_at || null, updated_at: new Date().toISOString() }),
         });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
-
       if (action === 'record-sent') {
-        await upsertRows(url, key, 'sent_history', [{
-          contact_email: body.email, contact_name: body.name,
-          campaign_id: body.campaign, subject: body.subject, body: body.body,
-        }]);
+        await upsertRows(url, key, 'sent_history', [{ contact_email: body.email, contact_name: body.name, campaign_id: body.campaign, subject: body.subject, body: body.body }]);
         try {
-          await sbFetch(url, key, `/outreach_contacts?id=eq.${encodeURIComponent(body.email)}`, {
-            method: 'PATCH', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ last_contacted_at: new Date().toISOString(), last_campaign: body.campaign }),
-          });
+          await sbFetch(url, key, `/outreach_contacts?id=eq.${encodeURIComponent(body.email)}`, { method: 'PATCH', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' }, body: JSON.stringify({ last_contacted_at: new Date().toISOString(), last_campaign: body.campaign }) });
         } catch(e) { console.warn('Could not update last_contacted_at:', e.message); }
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
-
       if (action === 'suppress') {
         await upsertRows(url, key, 'suppression_list', [{ email: (body.email||'').toLowerCase(), reason: body.reason||'manual' }]);
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
-
       if (action === 'unsuppress') {
         await sbFetch(url, key, `/suppression_list?email=eq.${encodeURIComponent((body.email||'').toLowerCase())}`, { method: 'DELETE', prefer: 'return=minimal', headers: {'Prefer':'return=minimal'} });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
@@ -361,12 +338,11 @@ exports.handler = async (event) => {
     return {
       statusCode: 500, headers: CORS,
       body: JSON.stringify({
-        ok: false,
-        error: err.message,
-        action,
+        ok: false, error: err.message, action,
         hint: err.message.includes('NOT_CONFIGURED') ? 'Set SUPABASE_URL and SUPABASE_KEY in Netlify environment variables' :
               err.message.includes('42P01') ? 'Table does not exist — run the SQL schema in Supabase' :
               err.message.includes('23502') ? 'NULL constraint violation — a required field is missing' :
+              err.message.includes('synced_at') ? 'Column synced_at does not exist — deploy the new store.js' :
               'Check Netlify function logs for details',
       })
     };
