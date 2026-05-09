@@ -406,116 +406,68 @@ function buildOpportunities() {
 
 // ── LOAD FROM SUPABASE ────────────────────────────────────────────────────────
 async function loadFromDB() {
-  setStatus('Loading from Supabase…','ld');
-  const debug={step:'meta'};
-  try{
-    const metaRes=await fetch(`${API_ST}?action=get-metadata`);
-    const meta=await metaRes.json().catch(()=>({}));
-    debug.meta=meta;
+  setStatus('Loading…','ld');
+  try {
+    const metaRes = await fetch(`${API_ST}?action=get-metadata`);
+    const meta    = await metaRes.json().catch(()=>({}));
 
-    if(meta.configured===false||meta.ok===false){
-      dbConfigured=false;
+    if (meta.configured === false || meta.ok === false) {
+      dbConfigured = false;
       renderSetupBanner(meta.error);
       setStatus('','');
       return;
     }
-    dbConfigured=true;
+    dbConfigured = true;
 
-    const totalBookings=parseInt(meta.total_bookings||'0');
-    const lastSync=meta.last_full_sync;
-    debug.totalBookings=totalBookings; debug.lastSync=lastSync;
+    // Always try to load — don't gate on metadata values.
+    // Only bail if the table is genuinely empty.
+    setProgress(20,'Loading events…');
+    const evRows = await loadAllRows('ts_events','*','event_start.asc.nullslast');
+    const bkRows = evRows.length === 0
+      ? await loadAllRows('ts_bookings','*','start_date.asc.nullslast')
+      : [];
+    allEvents = evRows.length > 0 ? evRows : bkRows;
 
-    if(!lastSync){
-      setStatus('No data found. Click "↻ Full Sync" to import from Tripleseat for the first time.','wa');
-      renderTab(activeTab); return;
+    if (allEvents.length === 0) {
+      setStatus('No data yet. Click "↻ Full Sync" to import from Tripleseat.','wa');
+      hideProgress();
+      renderTab(activeTab);
+      return;
     }
 
-    // Load events from Supabase (events have the status field)
-    const totalEvents=parseInt(meta.total_events||'0');
-    debug.step='get-events';
-    setProgress(15,'Loading events from Supabase…');
-    if(totalEvents>0){
-      const eRows=await loadAllRows('ts_events','*','event_start.desc.nullslast');
-      bookings=eRows; // use events as primary "bookings" since they have status
-      debug.eventsLoaded=bookings.length;
-    } else if(parseInt(meta.total_bookings||'0')>0){
-      // Fallback to bookings table if events not synced yet
-      const bRows=await loadAllRows('ts_bookings','*','start_date.desc.nullslast');
-      bookings=bRows;
-      debug.bookingsLoaded=bookings.length;
+    if (evRows.length === 0 && bkRows.length > 0) {
+      setStatus('Using booking data — run Full Sync to get proper event status data.','wa');
     }
 
-    // Load accounts and contacts
-    debug.step='get-accounts-contacts';
-    setProgress(40,'Loading accounts and contacts…');
-    const [acctRows,contRows]=await Promise.all([
-      loadAllRows('ts_accounts','*','name.asc'),
-      loadAllRows('ts_contacts','*','last_name.asc'),
-    ]);
-    accounts=acctRows; contacts=contRows;
+    setProgress(70,'Building pipeline…');
+    pipeline = buildPipeline(allEvents);
 
-    // Load leads (for contacts with no bookings)
-    const totalLeads=parseInt(meta.total_leads||'0');
-    if(totalLeads>0){
-      debug.step='get-leads';
-      setProgress(65,'Loading leads…');
-      leads=await loadAllRows('ts_leads','*','created_at.desc');
-    }
-
-    setProgress(80,'Building opportunity engine…');
-    opportunities=buildOpportunities();
-    debug.opportunities=opportunities.length;
-
-    // Load queue
-    debug.step='get-queue';
-    const qRes=await fetch(`${API_ST}?action=get-queue`);
-    const qData=await qRes.json().catch(()=>({queue:[]}));
-    queue=qData.queue||[];
+    setProgress(85,'Loading queue…');
+    const qData = await fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]}));
+    queue = qData.queue || [];
 
     setProgress(100,'✓ Loaded');
     hideProgress();
 
-    const syncDate=lastSync?new Date(lastSync):null;
-    document.getElementById('last-sync-label').textContent=syncDate?'Synced '+syncDate.toLocaleDateString():'';
-    setStatus(`✓ ${bookings.length.toLocaleString()} bookings, ${contacts.length.toLocaleString()} contacts loaded from Supabase`,'ok');
-    setTimeout(()=>setStatus('',''),5000);
-    updateBadges(); renderTab(activeTab);
+    const lastSync = meta.last_full_sync;
+    const syncDate = lastSync ? new Date(lastSync) : null;
+    document.getElementById('last-sync-label').textContent = syncDate
+      ? 'Synced '+syncDate.toLocaleDateString() : '';
 
-    if(totalEvents===0&&lastSync){
-      setStatus('Events not synced yet. Click "↻ Full Sync" to get real Prospect/Tentative/Definite/Closed/Lost status data from Tripleseat.','wa');
+    setStatus(`✓ ${allEvents.length.toLocaleString()} events loaded`,'ok');
+    setTimeout(()=>setStatus('',''),4000);
+    updateBadges();
+    renderTab(activeTab);
+
+    if (syncDate && (Date.now()-syncDate.getTime()) > 3*86400000) {
+      setTimeout(()=>setStatus(`Data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider a Full Sync.`,'wa'),5000);
     }
-    if(syncDate&&(Date.now()-syncDate.getTime())>3*86400000){
-      setTimeout(()=>setStatus(`Data is ${Math.floor((Date.now()-syncDate.getTime())/86400000)} days old. Consider a Full Sync for latest status data.`,'wa'),5500);
-    }
-  }catch(err){
-    console.error('[loadFromDB]',debug.step,err);
-    setStatus(`Load error at step "${debug.step}": ${err.message}`,'er');
+  } catch(err) {
+    console.error('[loadFromDB]',err);
+    setStatus('Load error: '+err.message,'er');
     renderTab(activeTab);
   }
-  window._loadDebug=debug;
 }
-
-async function loadAllRows(table, select='*', order='') {
-  const all=[]; let offset=0; const limit=2000;
-  while(true){
-    let qs=`select=${select}&limit=${limit}&offset=${offset}`;
-    if(order) qs+=`&order=${order}`;
-    const res=await fetch(`${API_ST}?action=get-table&table=${table}&qs=${encodeURIComponent(qs)}`);
-    const data=await res.json().catch(()=>({rows:[]}));
-    const batch=data.rows||[];
-    all.push(...batch);
-    if(batch.length<limit) break;
-    offset+=limit;
-  }
-  return all;
-}
-
-// ── FULL SYNC ─────────────────────────────────────────────────────────────────
-async function doFullSync(){
-  const btn=document.getElementById('btn-sync');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Syncing…';}
-  setProgress(0,'Starting full sync…');
-
   try{
     // 1. Leads
     setProgress(3,'Fetching leads…');
