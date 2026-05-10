@@ -200,7 +200,7 @@
 <script>
 const API_TS='/.netlify/functions/tripleseat', API_AI='/.netlify/functions/ai', API_ST='/.netlify/functions/store';
 const TS_PLACEHOLDER='2000-01-01';
-let allEvents=[], pipeline={}, queue=[], activeTab='cmd', dbConfigured=false, modalQueueId=null;
+let allEvents=[], pipeline={}, queue=[], sentMap={}, activeTab='cmd', dbConfigured=false, modalQueueId=null;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -376,7 +376,7 @@ function doSnooze(evId){
 function statusDot(status, future){
   if(!future&&['TENTATIVE','PROSPECT','DEFINITE'].indexOf(status)>=0)return '<span class="status-dot sd-past">'+status+'</span>';
   var m={TENTATIVE:'sd-tent',PROSPECT:'sd-prosp',DEFINITE:'sd-def',CLOSED:'sd-closed',LOST:'sd-lost'};
-  return '<span class="status-dot '+(m[status]||'")>'+status+'</span>';
+  return '<span class="status-dot '+(m[status]||'')+'">'+status+'</span>';
 }
 
 // ── WEEKLY SNAPSHOT ───────────────────────────────────────────────────────────
@@ -526,6 +526,17 @@ async function loadFromDB(){
     setProgress(85,'Loading queue...');
     var qd=await fetch(API_ST+'?action=get-queue').then(function(r){return r.json();}).catch(function(){return {queue:[]};});
     queue=qd.queue||[];
+    // Load sent history to show "last sent X days ago" on cards
+    try{
+      var sh=await fetch(API_ST+'?action=get-sent-history').then(function(r){return r.json();}).catch(function(){return {history:[]};});
+      sentMap={};
+      (sh.history||[]).forEach(function(row){
+        var e=row.contact_email;
+        if(e&&(!sentMap[e]||new Date(row.sent_at||row.created_at)>new Date(sentMap[e]))){
+          sentMap[e]=row.sent_at||row.created_at;
+        }
+      });
+    }catch(e){sentMap={};}
     setProgress(100,'Done');hideProgress();
     if(meta.last_full_sync)document.getElementById('sync-label').textContent='Synced '+new Date(meta.last_full_sync).toLocaleDateString();
     setStatus('&#10003; '+allEvents.length.toLocaleString()+' events loaded','ok');
@@ -582,6 +593,17 @@ async function doFullSync(){
     pipeline=buildPipeline(allEvents);
     var qd=await fetch(API_ST+'?action=get-queue').then(function(r){return r.json();}).catch(function(){return {queue:[]};});
     queue=qd.queue||[];
+    // Load sent history to show "last sent X days ago" on cards
+    try{
+      var sh=await fetch(API_ST+'?action=get-sent-history').then(function(r){return r.json();}).catch(function(){return {history:[]};});
+      sentMap={};
+      (sh.history||[]).forEach(function(row){
+        var e=row.contact_email;
+        if(e&&(!sentMap[e]||new Date(row.sent_at||row.created_at)>new Date(sentMap[e]))){
+          sentMap[e]=row.sent_at||row.created_at;
+        }
+      });
+    }catch(e){sentMap={};}
     setProgress(100,'Done');hideProgress();
     document.getElementById('sync-label').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
     setStatus('&#10003; '+evArr.length+' events, '+ctArr.length+' contacts synced','ok');
@@ -775,6 +797,7 @@ function radarCard(o, cat){
     +(guests?'<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">'+guests+'</div></div>':'')
     +(ds!==null?'<div class="card-meta-item"><div class="card-meta-label">Last Updated</div><div class="card-meta-value'+(ds>14?' hot':ds>7?' warm':'')+'">'+ds+'d ago</div></div>':'')
     +'</div>'
+    +(contact.email&&sentMap[contact.email]?'<div class="card-meta-item"><div class="card-meta-label">Last Sent</div><div class="card-meta-value">'+daysAgo(sentMap[contact.email])+'d ago</div></div>':'')
     +(reason?'<div class="card-action"><strong>Radar:</strong> '+esc(reason)+'</div>':'')
     +(angle?'<div style="font-size:.74rem;color:var(--mute);padding:5px 0 8px 0"><span style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">Suggested angle</span><br>'+esc(angle)+'</div>':'')
     +'<div class="card-footer">'
@@ -900,6 +923,7 @@ function card(o,showAction){
     +(guests?'<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">'+guests+'</div></div>':'')
     +(o.location_name||(raw.location&&raw.location.name)?'<div class="card-meta-item"><div class="card-meta-label">Location</div><div class="card-meta-value">'+esc(o.location_name||(raw.location&&raw.location.name))+'</div></div>':'')
     +(ds!==null?'<div class="card-meta-item"><div class="card-meta-label">Updated</div><div class="card-meta-value'+(ds>7?' hot':ds>3?' warm':'')+'">'+ds+'d ago</div></div>':'')
+    +(contact.email&&sentMap[contact.email]?'<div class="card-meta-item"><div class="card-meta-label">Last Sent</div><div class="card-meta-value">'+daysAgo(sentMap[contact.email])+'d ago</div></div>':'')
     +(dt!==null&&dt>=0?'<div class="card-meta-item"><div class="card-meta-label">Days Out</div><div class="card-meta-value'+(dt<=30?' warm':'')+'">'+dt+'</div></div>':'')
     +'</div>'
     +(action?'<div class="card-action"><strong>Note:</strong> '+esc(action)+'</div>':'')
@@ -924,6 +948,7 @@ function pastCard(o,draftLabel){
     +(date?'<div class="card-meta-item"><div class="card-meta-label">Event Date</div><div class="card-meta-value">'+fmtDate(date)+'</div></div>':'')
     +(guests?'<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">'+guests+'</div></div>':'')
     +(ds!==null?'<div class="card-meta-item"><div class="card-meta-label">Updated</div><div class="card-meta-value">'+ds+'d ago</div></div>':'')
+    +(contact.email&&sentMap[contact.email]?'<div class="card-meta-item"><div class="card-meta-label">Last Sent</div><div class="card-meta-value">'+(daysAgo(sentMap[contact.email]))+'d ago</div></div>':'')
     +'</div><div class="card-footer">'
     +(inQ?'<span class="in-queue-badge">&#10003; In queue</span>':'<button class="btn btn-primary btn-sm" onclick="queueOne(\''+esc(String(o.id))+'\')">&#10024; Draft '+draftLabel+'</button>')
     +(contact.email?'<a href="mailto:'+esc(contact.email)+'" class="btn btn-ghost btn-sm">Email</a>':'')
