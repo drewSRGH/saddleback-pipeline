@@ -395,14 +395,21 @@ function buildSnapshot(){
   });
   var confirmedRevWeek=defThisWeek.reduce(function(s,o){return s+getGrandTotal(o);},0);
 
+  // This month = Closed events + Definite events (future + past) within current calendar month
   var monthStart=new Date(now.getFullYear(),now.getMonth(),1);
-  var defThisMonth=(pipeline.futureDef||[]).filter(function(o){
-    if(!o._date)return false;
-    return new Date(o._date)>=monthStart;
+  var monthEnd=new Date(now.getFullYear(),now.getMonth()+1,1);
+  var defThisMonth=[].concat(pipeline.futureDef||[],pipeline.pastDef||[],pipeline.closed||[]).filter(function(o){
+    var d=new Date(o._date||o.updated_at||0);
+    return d>=monthStart&&d<monthEnd;
   });
   var confirmedRevMonth=defThisMonth.reduce(function(s,o){return s+getGrandTotal(o);},0);
 
-  var pipelineVal=[].concat(pipeline.futureTent||[],pipeline.futurePros||[]).reduce(function(s,o){return s+getGrandTotal(o);},0);
+  // Pipeline value = all future Definite events from today through end of 2028
+  var cutoff2028=new Date('2029-01-01');
+  var pipelineVal=(pipeline.futureDef||[]).filter(function(o){
+    if(!o._date)return false;
+    return new Date(o._date)<cutoff2028;
+  }).reduce(function(s,o){return s+getGrandTotal(o);},0);
 
   // Lead activity - last 7 days bar chart
   var days7=[];
@@ -473,7 +480,7 @@ function buildSnapshot(){
     trendHtml='<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;padding:2px 7px;background:'+tBg+';color:'+tCol+'">'+(trend>=0?'+':'')+trend+'% vs last wk</span>';
   }
 
-  var revenueNote=confirmedRevWeek===0&&confirmedRevMonth===0
+  var revenueNote=confirmedRevWeek===0&&confirmedRevMonth===0&&pipelineVal===0
     ?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.63rem;color:var(--mute);margin-top:10px">Revenue reflects amounts entered in Tripleseat on Definite events. $0 means amounts not yet entered.</div>'
     :'';
 
@@ -486,9 +493,9 @@ function buildSnapshot(){
     +'<div style="height:1px;background:var(--border)"></div>'
     +'<div style="display:flex;gap:24px">'
     +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700">'+fmtMoney(confirmedRevMonth)+'</div>'
-    +'<div class="snapshot-sub">THIS MONTH &middot; '+defThisMonth.length+' events</div></div>'
+    +'<div class="snapshot-sub">CLOSED + DEFINITE &middot; '+defThisMonth.length+' events</div></div>'
     +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700;color:var(--yellow)">'+fmtMoney(pipelineVal)+'</div>'
-    +'<div class="snapshot-sub">PIPELINE VALUE</div></div>'
+    +'<div class="snapshot-sub">ALL DEFINITE THRU 2028</div></div>'
     +'</div>'
     +revenueNote
     +'</div></div>'
