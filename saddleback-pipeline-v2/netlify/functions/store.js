@@ -325,6 +325,131 @@ exports.handler = async (event) => {
       }
     }
 
+
+      // ── CAMPAIGNS ──────────────────────────────────────────────────────────
+
+      if (action === 'get-campaigns') {
+        const campaigns = await query(url, key, 'campaigns', 'select=*&order=created_at.desc');
+        const list = campaigns || [];
+        const withStats = await Promise.all(list.map(async (camp) => {
+          try {
+            const contacts = await query(url, key, 'campaign_contacts', `select=status&campaign_id=eq.${camp.id}&limit=5000`);
+            const all = contacts || [];
+            return { ...camp,
+              total:    all.length,
+              drafted:  all.filter(x => x.status === 'drafted').length,
+              approved: all.filter(x => x.status === 'approved').length,
+              sent:     all.filter(x => x.status === 'sent').length,
+            };
+          } catch(e) { return { ...camp, total:0, drafted:0, approved:0, sent:0 }; }
+        }));
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ campaigns: withStats }) };
+      }
+
+      if (action === 'save-campaign') {
+        const row = {
+          name:       body.name || 'Untitled Campaign',
+          angle:      body.angle || null,
+          target:     body.target || 'all',
+          status:     'active',
+          updated_at: new Date().toISOString(),
+        };
+        if (body.id) {
+          await sbFetch(url, key, `/campaigns?id=eq.${body.id}`, {
+            method: 'PATCH', prefer: 'return=minimal',
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify(row),
+          });
+          return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, id: body.id }) };
+        } else {
+          const result = await sbFetch(url, key, '/campaigns', {
+            method: 'POST', prefer: 'return=representation',
+            headers: { 'Prefer': 'return=representation' },
+            body: JSON.stringify([row]),
+          });
+          const created = Array.isArray(result) ? result[0] : result;
+          return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, id: created.id }) };
+        }
+      }
+
+      if (action === 'delete-campaign') {
+        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${body.id}`, {
+          method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
+        });
+        await sbFetch(url, key, `/campaigns?id=eq.${body.id}`, {
+          method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      if (action === 'add-campaign-contacts') {
+        const rows = (body.contacts || []).map(c => ({
+          campaign_id:   body.campaign_id,
+          event_id:      c.event_id || null,
+          contact_email: c.email || null,
+          contact_name:  c.name || null,
+          company:       c.company || null,
+          event_history: c.event_history || null,
+          status:        'pending',
+          created_at:    new Date().toISOString(),
+          updated_at:    new Date().toISOString(),
+        }));
+        if (!rows.length) return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, added: 0 }) };
+        // Batch insert
+        for (let i = 0; i < rows.length; i += 100) {
+          await sbFetch(url, key, '/campaign_contacts', {
+            method: 'POST', prefer: 'return=minimal',
+            headers: { 'Prefer': 'return=minimal' },
+            body: JSON.stringify(rows.slice(i, i + 100)),
+          });
+        }
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, added: rows.length }) };
+      }
+
+      if (action === 'get-campaign-contacts') {
+        const cid = event.queryStringParameters?.campaign_id;
+        const offset = parseInt(event.queryStringParameters?.offset || '0');
+        const limit  = parseInt(event.queryStringParameters?.limit  || '500');
+        const status = event.queryStringParameters?.status || '';
+        let qs = `campaign_id=eq.${cid}&order=created_at.asc&limit=${limit}&offset=${offset}`;
+        if (status) qs += `&status=eq.${status}`;
+        const rows = await query(url, key, 'campaign_contacts', qs);
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ contacts: rows || [] }) };
+      }
+
+      if (action === 'update-campaign-contact') {
+        const patch = {
+          subject:     body.subject     || null,
+          body:        body.body        || null,
+          status:      body.status      || 'pending',
+          approved_at: body.approved_at || null,
+          sent_at:     body.sent_at     || null,
+          updated_at:  new Date().toISOString(),
+        };
+        await sbFetch(url, key, `/campaign_contacts?id=eq.${body.id}`, {
+          method: 'PATCH', prefer: 'return=minimal',
+          headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify(patch),
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      if (action === 'remove-campaign-contact') {
+        await sbFetch(url, key, `/campaign_contacts?id=eq.${body.id}`, {
+          method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
+      if (action === 'bulk-approve-campaign') {
+        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${body.campaign_id}&status=eq.drafted`, {
+          method: 'PATCH', prefer: 'return=minimal',
+          headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
+        });
+        return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
+      }
+
     return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Unknown action: ' + action }) };
 
   } catch(err) {
