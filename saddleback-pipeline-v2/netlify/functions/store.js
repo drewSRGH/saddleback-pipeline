@@ -327,6 +327,8 @@ exports.handler = async (event) => {
 
 
       // ── CAMPAIGNS ──────────────────────────────────────────────────────────
+      // body may be out of scope here (campaigns block is outside GET/POST blocks)
+      const campBody = (event.httpMethod === 'POST' && event.body) ? (() => { try { return JSON.parse(event.body); } catch(e) { return {}; } })() : {};
 
       if (action === 'get-campaigns') {
         const campaigns = await query(url, key, 'campaigns', 'select=*&order=created_at.desc');
@@ -348,19 +350,19 @@ exports.handler = async (event) => {
 
       if (action === 'save-campaign') {
         const row = {
-          name:       body.name || 'Untitled Campaign',
-          angle:      body.angle || null,
-          target:     body.target || 'all',
+          name:       campBody.name || 'Untitled Campaign',
+          angle:      campBody.angle || null,
+          target:     campBody.target || 'all',
           status:     'active',
           updated_at: new Date().toISOString(),
         };
-        if (body.id) {
-          await sbFetch(url, key, `/campaigns?id=eq.${body.id}`, {
+        if (campBody.id) {
+          await sbFetch(url, key, `/campaigns?id=eq.${campBody.id}`, {
             method: 'PATCH', prefer: 'return=minimal',
             headers: { 'Prefer': 'return=minimal' },
             body: JSON.stringify(row),
           });
-          return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, id: body.id }) };
+          return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, id: campBody.id }) };
         } else {
           const result = await sbFetch(url, key, '/campaigns', {
             method: 'POST', prefer: 'return=representation',
@@ -373,18 +375,18 @@ exports.handler = async (event) => {
       }
 
       if (action === 'delete-campaign') {
-        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${body.id}`, {
+        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${campBody.id}`, {
           method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
         });
-        await sbFetch(url, key, `/campaigns?id=eq.${body.id}`, {
+        await sbFetch(url, key, `/campaigns?id=eq.${campBody.id}`, {
           method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
         });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
 
       if (action === 'add-campaign-contacts') {
-        const rows = (body.contacts || []).map(c => ({
-          campaign_id:   body.campaign_id,
+        const rows = (campBody.contacts || []).map(c => ({
+          campaign_id:   campBody.campaign_id,
           event_id:      c.event_id || null,
           contact_email: c.email || null,
           contact_name:  c.name || null,
@@ -419,14 +421,14 @@ exports.handler = async (event) => {
 
       if (action === 'update-campaign-contact') {
         const patch = {
-          subject:     body.subject     || null,
-          body:        body.body        || null,
-          status:      body.status      || 'pending',
-          approved_at: body.approved_at || null,
-          sent_at:     body.sent_at     || null,
+          subject:     campBody.subject     || null,
+          body:        campBody.body        || null,
+          status:      campBody.status      || 'pending',
+          approved_at: campBody.approved_at || null,
+          sent_at:     campBody.sent_at     || null,
           updated_at:  new Date().toISOString(),
         };
-        await sbFetch(url, key, `/campaign_contacts?id=eq.${body.id}`, {
+        await sbFetch(url, key, `/campaign_contacts?id=eq.${campBody.id}`, {
           method: 'PATCH', prefer: 'return=minimal',
           headers: { 'Prefer': 'return=minimal' },
           body: JSON.stringify(patch),
@@ -435,14 +437,14 @@ exports.handler = async (event) => {
       }
 
       if (action === 'remove-campaign-contact') {
-        await sbFetch(url, key, `/campaign_contacts?id=eq.${body.id}`, {
+        await sbFetch(url, key, `/campaign_contacts?id=eq.${campBody.id}`, {
           method: 'DELETE', prefer: 'return=minimal', headers: { 'Prefer': 'return=minimal' },
         });
         return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true }) };
       }
 
       if (action === 'bulk-approve-campaign') {
-        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${body.campaign_id}&status=eq.drafted`, {
+        await sbFetch(url, key, `/campaign_contacts?campaign_id=eq.${campBody.campaign_id}&status=eq.drafted`, {
           method: 'PATCH', prefer: 'return=minimal',
           headers: { 'Prefer': 'return=minimal' },
           body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
