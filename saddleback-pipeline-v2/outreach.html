@@ -611,25 +611,80 @@ function calcScore(ev){
   return sc;
 }
 
+// ── RADAR HELPERS ─────────────────────────────────────────────────────────────
+function getRadarReason(ev, cat){
+  const raw=ev.raw||ev;
+  const ds=daysAgo(ev.updated_at||ev.created_at);
+  const dt=daysUntil(ev._date||getEventDate(ev));
+  const g=parseInt(raw?.guest_count||ev.guest_count)||0;
+  if(cat==='coldTent'){
+    if(ds>14)return`Looks like this hasn't been updated in ${ds} days — potentially getting cold.`;
+    if(ds>7) return`No update in ${ds} days. Might be worth keeping this warm.`;
+    if(dt!==null&&dt>=0&&dt<=60)return`Event is ${dt} days out and still tentative.`;
+    if(g>=100)return`High-value event (${g} guests) still sitting as tentative.`;
+    return`Tentative event that could use some warmth.`;
+  }
+  if(cat==='warmPros'){
+    if(ds>10)return`This prospect has been quiet for ${ds} days.`;
+    if(ds>3) return`Inquiry came in ${ds} days ago — might be a good time to follow up before it goes quiet.`;
+    if(dt!==null&&dt>=0&&dt<=90)return`Event is ${dt} days out. Good time to stay in touch.`;
+    return`Active prospect that could use a warm-up.`;
+  }
+  if(cat==='defTouch'){
+    if(ds>20)return`We don't show a recent touchpoint — last update was ${ds} days ago.`;
+    if(dt!==null&&dt>=0&&dt<=30)return`Event is ${dt} days away. Worth confirming everything is still aligned.`;
+    return`Coming up soon — might be worth a quick check-in.`;
+  }
+  if(cat==='pastCust')return`This past customer may be worth a soft reactivation note.`;
+  if(cat==='oldInq')  return`They reached out in the past but we don't show a completed event. Soft nurture opportunity.`;
+  return'';
+}
+function getSuggestedAngle(ev, cat){
+  if(cat==='coldTent') return`Low-pressure check-in to see if they're still thinking through catering and whether it'd help to talk through next steps.`;
+  if(cat==='warmPros') return`Helpful follow-up to see if they still need options or a quote.`;
+  if(cat==='defTouch') return`Service check-in to make sure all the details are still accurate and nothing has changed.`;
+  if(cat==='pastCust') return`Soft note staying in touch — we'd be happy to help if anything is coming up.`;
+  if(cat==='oldInq')   return`Soft nurture note. Don't imply they booked with us before.`;
+  return'';
+}
+function getConfidence(ev){
+  const contact=ev._contact||getContact(ev), date=ev._date||getEventDate(ev);
+  if(contact.name&&contact.email&&date) return'high';
+  if(contact.email&&ev.status)          return'medium';
+  return'needs-review';
+}
+const confidenceLabel={'high':{text:'High confidence',color:'var(--green)'},'medium':{text:'Medium confidence',color:'var(--yellow)'},'needs-review':{text:'Needs review',color:'var(--red)'}};
+function isSnoozed(ev){
+  try{const v=sessionStorage.getItem('srg_snz_'+String(ev.id));return v?new Date(v)>new Date():false;}catch(e){return false;}
+}
+function snoozeEvent(ev, days){
+  try{sessionStorage.setItem('srg_snz_'+String(ev.id),new Date(Date.now()+days*86400000).toISOString());}catch(e){}
+}
+function markTouched(ev, cat){
+  const days={coldTent:7,warmPros:5,defTouch:20,pastCust:30,oldInq:45}[cat]||7;
+  snoozeEvent(ev,days);
+  const el=document.getElementById('rc-'+String(ev.id));
+  if(el){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>el.remove(),300);}
+}
 function getAction(ev){
   const s=(ev.status||'').toUpperCase(), raw=ev.raw||ev;
   const dt=daysUntil(ev._date||getEventDate(ev)), ds=daysAgo(ev.updated_at||ev.created_at);
   const g=parseInt(raw?.guest_count||ev.guest_count)||0;
   const gStr=g?` (${g} guests)`:'', dStr=(ev._date||getEventDate(ev))?` on ${fmtDate(ev._date||getEventDate(ev))}`:'';
   if(s==='TENTATIVE'){
-    if(dt!==null&&dt>=0&&dt<=30)return`Event${dStr} is ${dt} days away${gStr}. Confirm details and lock in the date.`;
-    if(ds>14)return`${ds} days since last update${gStr}. Going cold — check in now.`;
-    if(ds>7)return`${ds} days since update. Good time for a check-in${gStr}.`;
-    return`Follow up to move toward Definite${gStr}${dStr}.`;
+    if(dt!==null&&dt>=0&&dt<=30)return`Event${dStr} is ${dt} days away${gStr}. Might be worth confirming details.`;
+    if(ds>14)return`Looks like this hasn't been updated in ${ds} days${gStr}. Could be a good time to check in.`;
+    if(ds>7) return`No update in ${ds} days${gStr}. Might be worth keeping this warm.`;
+    return`Tentative${gStr}${dStr} — worth keeping warm.`;
   }
   if(s==='PROSPECT'){
-    if(ds!==null&&ds<=2)return`New inquiry — just came in${gStr}. Respond quickly.`;
-    if(ds>10)return`Quiet for ${ds} days${gStr}. Low-pressure check-in.`;
-    return`Active prospect${gStr}${dStr} — ${ds} days old. Follow up.`;
+    if(ds!==null&&ds<=2)return`New inquiry${gStr}${dStr} — might be worth a quick response.`;
+    if(ds>10)return`Quiet for ${ds} days${gStr}. Low-pressure check-in could help.`;
+    return`Active prospect${gStr}${dStr} — could be worth a follow-up.`;
   }
   if(s==='DEFINITE'){
-    if(dt!==null&&dt>=0&&dt<=30)return`${dt} days to event${gStr}. Confirm all details.`;
-    if(ds>20)return`No contact in ${ds} days. Time for a service check-in.`;
+    if(dt!==null&&dt>=0&&dt<=30)return`${dt} days to event${gStr}. Could be worth checking that details are still aligned.`;
+    if(ds>20)return`We don't show a recent touchpoint in ${ds} days. Might be worth a quick check-in.`;
     return`Upcoming event${gStr}${dStr}.`;
   }
   return'';
@@ -809,60 +864,134 @@ function renderCmd(){
   if(!allEvents.length){
     p.innerHTML=`<div class="empty"><div class="empty-icon">◎</div><div class="empty-title">No data loaded</div><div class="empty-sub">Click Sync to import from Tripleseat</div><br><button class="btn btn-primary" onclick="doFullSync()" style="margin:0 auto;display:flex">Sync now</button></div>`;return;
   }
+
   const ft=pipeline.futureTent||[], fp=pipeline.futurePros||[], fd=pipeline.futureDef||[];
-  const pastCust=(pipeline.closed||[]).length+(pipeline.pastDef||[]).length;
-  const urgent=ft.filter(o=>o._urgency==='urgent'||o._urgency==='high').slice(0,5);
-  const staleProsp=fp.filter(o=>daysAgo(o.updated_at)>5).slice(0,4);
-  const staleTent=ft.filter(o=>daysAgo(o.updated_at)>7).length;
-  const yr26=[...ft,...fp,...fd].filter(o=>o._date&&new Date(o._date).getFullYear()===2026);
-  const yr27=[...ft,...fp,...fd].filter(o=>o._date&&new Date(o._date).getFullYear()===2027);
+  const pastCust=[...(pipeline.closed||[]),...(pipeline.pastDef||[])];
+  const oldInq=[...(pipeline.pastTent||[]),...(pipeline.pastPros||[]),...(pipeline.lost||[])];
+
+  // ── Build radar lists (threshold-filtered, snooze-filtered) ──
+  const coldTent = ft.filter(o=>{
+    if(isSnoozed(o)) return false;
+    const ds=daysAgo(o.updated_at||o.created_at), dt=daysUntil(o._date);
+    const g=parseInt((o.raw||o).guest_count)||0;
+    return ds>7 || (dt!==null&&dt>=0&&dt<=90) || g>=100;
+  }).sort((a,b)=>daysAgo(b.updated_at||b.created_at)-daysAgo(a.updated_at||a.created_at)).slice(0,8);
+
+  const warmPros = fp.filter(o=>{
+    if(isSnoozed(o)) return false;
+    const ds=daysAgo(o.updated_at||o.created_at), dt=daysUntil(o._date);
+    return ds>3 || (dt!==null&&dt>=0&&dt<=90);
+  }).sort((a,b)=>daysAgo(b.updated_at||b.created_at)-daysAgo(a.updated_at||a.created_at)).slice(0,6);
+
+  const defTouch = fd.filter(o=>{
+    if(isSnoozed(o)) return false;
+    const ds=daysAgo(o.updated_at||o.created_at), dt=daysUntil(o._date);
+    return ds>20 || (dt!==null&&dt>=0&&dt<=60);
+  }).sort((a,b)=>daysUntil(a._date)-daysUntil(b._date)).slice(0,4);
+
+  const reactivate = pastCust.filter(o=>!isSnoozed(o))
+    .sort((a,b)=>(parseInt((b.raw||b).guest_count)||0)-(parseInt((a.raw||a).guest_count)||0))
+    .slice(0,5);
+
+  const nurture = oldInq.filter(o=>!isSnoozed(o)).slice(0,4);
+
+  // ── Stats ──
   const guests=ft.reduce((s,o)=>s+(parseInt((o.raw||o).guest_count)||0),0);
   const drafts=queue.filter(q=>['needs_review','approved'].includes(q.status)).length;
+  const touchedToday=Object.keys(sessionStorage).filter(k=>k.startsWith('srg_snz_')).length;
 
   p.innerHTML=`
   <div style="margin-bottom:24px">
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">Ryan Sales Command Center</div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--mute);letter-spacing:.08em">FUTURE EVENTS ONLY — PAST EXCLUDED FROM ACTIVE PIPELINE</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">Command Center</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--mute);letter-spacing:.08em">RELATIONSHIPS AND EVENTS WORTH KEEPING WARM TODAY</div>
   </div>
   <div class="stat-grid">
-    ${sc(ft.length,'Future Tentative','orange','tent')}
-    ${sc(fp.length,'Future Prospects','','prospect')}
-    ${sc(fd.length,'Upcoming Definite','green','definite')}
-    ${sc(pastCust,'Past Customers','blue','closed')}
-    ${sc(staleTent,'Stale Tentative','red','tent')}
+    ${sc(coldTent.length,'Getting Cold','orange','tent')}
+    ${sc(warmPros.length,'Warm Up','','prospect')}
+    ${sc(defTouch.length,'Def. Touchpoints','green','definite')}
+    ${sc(reactivate.length,'Re-engage','blue','closed')}
     ${sc(guests?guests.toLocaleString():'—','Tent. Guests','yellow',null)}
-    ${sc(drafts,'Drafts Ready','green','queue')}
+    ${sc(touchedToday,'Touched Today','green',null)}
+    ${sc(drafts,'Drafts Ready','orange','queue')}
   </div>
-  <div class="two-col">
-    <div>
-      <div class="sec-hdr">
-        <div class="sec-title">// Future Tentative — Follow Up Now</div>
-        <button class="btn btn-ghost btn-sm" onclick="showTab('tent')">All ${ft.length} →</button>
-      </div>
-      ${ft.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">✓</div><div class="empty-title">No future tentative events</div></div>`:(urgent.length?urgent:ft.slice(0,5)).map(o=>card(o,true)).join('')}
 
-      <hr class="divider">
-      <div class="sec-hdr">
-        <div class="sec-title">// Active Prospects</div>
-        <button class="btn btn-ghost btn-sm" onclick="showTab('prospect')">All ${fp.length} →</button>
+  ${radarSection('Tentative Getting Cold', coldTent, 'coldTent',
+    'These tentative events may be getting cold. Worth keeping warm.',
+    'yellow',
+    `All ${ft.length} Tentative →`, "showTab('tent')")}
+
+  ${radarSection('Prospects to Warm Up', warmPros, 'warmPros',
+    'These prospects could use a follow-up before they go quiet.',
+    'purple',
+    `All ${fp.length} Prospects →`, "showTab('prospect')")}
+
+  ${radarSection('Upcoming Definite Touchpoints', defTouch, 'defTouch',
+    "Booked events coming up where we don't show a recent touchpoint. Service check-in, not sales.",
+    'green',
+    `All ${fd.length} Definite →`, "showTab('definite')")}
+
+  ${radarSection('Past Customers to Re-engage', reactivate, 'pastCust',
+    'Past customers who may be worth a soft reactivation note.',
+    'blue',
+    `All ${pastCust.length} Past Customers →`, "showTab('closed')")}
+
+  ${radarSection('Old Inquiries to Nurture', nurture, 'oldInq',
+    "Reached out in the past but we don't show a completed event. Soft nurture only.",
+    'mute',
+    `All ${oldInq.length} Old Inquiries →`, "showTab('lost')")}`;
+}
+
+function radarSection(title, list, cat, subtitle, color, linkText, linkAction){
+  return`<div style="margin-bottom:28px">
+    <div class="sec-hdr">
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--${color==='mute'?'dim':color})">${title}</div>
+        <div style="font-size:.74rem;color:var(--mute);margin-top:2px">${subtitle}</div>
       </div>
-      ${fp.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No active prospects</div></div>`:(staleProsp.length?staleProsp:fp.slice(0,4)).map(o=>card(o,true)).join('')}
+      <button class="btn btn-ghost btn-sm" onclick="${linkAction}">${linkText}</button>
     </div>
-    <div>
-      <div class="sec-hdr">
-        <div class="sec-title">// 2026 Active Leads</div>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">${yr26.length}</span>
-      </div>
-      ${yr26.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No 2026 events with dates</div></div>`:yr26.slice(0,5).map(o=>card(o,false)).join('')}
-      ${yr26.length>5?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showTab('years')">+${yr26.length-5} more</button>`:''}
+    ${list.length===0
+      ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--mute);padding:12px 0">Nothing flagged right now.</div>`
+      : list.map(o=>radarCard(o,cat)).join('')}
+  </div>`;
+}
 
-      <hr class="divider">
-      <div class="sec-hdr">
-        <div class="sec-title">// 2027 Active Leads</div>
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">${yr27.length}</span>
+function radarCard(o, cat){
+  const contact=o._contact||getContact(o), date=o._date||getEventDate(o);
+  const raw=o.raw||o, guests=parseInt(raw.guest_count)||0;
+  const ds=daysAgo(o.updated_at||o.created_at), dt=date?daysUntil(date):null;
+  const inQ=queue.some(q=>q.event_id===String(o.id)||q.contact_email===contact.email);
+  const reason=getRadarReason(o,cat), angle=getSuggestedAngle(o,cat);
+  const conf=getConfidence(o), cl=confidenceLabel[conf];
+
+  return`<div class="card low" id="rc-${o.id}" style="margin-bottom:8px">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${esc(contact.name||'Unknown')}</div>
+        ${contact.company?`<div class="card-co">${esc(contact.company)}</div>`:''}
       </div>
-      ${yr27.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No 2027 events with dates</div></div>`:yr27.slice(0,5).map(o=>card(o,false)).join('')}
-      ${yr27.length>5?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showTab('years')">+${yr27.length-5} more</button>`:''}
+      <div class="card-right">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.59rem;color:${cl.color};padding:2px 6px;background:${cl.color}1a">${cl.text}</span>
+        ${statusDot(o.status,['futureTent','futurePros','futureDef'].includes(cat))}
+      </div>
+    </div>
+    <div class="card-meta">
+      ${contact.email?`<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value">${esc(contact.email)}</div></div>`:'<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value hot">not on file</div></div>'}
+      ${contact.phone?`<div class="card-meta-item"><div class="card-meta-label">Phone</div><div class="card-meta-value">${esc(contact.phone)}</div></div>`:''}
+      ${date?`<div class="card-meta-item"><div class="card-meta-label">Event Date</div><div class="card-meta-value">${fmtDate(date)}${dt!==null&&dt>=0?` (${dt}d out)`:''}</div></div>`:''}
+      ${guests?`<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">${guests}</div></div>`:''}
+      ${ds!==null?`<div class="card-meta-item"><div class="card-meta-label">Last Updated</div><div class="card-meta-value ${ds>14?'hot':ds>7?'warm':''}">${ds}d ago</div></div>`:''}
+    </div>
+    ${reason?`<div class="card-action"><strong>Radar:</strong> ${esc(reason)}</div>`:''}
+    ${angle?`<div style="font-size:.74rem;color:var(--mute);padding:5px 0 8px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em">Suggested angle</span><br>${esc(angle)}</div>`:''}
+    <div class="card-footer">
+      ${inQ
+        ? `<span class="in-queue-badge">✓ Draft in queue</span>`
+        : `<button class="btn btn-primary btn-sm" onclick="queueOne('${esc(String(o.id))}')">Draft note</button>`}
+      ${contact.email?`<a href="mailto:${esc(contact.email)}" class="btn btn-ghost btn-sm">Email</a>`:''}
+      ${contact.phone?`<a href="tel:${esc(contact.phone)}" class="btn btn-ghost btn-sm">Call</a>`:''}
+      <button class="btn btn-ghost btn-sm" onclick="markTouched(allEvents.find(e=>String(e.id)==='${String(o.id)}'),'${cat}')" style="color:var(--green);border-color:rgba(0,232,122,.2)">✓ Touched</button>
+      <button class="btn btn-ghost btn-sm" onclick="snoozeEvent(allEvents.find(e=>String(e.id)==='${String(o.id)}'),7);document.getElementById('rc-${o.id}').remove()" style="font-size:.63rem">Snooze 7d</button>
     </div>
   </div>`;
 }
@@ -872,6 +1001,7 @@ function sc(n,l,color,tab){
     <div class="stat-label">${l}</div>
   </div>`;
 }
+
 
 // ── CATEGORY VIEWS ────────────────────────────────────────────────────────────
 function renderCat(cat){
