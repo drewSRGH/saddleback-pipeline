@@ -1160,3 +1160,526 @@ loadFromDB();
 </script>
 </body>
 </html>
+
+<script>
+// ── CAMPAIGNS ─────────────────────────────────────────────────────────────────
+let campaigns=[], activeCampaignId=null, campaignContacts=[], 
+    browserPool=[], browserSelected=new Set(), browserPage=0,
+    campBrowserOpen=false, campFilter={cat:'all',search:'',minGuests:0};
+
+// Build deduped contact pool from allEvents for a given target
+function buildCampaignPool(target){
+  var sources=[];
+  if(target==='past'||target==='all') sources=sources.concat(pipeline.closed||[],pipeline.pastDef||[]);
+  if(target==='old' ||target==='all') sources=sources.concat(pipeline.pastTent||[],pipeline.pastPros||[],pipeline.lost||[]);
+  var catRank={closed:0,pastDef:1,pastTent:2,pastPros:3,lost:4,unknown:5};
+  var byEmail={};
+  sources.forEach(function(ev){
+    var ct=ev._contact||getContact(ev); if(!ct.email)return;
+    var ex=byEmail[ct.email];
+    if(!ex||(catRank[ev._cat]||9)<(catRank[ex._cat]||9)||(catRank[ev._cat]===catRank[ex._cat]&&(parseInt((ev.raw||ev).guest_count)||0)>(parseInt((ex.raw||ex).guest_count)||0)))
+      byEmail[ct.email]=ev;
+  });
+  return Object.values(byEmail);
+}
+
+// ── Store wrappers ────────────────────────────────────────────────────────────
+async function campGet(action,qs){return fetch(API_ST+'?action='+action+(qs?'&'+qs:'')).then(function(r){return r.json();}).catch(function(){return {};});}
+async function campPost(action,body){
+  var r=await fetch(API_ST+'?action='+action,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json().catch(function(){return {};});
+}
+
+// ── Main render ───────────────────────────────────────────────────────────────
+async function renderCampaigns(){
+  var p=document.getElementById('pane-campaigns');
+  p.innerHTML='<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.7rem;color:var(--mute);padding:20px 0">Loading campaigns...</div>';
+  var d=await campGet('get-campaigns');
+  campaigns=d.campaigns||[];
+  campBrowserOpen=false; activeCampaignId=null;
+  renderCampaignList();
+}
+
+function renderCampaignList(){
+  campBrowserOpen=false;
+  var p=document.getElementById('pane-campaigns');
+  var todayStr=new Date().toISOString().slice(0,10);
+  var totalSentToday=0;
+  campaigns.forEach(function(c){totalSentToday+=c.sent_today||0;});
+
+  var html='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Campaigns</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:var(--mute);margin-top:2px">Personalized outreach to past customers and old inquiries -- 100-200 emails/day</div>'
+    +'</div>'
+    +'<button class="btn btn-primary" onclick="showNewCampForm()">+ New Campaign</button>'
+    +'</div>'
+
+    // New campaign form
+    +'<div id="new-camp-form" style="display:none;background:var(--surface);border:1px solid var(--orange-border);padding:20px;margin-bottom:20px">'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:14px">New Campaign</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">'
+    +'<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;text-transform:uppercase;color:var(--mute);margin-bottom:5px">Campaign Name *</div>'
+    +'<input id="camp-name" type="text" placeholder="e.g. Holiday Party Push -- May 2026" '
+    +'style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:8px 10px;font-family:\'Barlow\',sans-serif;font-size:.85rem;outline:none;border-radius:2px"></div>'
+    +'<div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;text-transform:uppercase;color:var(--mute);margin-bottom:5px">Target Audience</div>'
+    +'<select id="camp-target" style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:8px 10px;font-family:\'Barlow\',sans-serif;font-size:.85rem;outline:none;border-radius:2px">'
+    +'<option value="all">Past Customers + Old Inquiries</option><option value="past">Past Customers Only</option><option value="old">Old Inquiries Only</option>'
+    +'</select></div></div>'
+    +'<div style="margin-bottom:14px"><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;text-transform:uppercase;color:var(--mute);margin-bottom:5px">Angle / Theme (tell the AI what to focus on)</div>'
+    +'<textarea id="camp-angle" placeholder="e.g. Summer catering push. Mention Assembly opening in Mason. Focus on corporate and social events. Soft and friendly, not salesy." '
+    +'style="width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:8px 10px;font-family:\'Barlow\',sans-serif;font-size:.82rem;outline:none;border-radius:2px;height:72px;resize:vertical"></textarea></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn btn-primary" onclick="saveNewCampaign()">Create Campaign</button>'
+    +'<button class="btn btn-ghost" onclick="document.getElementById(\'new-camp-form\').style.display=\'none\'">Cancel</button>'
+    +'</div></div>';
+
+  if(!campaigns.length){
+    html+='<div class="empty"><div class="empty-icon">&#9993;</div><div class="empty-title">No campaigns yet</div>'
+      +'<div class="empty-sub">Create a campaign, add contacts, generate personalized drafts, send 100-200 per day</div></div>';
+  } else {
+    html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">';
+    campaigns.forEach(function(camp){
+      var pct=camp.total>0?Math.round(camp.sent/camp.total*100):0;
+      var tgtLabel=camp.target==='past'?'Past Customers':camp.target==='old'?'Old Inquiries':'Past Customers + Old Inquiries';
+      var statusBtn=camp.total===0?'Add Contacts &rarr;':camp.approved>camp.sent?'Continue Sending &rarr;':camp.drafted>0?'Review Drafts &rarr;':'Generate Drafts &rarr;';
+      html+='<div style="background:var(--surface);border:1px solid var(--border);padding:18px">'
+        +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+        +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.05rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;flex:1;cursor:pointer" onclick="openCampaignDetail('+camp.id+')">'+esc(camp.name)+'</div>'
+        +'<button onclick="confirmDeleteCamp('+camp.id+',\''+esc(camp.name)+'\')" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:.75rem;padding:0 0 0 8px" title="Delete">&#10005;</button>'
+        +'</div>'
+        +(camp.angle?'<div style="font-size:.74rem;color:var(--mute);margin-bottom:8px;line-height:1.5;font-style:italic">'+esc(camp.angle.slice(0,120))+(camp.angle.length>120?'...':'')+'</div>':'')
+        +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--orange);margin-bottom:12px">'+tgtLabel+'</div>'
+        +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-bottom:10px">'
+        +'<div style="background:var(--surface2);padding:8px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.1rem;font-weight:700">'+camp.total+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">TOTAL</div></div>'
+        +'<div style="background:var(--surface2);padding:8px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.1rem;font-weight:700;color:var(--blue)">'+camp.drafted+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">DRAFTED</div></div>'
+        +'<div style="background:var(--surface2);padding:8px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.1rem;font-weight:700;color:var(--orange)">'+camp.approved+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">APPROVED</div></div>'
+        +'<div style="background:var(--surface2);padding:8px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.1rem;font-weight:700;color:var(--green)">'+camp.sent+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">SENT</div></div>'
+        +'</div>'
+        +'<div style="height:3px;background:var(--surface2);margin-bottom:12px"><div style="height:100%;width:'+pct+'%;background:var(--green)"></div></div>'
+        +'<button class="btn btn-primary btn-sm" onclick="openCampaignDetail('+camp.id+')" style="width:100%;justify-content:center">'+statusBtn+'</button>'
+        +'</div>';
+    });
+    html+='</div>';
+  }
+  p.innerHTML=html;
+}
+
+function showNewCampForm(){document.getElementById('new-camp-form').style.display='block';setTimeout(function(){document.getElementById('camp-name').focus();},50);}
+
+async function saveNewCampaign(){
+  var name=document.getElementById('camp-name').value.trim();
+  if(!name){alert('Campaign name is required.');return;}
+  var btn=document.querySelector('[onclick="saveNewCampaign()"]');
+  if(btn){btn.disabled=true;btn.textContent='Creating...';}
+  var res=await campPost('save-campaign',{name:name,target:document.getElementById('camp-target').value,angle:document.getElementById('camp-angle').value.trim()});
+  if(res.ok&&res.id){openCampaignDetail(res.id);}
+  else{alert('Error creating campaign.');if(btn){btn.disabled=false;btn.textContent='Create Campaign';}}
+}
+
+async function confirmDeleteCamp(id,name){
+  if(!confirm('Delete "'+name+'"? This will delete all contacts and drafts in this campaign.'))return;
+  await campPost('delete-campaign',{id:id});
+  renderCampaigns();
+}
+
+// ── Campaign Detail ───────────────────────────────────────────────────────────
+async function openCampaignDetail(id){
+  activeCampaignId=id;
+  var p=document.getElementById('pane-campaigns');
+  p.innerHTML='<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.7rem;color:var(--mute);padding:20px 0">Loading...</div>';
+  var camp=campaigns.filter(function(c){return c.id===id;})[0];
+  if(!camp){var d=await campGet('get-campaigns');campaigns=d.campaigns||[];camp=campaigns.filter(function(c){return c.id===id;})[0];}
+  if(!camp){renderCampaignList();return;}
+  campaignContacts=await campGet('get-campaign-contacts','campaign_id='+id+'&limit=500').then(function(d){return d.contacts||[];});
+  renderCampaignDetail(camp);
+}
+
+function renderCampaignDetail(camp){
+  var p=document.getElementById('pane-campaigns');
+  var total=campaignContacts.length;
+  var drafted=campaignContacts.filter(function(c){return c.status==='drafted';}).length;
+  var approved=campaignContacts.filter(function(c){return c.status==='approved';}).length;
+  var sent=campaignContacts.filter(function(c){return c.status==='sent';}).length;
+  var pending=campaignContacts.filter(function(c){return c.status==='pending';}).length;
+  var todayStr=new Date().toISOString().slice(0,10);
+  var sentToday=campaignContacts.filter(function(c){return c.sent_at&&c.sent_at.slice(0,10)===todayStr;}).length;
+
+  var html='<div style="margin-bottom:20px">'
+    // Back button + title
+    +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">'
+    +'<button class="btn btn-ghost btn-sm" onclick="renderCampaignList()">&larr; All Campaigns</button>'
+    +'</div>'
+    +'<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.4rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+esc(camp.name)+'</div>'
+    +(camp.angle?'<div style="font-size:.77rem;color:var(--mute);margin-top:4px;max-width:600px;line-height:1.5">Angle: '+esc(camp.angle)+'</div>':'')
+    +'</div>'
+    +'<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center">'
+    +'<button class="btn btn-ghost btn-sm" onclick="openContactBrowser('+camp.id+')">+ Add Contacts</button>'
+    +(pending>0?'<button class="btn btn-primary btn-sm" onclick="generateAllCampaignDrafts()">&#10024; Generate '+pending+' Drafts</button>':'')
+    +(drafted>0?'<button class="btn btn-success btn-sm" onclick="bulkApproveCampaign('+camp.id+')">&#10003; Approve All Drafted</button>':'')
+    +'</div></div></div>'
+
+    // Stats bar
+    +'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);margin-bottom:20px">'
+    +campStat(total,'Total','white')+campStat(pending,'Pending','mute')+campStat(drafted,'Drafted','blue')
+    +campStat(approved,'Approved','orange')+campStat(sent,'Sent','green')
+    +'<div style="background:var(--surface2);padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.3rem;font-weight:700;color:var(--green)">'+sentToday+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">TODAY</div></div>'
+    +'</div>'
+
+    // Daily pace note
+    +(sentToday>0?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.67rem;color:var(--green);background:var(--green-dim);padding:8px 12px;margin-bottom:16px">&#10003; '+sentToday+' sent today'+(sentToday>=100?' -- great pace!':(sentToday>=50?' -- keep going!':''))+' Target: 100-200/day</div>':'')
+
+    +(total===0?'<div class="empty"><div class="empty-icon">&#128101;</div><div class="empty-title">No contacts added yet</div><div class="empty-sub">Click "+ Add Contacts" to browse and select who to include in this campaign</div></div>':'');
+
+  // Contact cards
+  if(total>0){
+    // Group by status for better UX: approved first, then drafted, then pending, then sent
+    var order=['approved','drafted','pending','sent'];
+    var grouped={};order.forEach(function(s){grouped[s]=[];});
+    campaignContacts.forEach(function(c){if(grouped[c.status])grouped[c.status].push(c);else grouped.pending.push(c);});
+
+    order.forEach(function(status){
+      var group=grouped[status];if(!group.length)return;
+      var labels={approved:'Approved -- Ready to Send',drafted:'Drafted -- Needs Review',pending:'Pending -- Not Yet Generated',sent:'Sent'};
+      var colors={approved:'var(--orange)',drafted:'var(--blue)',pending:'var(--mute)',sent:'var(--green)'};
+      html+='<div style="margin-bottom:20px">'
+        +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:'+colors[status]+';margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">'+labels[status]+' ('+group.length+')</div>'
+        +group.map(function(c){return renderCampContact(c,camp);}).join('')
+        +'</div>';
+    });
+  }
+
+  p.innerHTML=html;
+}
+
+function campStat(n,label,color){
+  return '<div style="background:var(--surface2);padding:12px;text-align:center"><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.3rem;font-weight:700;color:var(--'+color+')">'+n+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:.52rem;color:var(--mute)">'+label.toUpperCase()+'</div></div>';
+}
+
+function renderCampContact(c, camp){
+  var hist=c.event_history||{};
+  var statusColors={pending:'var(--mute)',drafted:'var(--blue)',approved:'var(--orange)',sent:'var(--green)'};
+  var col=statusColors[c.status]||'var(--mute)';
+  return '<div id="cc-'+c.id+'" style="background:var(--surface);border:1px solid var(--border);border-left:3px solid '+col+';padding:14px;margin-bottom:4px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px">'
+    +'<div>'
+    +'<div style="font-weight:600;font-size:.9rem">'+esc(c.contact_name||'Unknown')+(c.company?' <span style="font-weight:400;color:var(--dim);font-size:.78rem">'+esc(c.company)+'</span>':'')+'</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:var(--dim);margin-top:2px">'+esc(c.contact_email||'')+'</div>'
+    +(hist.status?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--mute);margin-top:3px">'+hist.status+(hist.date?' &middot; '+fmtDate(hist.date):'')+(hist.guests?' &middot; '+hist.guests+' guests':'')+'</div>':'')
+    +'</div>'
+    +'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;padding:2px 7px;background:'+col+'1a;color:'+col+';flex-shrink:0">'+c.status.toUpperCase()+'</span>'
+    +'</div>'
+    // Subject preview
+    +(c.subject?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.67rem;color:var(--dim);background:var(--surface2);padding:6px 10px;margin-bottom:8px">'+esc(c.subject)+'</div>':'')
+    // Body preview
+    +(c.body&&c.status!=='sent'?'<div style="font-size:.74rem;color:var(--mute);line-height:1.6;max-height:80px;overflow:hidden;margin-bottom:8px;position:relative">'+esc(c.body.slice(0,250))+(c.body.length>250?'...':'')+'</div>':'')
+    // Actions
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+    +(c.status==='pending'?'<button class="btn btn-primary btn-sm" onclick="generateOneCampDraft(\''+c.id+'\')">&#10024; Draft</button>':'')
+    +(c.status==='drafted'?'<button class="btn btn-ghost btn-sm" onclick="reviewCampContact(\''+c.id+'\')">Review &amp; Edit</button><button class="btn btn-success btn-sm" onclick="approveCampContact(\''+c.id+'\')">&#10003; Approve</button>':'')
+    +(c.status==='approved'?'<button class="btn btn-success btn-sm" onclick="copyAndSendCamp(\''+c.id+'\')">&#128203; Copy &amp; Send</button><button class="btn btn-ghost btn-sm" onclick="reviewCampContact(\''+c.id+'\')">Edit</button>':'')
+    +(c.status==='sent'?'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.63rem;color:var(--green)">&#10003; Sent '+( c.sent_at?fmtDate(c.sent_at):'')+'</span>':'')
+    +'<button onclick="removeCampContact(\''+c.id+'\')" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:.75rem;margin-left:auto" title="Remove">&#10005;</button>'
+    +'</div></div>';
+}
+
+// ── Draft generation ──────────────────────────────────────────────────────────
+async function generateAllCampaignDrafts(){
+  var camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];if(!camp)return;
+  var pending=campaignContacts.filter(function(c){return c.status==='pending';});
+  if(!pending.length){alert('No pending contacts to generate.');return;}
+  setStatus('Generating '+pending.length+' drafts -- please wait...','ld');
+  for(var i=0;i<pending.length;i++){
+    await generateOneCampDraft(pending[i].id,camp,true);
+    if(i<pending.length-1)await new Promise(function(r){setTimeout(r,400);});
+    if((i+1)%10===0)setStatus('Generated '+(i+1)+' of '+pending.length+'...','ld');
+  }
+  setStatus('&#10003; All drafts generated','ok');
+  setTimeout(function(){setStatus('','');},4000);
+  // Re-render detail
+  var d=await campGet('get-campaigns');campaigns=d.campaigns||[];
+  var c=campaigns.filter(function(x){return x.id===activeCampaignId;})[0];
+  if(c)renderCampaignDetail(c);
+}
+
+async function generateOneCampDraft(contactId, camp, silent){
+  var cc=campaignContacts.filter(function(c){return c.id==contactId;})[0];if(!cc)return;
+  if(!camp)camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];
+  if(!camp)return;
+
+  // Update UI immediately
+  var el=document.getElementById('cc-'+contactId);
+  if(el){var b=el.querySelector('button');if(b){b.disabled=true;b.textContent='Generating...';}}
+
+  var hist=cc.event_history||{};
+  try{
+    var res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      contact:{
+        first_name:cc.contact_name?cc.contact_name.split(' ')[0]:'',
+        last_name:cc.contact_name?cc.contact_name.split(' ').slice(1).join(' '):'',
+        email:cc.contact_email,company:cc.company,
+        event_date:hist.date||null, event_description:hist.description||hist.status||'',
+        guest_count:hist.guests||null, location_name:hist.location||'',
+        last_booking_status:hist.status||'',is_future:false,
+        pipeline_category:hist.status==='CLOSED'||hist.status==='DEFINITE'?'pastCust':'oldInq',
+        campaign_angle:camp.angle||''
+      },
+      campaign:'campaign_outreach'
+    })});
+    var data=await res.json();
+    if(!res.ok)throw new Error(data.error||'HTTP '+res.status);
+    cc.subject=(data.subject||'Checking in').replace(/\u2014/g,'-').replace(/\u2013/g,'-');
+    cc.body=(data.body||'').replace(/\u2014/g,'-').replace(/\u2013/g,'-');
+    cc.status='drafted';
+  }catch(err){
+    cc.subject='Draft error';cc.body='Error: '+err.message;cc.status='drafted';
+  }
+  await campPost('update-campaign-contact',{id:cc.id,subject:cc.subject,body:cc.body,status:'drafted'});
+  if(!silent){
+    var d=await campGet('get-campaigns');campaigns=d.campaigns||[];
+    var c=campaigns.filter(function(x){return x.id===activeCampaignId;})[0];
+    if(c)renderCampaignDetail(c);
+  }
+}
+
+// ── Approve / Send ────────────────────────────────────────────────────────────
+async function approveCampContact(id){
+  var cc=campaignContacts.filter(function(c){return c.id==id;})[0];if(!cc)return;
+  cc.status='approved';cc.approved_at=new Date().toISOString();
+  await campPost('update-campaign-contact',{id:cc.id,subject:cc.subject,body:cc.body,status:'approved',approved_at:cc.approved_at});
+  var el=document.getElementById('cc-'+id);
+  if(el){el.style.transition='opacity .2s';el.style.opacity='0.4';setTimeout(function(){
+    var d2=campGet('get-campaigns').then(function(d){campaigns=d.campaigns||[];var c=campaigns.filter(function(x){return x.id===activeCampaignId;})[0];if(c)renderCampaignDetail(c);});
+  },300);}
+}
+
+async function bulkApproveCampaign(campId){
+  if(!confirm('Approve all drafted emails in this campaign?'))return;
+  campaignContacts.filter(function(c){return c.status==='drafted';}).forEach(function(c){c.status='approved';c.approved_at=new Date().toISOString();});
+  await campPost('bulk-approve-campaign',{campaign_id:campId});
+  var d=await campGet('get-campaigns');campaigns=d.campaigns||[];
+  var camp=campaigns.filter(function(c){return c.id===campId;})[0];
+  if(camp)renderCampaignDetail(camp);
+}
+
+function copyAndSendCamp(id){
+  var cc=campaignContacts.filter(function(c){return c.id==id;})[0];if(!cc)return;
+  var text='Subject: '+(cc.subject||'')+'\n\n'+(cc.body||'');
+  navigator.clipboard.writeText(text).then(function(){
+    // Show sent confirmation inline
+    var el=document.getElementById('cc-'+id);
+    if(el){
+      el.style.background='rgba(0,232,122,0.05)';
+      var orig=el.innerHTML;
+      // Add a "Mark as Sent" button at the bottom
+      var footer=el.querySelector('[style*="display:flex"]');
+      if(footer){footer.innerHTML='<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:var(--green)">&#128203; Copied!</span><button class="btn btn-success btn-sm" onclick="markCampSent(\''+id+'\')">&#10003; Mark Sent</button><button class="btn btn-ghost btn-sm" onclick="reviewCampContact(\''+id+'\')">Edit</button>';}
+    }
+  }).catch(function(){markCampSent(id);});
+}
+
+async function markCampSent(id){
+  var cc=campaignContacts.filter(function(c){return c.id==id;})[0];if(!cc)return;
+  cc.status='sent';cc.sent_at=new Date().toISOString();
+  await campPost('update-campaign-contact',{id:cc.id,subject:cc.subject,body:cc.body,status:'sent',sent_at:cc.sent_at});
+  // record in sent_history too
+  await sbPost('record-sent',{email:cc.contact_email,name:cc.contact_name,campaign:'campaign_'+activeCampaignId,subject:cc.subject,body:cc.body});
+  var d=await campGet('get-campaigns');campaigns=d.campaigns||[];
+  var camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];
+  if(camp)renderCampaignDetail(camp);
+}
+
+async function removeCampContact(id){
+  campaignContacts=campaignContacts.filter(function(c){return c.id!=id;});
+  await campPost('remove-campaign-contact',{id:id});
+  var el=document.getElementById('cc-'+id);
+  if(el){el.style.transition='opacity .2s';el.style.opacity='0';setTimeout(function(){el.remove();},200);}
+}
+
+// ── Review modal (reuse existing modal) ──────────────────────────────────────
+function reviewCampContact(id){
+  var cc=campaignContacts.filter(function(c){return c.id==id;})[0];if(!cc)return;
+  document.getElementById('modal-title').textContent='CAMPAIGN DRAFT -- '+(cc.contact_name||'').toUpperCase();
+  document.getElementById('modal-sub').value=cc.subject||'';
+  document.getElementById('modal-body-text').value=cc.body||'';
+  document.getElementById('modal-risks').innerHTML='';
+  modalQueueId='camp:'+id; // flag as campaign contact
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Override approveFromModal to handle campaign contacts
+var _origApproveFromModal=approveFromModal;
+approveFromModal=function(){
+  if(modalQueueId&&String(modalQueueId).startsWith('camp:')){
+    var id=modalQueueId.replace('camp:','');
+    var cc=campaignContacts.filter(function(c){return c.id==id;})[0];
+    if(cc){
+      cc.subject=document.getElementById('modal-sub').value;
+      cc.body=document.getElementById('modal-body-text').value;
+      cc.status='approved';cc.approved_at=new Date().toISOString();
+      campPost('update-campaign-contact',{id:cc.id,subject:cc.subject,body:cc.body,status:'approved',approved_at:cc.approved_at});
+    }
+    document.getElementById('modal-overlay').classList.remove('open');
+    modalQueueId=null;
+    var d=campGet('get-campaigns').then(function(d){campaigns=d.campaigns||[];var camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];if(camp)renderCampaignDetail(camp);});
+    return;
+  }
+  _origApproveFromModal();
+};
+
+// ── Contact Browser ───────────────────────────────────────────────────────────
+function openContactBrowser(campId){
+  campBrowserOpen=true;
+  var camp=campaigns.filter(function(c){return c.id===campId;})[0]||{target:'all'};
+  browserPool=buildCampaignPool(camp.target||'all');
+  browserSelected=new Set();
+  // Mark already-added contacts
+  var addedEmails=new Set(campaignContacts.map(function(c){return c.contact_email;}));
+  renderContactBrowser(camp,addedEmails);
+}
+
+function renderContactBrowser(camp, addedEmails){
+  var p=document.getElementById('pane-campaigns');
+  if(!addedEmails)addedEmails=new Set(campaignContacts.map(function(c){return c.contact_email;}));
+
+  // Apply filters
+  var filtered=browserPool.filter(function(ev){
+    var ct=ev._contact||getContact(ev);
+    if(campFilter.search){var q=campFilter.search.toLowerCase();if(!((ct.name||'').toLowerCase().includes(q)||(ct.email||'').toLowerCase().includes(q)||(ct.company||'').toLowerCase().includes(q)))return false;}
+    if(campFilter.minGuests>0&&(parseInt((ev.raw||ev).guest_count)||0)<campFilter.minGuests)return false;
+    if(campFilter.cat==='past'&&['closed','pastDef'].indexOf(ev._cat)<0)return false;
+    if(campFilter.cat==='old'&&['pastTent','pastPros','lost'].indexOf(ev._cat)<0)return false;
+    return true;
+  });
+  var notAdded=filtered.filter(function(ev){var ct=ev._contact||getContact(ev);return !addedEmails.has(ct.email);});
+  var page=Math.max(0,browserPage), perPage=100, paginated=notAdded.slice(page*perPage,(page+1)*perPage);
+
+  var html='<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'
+    +'<button class="btn btn-ghost btn-sm" onclick="renderCampaignDetail(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])">&larr; Back to Campaign</button>'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Add Contacts</div>'
+    +'</div>'
+
+    // Filters
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;background:var(--surface);padding:12px;border:1px solid var(--border)">'
+    +'<input type="text" placeholder="Search name, email, company..." oninput="campFilter.search=this.value;browserPage=0;renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])" '
+    +'style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:6px 10px;font-family:\'Barlow\',sans-serif;font-size:.82rem;outline:none;border-radius:2px">'
+    +'<select onchange="campFilter.cat=this.value;browserPage=0;renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])" '
+    +'style="background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:6px 10px;font-family:\'Barlow\',sans-serif;font-size:.82rem;outline:none;border-radius:2px">'
+    +'<option value="all">All Categories</option><option value="past">Past Customers</option><option value="old">Old Inquiries</option>'
+    +'</select>'
+    +'<select onchange="campFilter.minGuests=parseInt(this.value);browserPage=0;renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])" '
+    +'style="background:var(--surface2);border:1px solid var(--border2);color:var(--white);padding:6px 10px;font-family:\'Barlow\',sans-serif;font-size:.82rem;outline:none;border-radius:2px">'
+    +'<option value="0">Any Size</option><option value="25">25+ guests</option><option value="50">50+ guests</option><option value="100">100+ guests</option><option value="200">200+ guests</option>'
+    +'</select>'
+    +'</div>'
+
+    // Action bar
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:var(--mute)">'
+    +notAdded.length+' available &nbsp;&middot;&nbsp; '+addedEmails.size+' already added &nbsp;&middot;&nbsp; '
+    +'<span style="color:var(--orange)">'+browserSelected.size+' selected</span>'
+    +'</div>'
+    +'<div style="display:flex;gap:6px">'
+    +'<button class="btn btn-ghost btn-sm" onclick="selectAllBrowserPage('+JSON.stringify(paginated.map(function(ev){var ct=ev._contact||getContact(ev);return ct.email;}))+')">'
+    +'Select Page</button>'
+    +'<button class="btn btn-ghost btn-sm" onclick="browserSelected=new Set();renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])">Clear</button>'
+    +(browserSelected.size>0?'<button class="btn btn-primary btn-sm" onclick="addSelectedToCampaign()">Add '+browserSelected.size+' to Campaign &rarr;</button>':'')
+    +'</div></div>';
+
+  // Contact rows
+  if(!paginated.length){
+    html+='<div class="empty"><div class="empty-title">No contacts match your filters</div></div>';
+  } else {
+    html+='<div>';
+    paginated.forEach(function(ev){
+      var ct=ev._contact||getContact(ev), raw=ev.raw||ev;
+      var g=parseInt(raw.guest_count)||0;
+      var cat=ev._cat||'', catLabel={closed:'Past Customer',pastDef:'Past Definite',pastTent:'Old Inquiry',pastPros:'Old Inquiry',lost:'Lost'}[cat]||cat;
+      var checked=browserSelected.has(ct.email);
+      html+='<div onclick="toggleBrowserContact(\''+esc(ct.email)+'\',this)" '
+        +'style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;background:'+(checked?'rgba(91,200,255,0.05)':'var(--surface)')+';">'
+        +'<div style="width:18px;height:18px;border:1px solid '+(checked?'var(--orange)':'var(--border2)')+';background:'+(checked?'var(--orange)':'transparent')+';flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:2px">'
+        +(checked?'<span style="color:var(--black);font-size:.65rem;font-weight:900">&#10003;</span>':'')
+        +'</div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-weight:600;font-size:.88rem">'+esc(ct.name||'Unknown')+(ct.company?' <span style="font-weight:400;color:var(--dim)">'+esc(ct.company)+'</span>':'')+'</div>'
+        +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.63rem;color:var(--mute)">'+esc(ct.email||'')+'</div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0">'
+        +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--dim)">'+catLabel+'</div>'
+        +(g?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--mute)">'+g+' guests</div>':'')
+        +(ev._date?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;color:var(--mute)">'+fmtDate(ev._date)+'</div>':'')
+        +'</div></div>';
+    });
+    html+='</div>';
+  }
+
+  // Pagination
+  if(notAdded.length>perPage){
+    html+='<div style="display:flex;gap:8px;justify-content:center;margin-top:14px">';
+    if(page>0)html+='<button class="btn btn-ghost btn-sm" onclick="browserPage='+(page-1)+';renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])">Previous</button>';
+    html+='<span style="font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:var(--mute);line-height:32px">Page '+(page+1)+' of '+Math.ceil(notAdded.length/perPage)+'</span>';
+    if((page+1)*perPage<notAdded.length)html+='<button class="btn btn-ghost btn-sm" onclick="browserPage='+(page+1)+';renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0])">Next</button>';
+    html+='</div>';
+  }
+
+  p.innerHTML=html;
+}
+
+function toggleBrowserContact(email, row){
+  if(browserSelected.has(email)){browserSelected.delete(email);}else{browserSelected.add(email);}
+  // Update checkbox visual without full re-render
+  var box=row.querySelector('div');
+  if(box){
+    var checked=browserSelected.has(email);
+    box.style.border='1px solid '+(checked?'var(--orange)':'var(--border2)');
+    box.style.background=checked?'var(--orange)':'transparent';
+    box.innerHTML=checked?'<span style="color:var(--black);font-size:.65rem;font-weight:900">&#10003;</span>':'';
+    row.style.background=checked?'rgba(91,200,255,0.05)':'var(--surface)';
+  }
+  // Update counter
+  var counter=document.querySelector('[style*="selected"]');
+  if(counter)counter.textContent=browserSelected.size+' selected';
+  // Update add button
+  var actionBar=document.querySelector('[onclick*="addSelectedToCampaign"]');
+  if(actionBar)actionBar.textContent='Add '+browserSelected.size+' to Campaign \u2192';
+}
+
+function selectAllBrowserPage(emails){
+  emails.forEach(function(e){if(e)browserSelected.add(e);});
+  renderContactBrowser(campaigns.filter(function(c){return c.id===activeCampaignId;})[0]);
+}
+
+async function addSelectedToCampaign(){
+  if(!browserSelected.size)return;
+  var camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];if(!camp)return;
+  var btn=document.querySelector('[onclick="addSelectedToCampaign()"]');
+  if(btn){btn.disabled=true;btn.textContent='Adding...';}
+
+  // Build contact objects from pool
+  var emailSet=browserSelected;
+  var contacts=[];
+  browserPool.forEach(function(ev){
+    var ct=ev._contact||getContact(ev);
+    if(!emailSet.has(ct.email))return;
+    var raw=ev.raw||ev;
+    contacts.push({
+      email:ct.email, name:ct.name, company:ct.company||'',
+      event_id:String(ev.id),
+      event_history:{status:(ev.status||'').toUpperCase(),date:ev._date||null,guests:parseInt(raw.guest_count)||0,location:ev.location_name||(raw.location&&raw.location.name)||'',description:raw.name||ev.name||''}
+    });
+  });
+
+  // Add in batches
+  for(var i=0;i<contacts.length;i+=100){
+    await campPost('add-campaign-contacts',{campaign_id:activeCampaignId,contacts:contacts.slice(i,i+100)});
+  }
+
+  // Reload and show detail
+  campaignContacts=await campGet('get-campaign-contacts','campaign_id='+activeCampaignId+'&limit=500').then(function(d){return d.contacts||[];});
+  var d=await campGet('get-campaigns');campaigns=d.campaigns||[];
+  camp=campaigns.filter(function(c){return c.id===activeCampaignId;})[0];
+  browserSelected=new Set();
+  if(camp)renderCampaignDetail(camp);
+}
+</script>
