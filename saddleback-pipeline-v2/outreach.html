@@ -171,6 +171,7 @@
     <button class="tab"        onclick="showTab('lost')"     id="tab-lost">Old Inquiries <span class="badge" id="bg-lost">-</span></button>
     <button class="tab"        onclick="showTab('years')"    id="tab-years">2026 / 2027</button>
     <button class="tab"        onclick="showTab('queue')"    id="tab-queue">Queue <span class="badge" id="bg-queue">0</span></button>
+    <button class="tab"        onclick="showTab('campaigns')" id="tab-campaigns">Campaigns <span class="badge hot" id="bg-campaigns">&#9733;</span></button>
     <button class="tab"        onclick="showTab('debug')"    id="tab-debug">Debug</button>
   </div>
   <div id="pane-cmd"></div>
@@ -181,6 +182,7 @@
   <div id="pane-lost"     style="display:none"></div>
   <div id="pane-years"    style="display:none"></div>
   <div id="pane-queue"    style="display:none"></div>
+  <div id="pane-campaigns" style="display:none"></div>
   <div id="pane-debug"    style="display:none"></div>
 </div>
 
@@ -723,7 +725,7 @@ function buildOutreach(leads,bookings,accounts,contacts){
 // ── TABS ──────────────────────────────────────────────────────────────────────
 function showTab(t){
   activeTab=t;
-  ['cmd','tent','prospect','definite','closed','lost','years','queue','debug'].forEach(function(x){
+  ['cmd','tent','prospect','definite','closed','lost','years','queue','campaigns','debug'].forEach(function(x){
     document.getElementById('pane-'+x).style.display=x===t?'block':'none';
     document.getElementById('tab-'+x).classList.toggle('active',x===t);
   });
@@ -738,6 +740,7 @@ function renderTab(t){
   else if(t==='lost')renderOld();
   else if(t==='years')renderYears();
   else if(t==='queue')renderQueue();
+  else if(t==='campaigns')renderCampaigns();
   else if(t==='debug')renderDebug();
 }
 function updateBadges(){
