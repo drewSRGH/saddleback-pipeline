@@ -668,7 +668,7 @@ async function loadFromDB(){
 }
 
 async function loadRows(table,select,order){
-  const all=[];let offset=0;const limit=2000;
+  const all=[];let offset=0;const limit=1000; // Supabase max is 1000/request
   while(true){
     let qs=`select=${select||'*'}&limit=${limit}&offset=${offset}`;
     if(order)qs+=`&order=${order}`;
