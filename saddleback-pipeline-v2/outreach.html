@@ -3,142 +3,491 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Saddleback — Sales Command Center</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>SRG — Catering Command</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0f0f0e;--s:#181817;--s2:#1f1f1d;--b:#2a2a27;--b2:#333330;--t:#f0ede8;--m:#8a8780;--m2:#5a5855;--a:#e8772a;--a2:#f5a623;--g:#4caf7d;--r:#e05252;--y:#f5a623;--bl:#5b8dee;--pu:#9b7edb;--te:#3dbdb0;}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;font-size:14px;line-height:1.5}
-    nav{display:flex;align-items:center;padding:0 22px;background:var(--s);border-bottom:1px solid var(--b);height:52px;position:sticky;top:0;z-index:50}
-    .nb{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:600;color:var(--a2);margin-right:24px;text-decoration:none}
-    .nt{display:flex}
-    .ntb{padding:0 13px;height:52px;display:flex;align-items:center;font-size:.81rem;font-weight:500;color:var(--m);border-bottom:2px solid transparent;transition:color .15s;text-decoration:none}
-    .ntb:hover{color:var(--t)}.ntb.active{color:var(--t);border-bottom-color:var(--a)}
-    .nr{margin-left:auto;display:flex;align-items:center;gap:9px}
-    .page{padding:16px 22px;max-width:1500px;margin:0 auto}
-    .tabs{display:flex;gap:1px;border-bottom:1px solid var(--b);margin-bottom:18px;overflow-x:auto}
-    .tab{padding:9px 14px;font-size:.79rem;font-weight:500;color:var(--m);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:color .15s}
-    .tab:hover{color:var(--t)}.tab.active{color:var(--t);border-bottom-color:var(--a);font-weight:600}
-    .bge{display:inline-block;border-radius:20px;padding:1px 6px;font-size:.63rem;font-family:'DM Mono',monospace;margin-left:3px}
-    .bge.g{background:rgba(76,175,125,.15);color:var(--g)}.bge.y{background:rgba(245,166,35,.15);color:var(--y)}
-    .bge.r{background:rgba(224,82,82,.15);color:var(--r)}.bge.b{background:rgba(91,141,238,.15);color:var(--bl)}
-    .bge.m{background:rgba(90,88,85,.2);color:var(--m)}.bge.a{background:rgba(232,119,42,.15);color:var(--a)}
-    .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:18px}
-    .sc{background:var(--s);border:1px solid var(--b);border-radius:9px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
-    .sc:hover{border-color:var(--b2)}.sn{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;line-height:1}
-    .sl{font-size:.64rem;color:var(--m);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-top:3px}
-    .pw{background:var(--s);border:1px solid var(--b);border-radius:7px;padding:11px 15px;margin-bottom:16px}
-    .pl{font-size:.74rem;color:var(--m);margin-bottom:6px;font-family:'DM Mono',monospace}
-    .pb{background:var(--s2);border-radius:3px;height:4px;overflow:hidden}
-    .pf{height:100%;background:var(--a);border-radius:3px;transition:width .3s}
-    .sm{font-size:.76rem;padding:8px 12px;border-radius:7px;margin-bottom:13px;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:7px}
-    .sm.ld{background:rgba(91,141,238,.1);color:var(--bl);border:1px solid rgba(91,141,238,.2)}
-    .sm.ok{background:rgba(76,175,125,.1);color:var(--g);border:1px solid rgba(76,175,125,.2)}
-    .sm.er{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
-    .sm.wa{background:rgba(245,166,35,.1);color:var(--y);border:1px solid rgba(245,166,35,.2)}
-    .btn{border:none;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-    .ba{background:var(--a);color:#fff;padding:6px 13px;font-size:.79rem}.ba:hover{background:#f08030}
-    .ba:disabled{background:var(--b2);color:var(--m2);cursor:not-allowed}
-    .bgh{background:transparent;color:var(--m);border:1px solid var(--b2);padding:5px 10px;font-size:.74rem}
-    .bgh:hover{color:var(--t);border-color:var(--m)}
-    .bgg{background:var(--g);color:#fff;padding:6px 12px;font-size:.76rem}.bgg:hover{background:#3d9d6a}
-    .br{background:transparent;color:var(--r);border:1px solid rgba(224,82,82,.3);padding:4px 8px;font-size:.71rem}
-    .bs{padding:4px 9px;font-size:.71rem}
-    .pill{font-size:.63rem;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;white-space:nowrap;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
-    .pill-tent{background:rgba(245,166,35,.15);color:var(--y);border:1px solid rgba(245,166,35,.3)}
-    .pill-def{background:rgba(76,175,125,.15);color:var(--g);border:1px solid rgba(76,175,125,.3)}
-    .pill-closed{background:rgba(91,141,238,.15);color:var(--bl);border:1px solid rgba(91,141,238,.3)}
-    .pill-prosp{background:rgba(155,126,219,.15);color:var(--pu);border:1px solid rgba(155,126,219,.3)}
-    .pill-lost{background:rgba(224,82,82,.1);color:var(--r);border:1px solid rgba(224,82,82,.2)}
-    .pill-past{background:rgba(90,88,85,.15);color:var(--m);border:1px solid rgba(90,88,85,.3)}
-    .opp{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:8px;transition:border-color .15s}
-    .opp:hover{border-color:var(--b2)}
-    .opp.urgent{border-left:3px solid var(--y)}.opp.high{border-left:3px solid var(--a)}
-    .opp.med{border-left:3px solid var(--bl)}.opp.low{border-left:3px solid var(--m2)}
-    .opp.past-card{border-left:3px solid var(--m2)}
-    .opp-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
-    .opp-name{font-weight:600;font-size:.9rem}.opp-co{font-size:.72rem;color:var(--m);margin-top:1px}
-    .opp-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.69rem;color:var(--m2);font-family:'DM Mono',monospace;margin-bottom:8px}
-    .opp-meta span{color:var(--m)}
-    .opp-action{background:rgba(232,119,42,.06);border:1px solid rgba(232,119,42,.15);border-radius:6px;padding:7px 10px;font-size:.75rem;color:var(--m);margin-bottom:9px;line-height:1.5}
-    .opp-action strong{color:var(--a2)}
-    .opp-footer{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--b)}
-    .score{font-size:.65rem;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:20px}
-    .score-high{background:rgba(245,166,35,.15);color:var(--y)}
-    .score-med{background:rgba(91,141,238,.12);color:var(--bl)}
-    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-    .sec-title{font-family:'Fraunces',serif;font-size:1rem;font-weight:600;color:var(--t)}
-    .yr-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
-    .yr-col{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:14px}
-    .yr-col-hdr{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--b)}
-    .draft-body{background:var(--s2);border-radius:6px;padding:10px 12px;font-size:.78rem;line-height:1.65;color:var(--m);white-space:pre-wrap;max-height:140px;overflow-y:auto;border-left:3px solid var(--b2);margin:8px 0}
-    .risk{background:rgba(224,82,82,.07);border:1px solid rgba(224,82,82,.2);border-radius:5px;padding:5px 9px;font-size:.7rem;color:var(--r);margin-bottom:5px}
-    .setup{background:rgba(91,141,238,.07);border:1px solid rgba(91,141,238,.2);border-radius:10px;padding:17px 20px;margin-bottom:18px}
-    .setup h3{font-size:.92rem;font-weight:600;color:var(--bl);margin-bottom:9px}
-    .setup ol{padding-left:16px;font-size:.8rem;color:var(--m);line-height:2.1}
-    code{background:var(--s2);padding:1px 6px;border-radius:3px;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--t)}
-    .emp{text-align:center;padding:40px 20px;color:var(--m2)}
-    .emp-i{font-size:1.6rem;margin-bottom:8px;opacity:.4}
-    .emp h3{font-size:.88rem;color:var(--m);margin-bottom:4px}
-    .sp2{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    input[type=text]{background:var(--s);border:1px solid var(--b);color:var(--t);padding:6px 10px;border-radius:6px;font-size:.77rem;font-family:'DM Sans',sans-serif;outline:none}
-    input[type=text]:focus{border-color:var(--a)}input::placeholder{color:var(--m2)}
-    .dbg{background:var(--s);border:1px solid var(--b2);border-radius:7px;padding:13px;font-family:'DM Mono',monospace;font-size:.71rem;color:var(--m);white-space:pre-wrap;line-height:1.6;max-height:500px;overflow-y:auto}
-    .wfl{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
-    .wfi{font-size:.65rem;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:20px}
-    .notice{background:rgba(61,189,176,.07);border:1px solid rgba(61,189,176,.2);border-radius:8px;padding:10px 14px;font-size:.76rem;color:var(--te);margin-bottom:14px}
-    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-    @media(max-width:900px){.two-col{grid-template-columns:1fr}.yr-grid{grid-template-columns:1fr}}
-    hr.div{border:none;border-top:1px solid var(--b);margin:20px 0}
-    #mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);z-index:100;justify-content:center;align-items:center;padding:20px}
-    #mo.open{display:flex}
-    #md{background:var(--s);border:1px solid var(--b2);border-radius:14px;width:100%;max-width:640px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.5)}
-    .mh{padding:15px 20px 12px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
-    .mh h2{font-family:'Fraunces',serif;font-size:.95rem;font-weight:600}
-    .mc{background:none;border:none;color:var(--m);cursor:pointer;font-size:1rem}
-    .ms-w{padding:8px 20px;border-bottom:1px solid var(--b)}
-    .ms-l{font-size:.61rem;text-transform:uppercase;letter-spacing:.08em;color:var(--m2);margin-bottom:3px;font-weight:700}
-    #msub{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:5px;color:var(--t);padding:6px 10px;font-size:.81rem;font-family:'DM Sans',sans-serif;outline:none}
-    .mb{padding:12px 20px;flex:1;overflow-y:auto}
-    #memail{width:100%;min-height:220px;background:var(--s2);border:1px solid var(--b);border-radius:6px;color:var(--t);padding:12px;font-size:.79rem;line-height:1.65;resize:vertical;font-family:'DM Sans',sans-serif;outline:none}
-    .mf{padding:10px 20px;border-top:1px solid var(--b);display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
-    .mf button{padding:7px 15px;border-radius:6px;font-size:.79rem;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif}
-    #bam{background:var(--g);color:#fff}#bcm{background:var(--a);color:#fff}
-    #bclm{background:var(--s2);color:var(--m);border:1px solid var(--b2)}
+    :root {
+      --black: #050507;
+      --surface: #0c0c0f;
+      --surface2: #131318;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --white: #ffffff;
+      --dim: #888892;
+      --mute: #3a3a45;
+      --orange: #e8722a;
+      --orange-dim: rgba(232,114,42,0.15);
+      --orange-border: rgba(232,114,42,0.3);
+      --green: #00e87a;
+      --green-dim: rgba(0,232,122,0.1);
+      --red: #ff3f3f;
+      --red-dim: rgba(255,63,63,0.1);
+      --yellow: #ffaa00;
+      --yellow-dim: rgba(255,170,0,0.1);
+      --blue: #4d8fff;
+      --blue-dim: rgba(77,143,255,0.1);
+      --purple: #9d7cff;
+      --purple-dim: rgba(157,124,255,0.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--black);
+      color: var(--white);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      height: 56px;
+      background: rgba(5,5,7,0.95);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .nav-brand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      margin-right: 32px;
+    }
+    .nav-brand span { color: var(--orange); }
+    .nav-links { display: flex; }
+    .nav-link {
+      padding: 0 14px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      font-size: .78rem;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-link:hover { color: var(--white); }
+    .nav-link.active { color: var(--white); border-bottom-color: var(--orange); }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .sync-label { font-family: 'IBM Plex Mono', monospace; font-size: .68rem; color: var(--mute); }
+
+    /* ── LAYOUT ── */
+    .page { padding: 20px 28px; max-width: 1600px; margin: 0 auto; }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .72rem;
+      padding: 9px 14px;
+      border-radius: 3px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-bar.ld { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,143,255,.2); }
+    .status-bar.ok { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,232,122,.2); }
+    .status-bar.er { background: var(--red-dim); color: var(--red); border: 1px solid rgba(255,63,63,.2); }
+    .status-bar.wa { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(255,170,0,.2); }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { margin-bottom: 16px; display: none; }
+    .progress-label { font-family: 'IBM Plex Mono', monospace; font-size: .7rem; color: var(--dim); margin-bottom: 6px; }
+    .progress-track { height: 2px; background: var(--surface2); }
+    .progress-fill { height: 100%; background: var(--orange); transition: width .3s; }
+
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+      gap: 0;
+    }
+    .tab {
+      padding: 12px 16px;
+      font-size: .73rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--mute);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      font-family: 'Barlow', sans-serif;
+      transition: color .15s, border-color .15s;
+    }
+    .tab:hover { color: var(--dim); }
+    .tab.active { color: var(--white); border-bottom-color: var(--orange); }
+    .badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .6rem;
+      padding: 1px 5px;
+      border-radius: 2px;
+      margin-left: 5px;
+      background: var(--surface2);
+      color: var(--dim);
+    }
+    .badge.hot { background: var(--orange-dim); color: var(--orange); }
+    .badge.live { background: var(--green-dim); color: var(--green); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'Barlow', sans-serif;
+      font-weight: 600;
+      font-size: .72rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      border-radius: 2px;
+      transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--orange); color: #fff; padding: 8px 16px; }
+    .btn-primary:hover { background: #ff7f35; }
+    .btn-primary:disabled { background: var(--mute); cursor: not-allowed; }
+    .btn-ghost { background: transparent; color: var(--dim); border: 1px solid var(--border2); padding: 7px 12px; }
+    .btn-ghost:hover { color: var(--white); border-color: var(--dim); }
+    .btn-success { background: var(--green); color: var(--black); padding: 7px 12px; }
+    .btn-success:hover { background: #00ff88; }
+    .btn-danger { background: transparent; color: var(--red); border: 1px solid rgba(255,63,63,.25); padding: 6px 10px; font-size: .68rem; }
+    .btn-sm { padding: 5px 10px; font-size: .68rem; }
+
+    /* ── STAT GRID ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-bottom: 24px; }
+    .stat-cell {
+      background: var(--surface);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .stat-cell:hover { background: var(--surface2); }
+    .stat-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--white);
+      letter-spacing: -.01em;
+    }
+    .stat-num.orange { color: var(--orange); }
+    .stat-num.green { color: var(--green); }
+    .stat-num.red { color: var(--red); }
+    .stat-num.yellow { color: var(--yellow); }
+    .stat-num.blue { color: var(--blue); }
+    .stat-num.purple { color: var(--purple); }
+    .stat-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--mute);
+      margin-top: 5px;
+    }
+
+    /* ── SECTION HEADER ── */
+    .sec-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sec-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .sec-title-big {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    /* ── EVENT CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 1px;
+      transition: border-color .15s, background .15s;
+      position: relative;
+    }
+    .card:hover { background: var(--surface2); border-color: var(--border2); }
+    .card.urgent { border-left: 3px solid var(--yellow); }
+    .card.high   { border-left: 3px solid var(--orange); }
+    .card.med    { border-left: 3px solid var(--blue); }
+    .card.low    { border-left: 3px solid var(--mute); }
+    .card.past   { border-left: 3px solid var(--mute); opacity: .85; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+    .card-name { font-weight: 600; font-size: .95rem; letter-spacing: .01em; }
+    .card-co { font-size: .74rem; color: var(--dim); margin-top: 2px; }
+    .card-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .score-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .65rem;
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .score-high { background: var(--yellow-dim); color: var(--yellow); }
+    .score-med  { background: var(--blue-dim); color: var(--blue); }
+
+    /* ── STATUS DOT ── */
+    .status-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+    .status-dot::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .sd-tent   { background: var(--yellow-dim);  color: var(--yellow); } .sd-tent::before  { background: var(--yellow); }
+    .sd-prosp  { background: var(--purple-dim);  color: var(--purple); } .sd-prosp::before { background: var(--purple); }
+    .sd-def    { background: var(--green-dim);   color: var(--green);  } .sd-def::before   { background: var(--green); }
+    .sd-closed { background: var(--blue-dim);    color: var(--blue);   } .sd-closed::before{ background: var(--blue); }
+    .sd-lost   { background: var(--red-dim);     color: var(--red);    } .sd-lost::before  { background: var(--red); }
+    .sd-past   { background: var(--surface2);    color: var(--mute);   } .sd-past::before  { background: var(--mute); }
+
+    /* ── CARD META ── */
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .67rem;
+      color: var(--mute);
+      margin-bottom: 10px;
+    }
+    .card-meta-item { display: flex; flex-direction: column; gap: 1px; }
+    .card-meta-label { font-size: .57rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); opacity: .6; }
+    .card-meta-value { color: var(--dim); }
+    .card-meta-value.hot { color: var(--red); }
+    .card-meta-value.warm { color: var(--yellow); }
+
+    /* ── ACTION HINT ── */
+    .card-action {
+      background: rgba(232,114,42,0.05);
+      border-left: 2px solid var(--orange);
+      padding: 8px 12px;
+      font-size: .76rem;
+      color: var(--dim);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .card-action strong { color: var(--orange); font-weight: 600; }
+
+    /* ── CARD FOOTER ── */
+    .card-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border); }
+    .in-queue-badge { font-family: 'IBM Plex Mono', monospace; font-size: .65rem; color: var(--green); letter-spacing: .05em; }
+
+    /* ── TWO COL ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+    @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .yr-grid { grid-template-columns: 1fr; } }
+
+    /* ── YEAR GRID ── */
+    .yr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+    .yr-col { background: var(--surface); padding: 16px; }
+    .yr-col-hdr {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .yr-item { padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .yr-item:last-child { border-bottom: none; }
+    .yr-item-name { font-size: .83rem; font-weight: 600; margin-bottom: 2px; }
+    .yr-item-co { font-size: .7rem; color: var(--dim); }
+    .yr-item-meta { font-family: 'IBM Plex Mono', monospace; font-size: .63rem; color: var(--mute); margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .yr-item-actions { margin-top: 6px; display: flex; gap: 5px; }
+
+    /* ── EMPTY STATE ── */
+    .empty { text-align: center; padding: 48px 20px; }
+    .empty-icon { font-size: 1.4rem; opacity: .2; margin-bottom: 10px; }
+    .empty-title { font-size: .82rem; color: var(--dim); margin-bottom: 4px; font-weight: 500; }
+    .empty-sub { font-size: .74rem; color: var(--mute); }
+
+    /* ── SETUP ── */
+    .setup {
+      border: 1px solid rgba(77,143,255,.2);
+      background: var(--blue-dim);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .setup h3 { font-size: .85rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--blue); margin-bottom: 12px; }
+    .setup ol { padding-left: 16px; font-size: .8rem; color: var(--dim); line-height: 2.2; }
+    code { font-family: 'IBM Plex Mono', monospace; font-size: .76rem; background: var(--surface2); padding: 1px 6px; border-radius: 2px; color: var(--white); }
+
+    /* ── QUEUE ── */
+    .queue-legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .queue-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .6rem;
+      padding: 3px 8px;
+      border-radius: 2px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .draft-preview {
+      background: var(--surface2);
+      border-left: 2px solid var(--mute);
+      padding: 10px 12px;
+      font-size: .77rem;
+      line-height: 1.6;
+      color: var(--dim);
+      white-space: pre-wrap;
+      max-height: 120px;
+      overflow-y: auto;
+      margin: 8px 0;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* ── NOTICE ── */
+    .notice { background: rgba(0,232,122,.06); border: 1px solid rgba(0,232,122,.15); padding: 10px 14px; font-size: .76rem; color: rgba(0,232,122,.8); margin-bottom: 14px; }
+    .warn-notice { background: var(--yellow-dim); border: 1px solid rgba(255,170,0,.2); padding: 8px 12px; font-size: .74rem; color: var(--yellow); margin-bottom: 13px; }
+
+    /* ── DEBUG ── */
+    .debug-box { background: var(--surface); border: 1px solid var(--border); padding: 16px; font-family: 'IBM Plex Mono', monospace; font-size: .69rem; color: var(--dim); white-space: pre-wrap; line-height: 1.7; max-height: 600px; overflow-y: auto; }
+
+    /* ── DIVIDER ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ── SPINNER ── */
+    .spin {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border: 1.5px solid rgba(255,255,255,.2);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MODAL ── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    #modal-overlay.open { display: flex; }
+    #modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      width: 100%;
+      max-width: 660px;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-head {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .modal-close { background: none; border: none; color: var(--dim); cursor: pointer; font-size: 1rem; }
+    .modal-close:hover { color: var(--white); }
+    .modal-subject { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+    .modal-subject-label { font-family: 'IBM Plex Mono', monospace; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin-bottom: 5px; }
+    #modal-sub { width: 100%; background: var(--surface2); border: 1px solid var(--border2); color: var(--white); padding: 7px 10px; font-size: .82rem; font-family: 'Barlow', sans-serif; outline: none; border-radius: 2px; }
+    #modal-sub:focus { border-color: var(--orange); }
+    .modal-body { padding: 14px 20px; flex: 1; overflow-y: auto; }
+    #modal-body-text { width: 100%; min-height: 220px; background: var(--surface2); border: 1px solid var(--border2); color: var(--white); padding: 12px; font-size: .8rem; line-height: 1.7; resize: vertical; font-family: 'Barlow', sans-serif; outline: none; border-radius: 2px; }
+    #modal-body-text:focus { border-color: var(--orange); }
+    .modal-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; gap: 7px; justify-content: flex-end; flex-wrap: wrap; }
+    .risk-flag { background: var(--red-dim); border: 1px solid rgba(255,63,63,.2); padding: 5px 10px; font-size: .7rem; color: var(--red); margin-bottom: 5px; }
   </style>
 </head>
 <body>
+
 <nav>
-  <a class="nb" href="/">🔥 Saddleback SRG</a>
-  <div class="nt">
-    <a href="/" class="ntb">Pipeline</a>
-    <a href="/analytics.html" class="ntb">Analytics</a>
-    <a href="/outreach.html" class="ntb active">Outreach</a>
+  <a class="nav-brand" href="/">SRG <span>//</span> Catering</a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Pipeline</a>
+    <a href="/analytics.html" class="nav-link">Analytics</a>
+    <a href="/outreach.html" class="nav-link active">Outreach</a>
   </div>
-  <div class="nr">
-    <span style="font-size:.68rem;color:var(--m2);font-family:'DM Mono',monospace" id="last-sync-label"></span>
-    <button class="btn bgh bs" onclick="doFullSync()" id="btn-sync">↻ Full Sync</button>
+  <div class="nav-right">
+    <span class="sync-label" id="sync-label"></span>
+    <button class="btn btn-ghost btn-sm" onclick="doFullSync()" id="btn-sync">↻ Sync</button>
   </div>
 </nav>
 
 <div class="page">
-  <div id="status-msg" style="display:none"></div>
-  <div id="progress-wrap" style="display:none" class="pw">
-    <div class="pl" id="pl">Loading…</div>
-    <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="status-bar" id="status-bar"></div>
+  <div class="progress-wrap" id="progress-wrap">
+    <div class="progress-label" id="progress-label">Loading…</div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
+
   <div class="tabs">
     <button class="tab active" onclick="showTab('cmd')"      id="tab-cmd">Command Center</button>
-    <button class="tab"        onclick="showTab('tent')"     id="tab-tent">Future Tentative <span class="bge y" id="bg-tent">—</span></button>
-    <button class="tab"        onclick="showTab('prospect')" id="tab-prospect">Future Prospects <span class="bge b" id="bg-prospect">—</span></button>
-    <button class="tab"        onclick="showTab('definite')" id="tab-definite">Upcoming Definite <span class="bge g" id="bg-definite">—</span></button>
-    <button class="tab"        onclick="showTab('closed')"   id="tab-closed">Past Customers <span class="bge a" id="bg-closed">—</span></button>
-    <button class="tab"        onclick="showTab('lost')"     id="tab-lost">Old Inquiries <span class="bge r" id="bg-lost">—</span></button>
+    <button class="tab"        onclick="showTab('tent')"     id="tab-tent">Tentative <span class="badge hot" id="bg-tent">—</span></button>
+    <button class="tab"        onclick="showTab('prospect')" id="tab-prospect">Prospects <span class="badge" id="bg-prospect">—</span></button>
+    <button class="tab"        onclick="showTab('definite')" id="tab-definite">Definite <span class="badge live" id="bg-definite">—</span></button>
+    <button class="tab"        onclick="showTab('closed')"   id="tab-closed">Past Customers <span class="badge" id="bg-closed">—</span></button>
+    <button class="tab"        onclick="showTab('lost')"     id="tab-lost">Old Inquiries <span class="badge" id="bg-lost">—</span></button>
     <button class="tab"        onclick="showTab('years')"    id="tab-years">2026 / 2027</button>
-    <button class="tab"        onclick="showTab('queue')"    id="tab-queue">Email Queue <span class="bge g" id="bg-queue">0</span></button>
-    <button class="tab"        onclick="showTab('debug')"    id="tab-debug">Debug / Sync</button>
+    <button class="tab"        onclick="showTab('queue')"    id="tab-queue">Queue <span class="badge" id="bg-queue">0</span></button>
+    <button class="tab"        onclick="showTab('debug')"    id="tab-debug">Debug</button>
   </div>
+
   <div id="pane-cmd"></div>
   <div id="pane-tent"     style="display:none"></div>
   <div id="pane-prospect" style="display:none"></div>
@@ -150,200 +499,182 @@
   <div id="pane-debug"    style="display:none"></div>
 </div>
 
-<div id="mo">
-  <div id="md">
-    <div class="mh"><h2 id="mt">Review Draft</h2><button class="mc" onclick="closeModal()">✕</button></div>
-    <div class="ms-w"><div class="ms-l">Subject</div><input type="text" id="msub" placeholder="Subject…"></div>
-    <div class="mb"><div id="risk-display" style="margin-bottom:8px"></div><textarea id="memail"></textarea></div>
-    <div class="mf">
-      <button id="bclm" onclick="closeModal()">Close</button>
-      <button id="bcm"  onclick="copyModal()">Copy</button>
-      <button id="bam"  onclick="approveFromModal()">✓ Approve</button>
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Review Draft</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-subject">
+      <div class="modal-subject-label">Subject</div>
+      <input type="text" id="modal-sub" placeholder="Subject line…">
+    </div>
+    <div class="modal-body">
+      <div id="modal-risks" style="margin-bottom:8px"></div>
+      <textarea id="modal-body-text"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn btn-ghost" onclick="copyModal()">Copy</button>
+      <button class="btn btn-success" onclick="approveFromModal()">✓ Approve</button>
     </div>
   </div>
 </div>
 
 <script>
-const API_TS='/.netlify/functions/tripleseat';
-const API_AI='/.netlify/functions/ai';
-const API_ST='/.netlify/functions/store';
-const TS_PLACEHOLDER='2000-01-01'; // TripleSeat fake date for "no date set"
+const API_TS='/.netlify/functions/tripleseat', API_AI='/.netlify/functions/ai', API_ST='/.netlify/functions/store';
+const TS_PLACEHOLDER='2000-01-01';
 
-let allEvents=[],pipeline={},queue=[],activeTab='cmd',dbConfigured=false,modalQueueId=null;
+let allEvents=[], pipeline={}, queue=[], activeTab='cmd', dbConfigured=false, modalQueueId=null;
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function daysAgo(d){if(!d)return null;const n=new Date(d);return isNaN(n)?null:Math.floor((Date.now()-n)/86400000);}
-function daysUntil(d){if(!d)return null;const n=new Date(d);return isNaN(n)?null:Math.floor((n-Date.now())/86400000);}
-function fmtDate(d){if(!d)return null;try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(e){return String(d);}}
-function setStatus(msg,type='ld'){const el=document.getElementById('status-msg');if(!msg){el.style.display='none';return;}el.className='sm '+type;el.innerHTML=msg;el.style.display='flex';}
-function setProgress(pct,label){document.getElementById('progress-wrap').style.display='block';document.getElementById('pf').style.width=pct+'%';document.getElementById('pl').textContent=label;}
-function hideProgress(){setTimeout(()=>document.getElementById('progress-wrap').style.display='none',2000);}
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const daysAgo=d=>{if(!d)return null;const n=new Date(d);return isNaN(n)?null:Math.floor((Date.now()-n)/86400000);};
+const daysUntil=d=>{if(!d)return null;const n=new Date(d);return isNaN(n)?null:Math.floor((n-Date.now())/86400000);};
+const fmtDate=d=>{if(!d)return null;try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(e){return String(d);}};
 
-// ── DATE LOGIC ────────────────────────────────────────────────────────────────
+function setStatus(msg,type='ld'){
+  const el=document.getElementById('status-bar');
+  if(!msg){el.style.display='none';return;}
+  el.className='status-bar '+type; el.innerHTML=msg; el.style.display='flex';
+}
+function setProgress(pct,label){
+  document.getElementById('progress-wrap').style.display='block';
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-label').textContent=label;
+}
+function hideProgress(){setTimeout(()=>document.getElementById('progress-wrap').style.display='none',1500);}
+
+// ── DATE & CONTACT ────────────────────────────────────────────────────────────
 function getEventDate(ev){
   const raw=ev.raw||ev;
   const iso=raw?.event_start_iso8601||ev.event_start||raw?.start_date||null;
   if(!iso)return null;
-  const s=String(iso);
-  return s.startsWith(TS_PLACEHOLDER)?null:s;
+  return String(iso).startsWith(TS_PLACEHOLDER)?null:String(iso);
 }
-function isFutureEvent(ev){const d=getEventDate(ev);return d?new Date(d)>new Date():false;}
+function isFuture(ev){const d=getEventDate(ev);return d?new Date(d)>new Date():false;}
 
-// ── CONTACT EXTRACTION ────────────────────────────────────────────────────────
-// Email lives at raw.contact.email_addresses[0].address — NOT a flat field
-function extractContact(ev){
+function getContact(ev){
   const raw=ev.raw||ev;
-  const c=raw?.contact||{};
-  const a=raw?.account||{};
+  const c=raw?.contact||{}, a=raw?.account||{};
   const email=((c.email_addresses||[])[0]?.address||'').toLowerCase().trim();
   const phone=((c.phone_numbers||[])[0]?.number||'').trim();
   const first=c.first_name||'';
   const last=/^\*+$/.test(c.last_name||'')?'':(c.last_name||'');
   const name=[first,last].filter(Boolean).join(' ')||raw?.post_as||raw?.name||ev.name||'';
-  const company=a.name||c.company||'';
-  return{email,phone,name,first,last,company,contactId:c.id||null};
+  return{email,phone,name,first,last,company:a.name||c.company||''};
 }
 
 // ── PIPELINE ──────────────────────────────────────────────────────────────────
-function getCategory(ev){
+function getCat(ev){
   const s=(ev.status||'').toUpperCase();
-  if(s==='TENTATIVE')return isFutureEvent(ev)?'futureTentative':'pastTentative';
-  if(s==='PROSPECT') return isFutureEvent(ev)?'futureProspect':'pastProspect';
-  if(s==='DEFINITE') return isFutureEvent(ev)?'futureDefinite':'pastDefinite';
+  if(s==='TENTATIVE')return isFuture(ev)?'futureTent':'pastTent';
+  if(s==='PROSPECT') return isFuture(ev)?'futurePros':'pastPros';
+  if(s==='DEFINITE') return isFuture(ev)?'futureDef':'pastDef';
   if(s==='CLOSED')   return 'closed';
   if(s==='LOST')     return 'lost';
   return 'unknown';
 }
+
 function buildPipeline(events){
-  const keys=['futureTentative','futureProspect','futureDefinite','pastDefinite','closed','pastTentative','pastProspect','lost','unknown'];
-  const p=Object.fromEntries(keys.map(k=>[k,[]]));
+  const cats=['futureTent','futurePros','futureDef','pastDef','closed','pastTent','pastPros','lost','unknown'];
+  const p=Object.fromEntries(cats.map(k=>[k,[]]));
   events.forEach(ev=>{
-    const cat=getCategory(ev);
-    const contact=extractContact(ev);
-    const date=getEventDate(ev);
-    const score=scoreEvent(ev);
-    const urgency=score>=140?'urgent':score>=100?'high':score>=70?'med':'low';
+    const cat=getCat(ev), contact=getContact(ev), date=getEventDate(ev);
+    const score=calcScore(ev), urgency=score>=140?'urgent':score>=100?'high':score>=70?'med':'low';
     p[cat].push({...ev,_cat:cat,_contact:contact,_date:date,_score:score,_urgency:urgency});
   });
-  const byDateAsc=(a,b)=>{if(!a._date&&!b._date)return 0;if(!a._date)return 1;if(!b._date)return -1;return new Date(a._date)-new Date(b._date);};
-  const byScoreDesc=(a,b)=>b._score-a._score;
-  const byUpdDesc=(a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0);
-  p.futureTentative.sort(byScoreDesc);p.futureProspect.sort(byScoreDesc);
-  p.futureDefinite.sort(byDateAsc);p.pastDefinite.sort(byUpdDesc);
-  p.closed.sort(byUpdDesc);p.pastTentative.sort(byUpdDesc);p.pastProspect.sort(byUpdDesc);p.lost.sort(byUpdDesc);
+  const byScore=(a,b)=>b._score-a._score;
+  const byDate=(a,b)=>{if(!a._date&&!b._date)return 0;if(!a._date)return 1;if(!b._date)return -1;return new Date(a._date)-new Date(b._date);};
+  const byUpd=(a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0);
+  p.futureTent.sort(byScore); p.futurePros.sort(byScore);
+  p.futureDef.sort(byDate); p.pastDef.sort(byUpd); p.closed.sort(byUpd);
+  p.pastTent.sort(byUpd); p.pastPros.sort(byUpd); p.lost.sort(byUpd);
   return p;
 }
-function scoreEvent(ev){
+
+function calcScore(ev){
   const s=(ev.status||'').toUpperCase();
-  if(!['TENTATIVE','PROSPECT'].includes(s)||!isFutureEvent(ev))return 0;
+  if(!['TENTATIVE','PROSPECT'].includes(s)||!isFuture(ev))return 0;
   const raw=ev.raw||ev;
-  let score=s==='TENTATIVE'?100:60;
-  const ds=daysAgo(ev.updated_at||ev.created_at);
-  const dt=daysUntil(getEventDate(ev));
+  let sc=s==='TENTATIVE'?100:60;
+  const ds=daysAgo(ev.updated_at||ev.created_at), dt=daysUntil(getEventDate(ev));
   const g=parseInt(raw?.guest_count||ev.guest_count)||0;
-  if(s==='TENTATIVE'){if(ds>14)score+=40;else if(ds>7)score+=20;else if(ds>3)score+=10;}
-  else{if(ds>10)score+=30;else if(ds>5)score+=15;}
-  if(dt!==null&&dt>=0){if(dt<=30)score+=40;else if(dt<=90)score+=25;else if(dt<=180)score+=15;else if(dt<=365)score+=8;}
-  if(g>=200)score+=35;else if(g>=100)score+=25;else if(g>=50)score+=15;else if(g>=25)score+=8;
+  if(s==='TENTATIVE'){if(ds>14)sc+=40;else if(ds>7)sc+=20;else if(ds>3)sc+=10;}
+  else{if(ds>10)sc+=30;else if(ds>5)sc+=15;}
+  if(dt!==null&&dt>=0){if(dt<=30)sc+=40;else if(dt<=90)sc+=25;else if(dt<=180)sc+=15;else if(dt<=365)sc+=8;}
+  if(g>=200)sc+=35;else if(g>=100)sc+=25;else if(g>=50)sc+=15;else if(g>=25)sc+=8;
   const nm=(raw?.name||ev.name||'').toLowerCase();
-  if(/wedding|reception/.test(nm))score+=15;
-  if(/corporate|company|staff/.test(nm))score+=10;
-  if(/graduat/.test(nm))score+=10;
-  if(/holiday|christmas/.test(nm))score+=8;
-  return score;
+  if(/wedding|reception/.test(nm))sc+=15;
+  if(/corporate|company|staff/.test(nm))sc+=10;
+  if(/graduat/.test(nm))sc+=10;
+  return sc;
 }
-function suggestAction(ev){
-  const s=(ev.status||'').toUpperCase();
-  const raw=ev.raw||ev;
-  const dt=daysUntil(ev._date||getEventDate(ev));
-  const ds=daysAgo(ev.updated_at||ev.created_at);
+
+function getAction(ev){
+  const s=(ev.status||'').toUpperCase(), raw=ev.raw||ev;
+  const dt=daysUntil(ev._date||getEventDate(ev)), ds=daysAgo(ev.updated_at||ev.created_at);
   const g=parseInt(raw?.guest_count||ev.guest_count)||0;
-  const gStr=g?` (${g} guests)`:'';
-  const dStr=(ev._date||getEventDate(ev))?` on ${fmtDate(ev._date||getEventDate(ev))}`:'';
+  const gStr=g?` (${g} guests)`:'', dStr=(ev._date||getEventDate(ev))?` on ${fmtDate(ev._date||getEventDate(ev))}`:'';
   if(s==='TENTATIVE'){
-    if(dt!==null&&dt>=0&&dt<=30)return`Event${dStr} is only ${dt} days away${gStr}. Ryan should confirm details and lock in the date.`;
-    if(ds>14)return`Tentative${gStr}${dStr} — ${ds} days since last update. Going cold. Check in and ask about locking in the date.`;
-    if(ds>7) return`Tentative${gStr}${dStr} — ${ds} days since update. Good time for a warm check-in.`;
-    return`Tentative${gStr}${dStr}. Follow up to move toward Definite.`;
+    if(dt!==null&&dt>=0&&dt<=30)return`Event${dStr} is ${dt} days away${gStr}. Confirm details and lock in the date.`;
+    if(ds>14)return`${ds} days since last update${gStr}. Going cold — check in now.`;
+    if(ds>7)return`${ds} days since update. Good time for a check-in${gStr}.`;
+    return`Follow up to move toward Definite${gStr}${dStr}.`;
   }
   if(s==='PROSPECT'){
-    if(ds!==null&&ds<=2)return`New inquiry${gStr}${dStr} — just came in. Ryan should respond quickly.`;
-    if(ds>10)return`Prospect quiet for ${ds} days${gStr}. Low-pressure check-in.`;
-    return`Active prospect${gStr}${dStr} — ${ds} days old. Follow up to understand their needs.`;
+    if(ds!==null&&ds<=2)return`New inquiry — just came in${gStr}. Respond quickly.`;
+    if(ds>10)return`Quiet for ${ds} days${gStr}. Low-pressure check-in.`;
+    return`Active prospect${gStr}${dStr} — ${ds} days old. Follow up.`;
   }
   if(s==='DEFINITE'){
-    if(dt!==null&&dt>=0&&dt<=30)return`Event${dStr} is ${dt} days away${gStr}. Check in to confirm all details.`;
-    if(ds>20)return`No contact in ${ds} days. Good time for a service check-in.`;
-    return`Upcoming booked event${gStr}${dStr}.`;
+    if(dt!==null&&dt>=0&&dt<=30)return`${dt} days to event${gStr}. Confirm all details.`;
+    if(ds>20)return`No contact in ${ds} days. Time for a service check-in.`;
+    return`Upcoming event${gStr}${dStr}.`;
   }
   return'';
 }
-function pillClass(status,future){
-  if(!future&&['TENTATIVE','PROSPECT','DEFINITE'].includes(status))return'pill-past';
-  return{TENTATIVE:'pill-tent',PROSPECT:'pill-prosp',DEFINITE:'pill-def',CLOSED:'pill-closed',LOST:'pill-lost'}[status]||'';
-}
-function statusColor(s){return{TENTATIVE:'var(--y)',PROSPECT:'var(--pu)',DEFINITE:'var(--g)',CLOSED:'var(--bl)',LOST:'var(--r)'}[s]||'var(--m)';}
 
-// ── LOAD FROM SUPABASE ────────────────────────────────────────────────────────
-// Queries tables directly — does NOT gate on sync_metadata values.
-// Only shows "no data" if both ts_events and ts_bookings are genuinely empty.
+// STATUS DOT
+function statusDot(status, future){
+  if(!future&&['TENTATIVE','PROSPECT','DEFINITE'].includes(status))return`<span class="status-dot sd-past">${status}</span>`;
+  const m={TENTATIVE:'sd-tent',PROSPECT:'sd-prosp',DEFINITE:'sd-def',CLOSED:'sd-closed',LOST:'sd-lost'};
+  return`<span class="status-dot ${m[status]||''}">${status||'?'}</span>`;
+}
+
+// ── LOAD ──────────────────────────────────────────────────────────────────────
 async function loadFromDB(){
   setStatus('Loading…','ld');
   try{
     const meta=await fetch(`${API_ST}?action=get-metadata`).then(r=>r.json()).catch(()=>({}));
-    if(meta.configured===false||meta.ok===false){
-      dbConfigured=false;renderSetupBanner(meta.error);setStatus('','');return;
-    }
+    if(meta.configured===false||meta.ok===false){dbConfigured=false;renderSetup(meta.error);setStatus('','');return;}
     dbConfigured=true;
-
     setProgress(15,'Loading events…');
-    const evRows=await loadAllRows('ts_events','*','event_start.asc.nullslast');
+    const evRows=await loadRows('ts_events','*','event_start.asc.nullslast');
     let bkRows=[];
-    if(evRows.length===0){
-      setProgress(35,'Loading bookings…');
-      bkRows=await loadAllRows('ts_bookings','*','start_date.asc.nullslast');
-    }
+    if(evRows.length===0){setProgress(35,'Loading bookings…');bkRows=await loadRows('ts_bookings','*','start_date.asc.nullslast');}
     allEvents=evRows.length>0?evRows:bkRows;
-
-    if(allEvents.length===0){
-      setStatus('No data yet. Click "↻ Full Sync" to import from Tripleseat.','wa');
-      hideProgress();renderTab(activeTab);return;
-    }
-    if(evRows.length===0&&bkRows.length>0){
-      setTimeout(()=>setStatus('Using booking data — run Full Sync to load event status data.','wa'),4500);
-    }
-
+    if(allEvents.length===0){setStatus('No data. Click Sync to import from Tripleseat.','wa');hideProgress();renderTab(activeTab);return;}
     setProgress(70,'Building pipeline…');
     pipeline=buildPipeline(allEvents);
-
     setProgress(85,'Loading queue…');
-    const qData=await fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]}));
-    queue=qData.queue||[];
-
-    setProgress(100,'✓ Loaded');
-    hideProgress();
-    if(meta.last_full_sync) document.getElementById('last-sync-label').textContent='Synced '+new Date(meta.last_full_sync).toLocaleDateString();
+    queue=(await fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]}))).queue||[];
+    setProgress(100,'✓');hideProgress();
+    if(meta.last_full_sync) document.getElementById('sync-label').textContent='Synced '+new Date(meta.last_full_sync).toLocaleDateString();
     setStatus(`✓ ${allEvents.length.toLocaleString()} events loaded`,'ok');
-    setTimeout(()=>setStatus('',''),4000);
+    setTimeout(()=>setStatus('',''),3500);
     updateBadges();renderTab(activeTab);
-  }catch(err){
-    console.error('[loadFromDB]',err);
-    setStatus('Load error: '+err.message,'er');
-    renderTab(activeTab);
-  }
+  }catch(err){console.error('[loadFromDB]',err);setStatus('Load error: '+err.message,'er');renderTab(activeTab);}
 }
 
-async function loadAllRows(table,select,order){
-  select=select||'*';const all=[];let offset=0;const limit=2000;
+async function loadRows(table,select,order){
+  const all=[];let offset=0;const limit=2000;
   while(true){
-    let qs=`select=${select}&limit=${limit}&offset=${offset}`;
+    let qs=`select=${select||'*'}&limit=${limit}&offset=${offset}`;
     if(order)qs+=`&order=${order}`;
-    const data=await fetch(`${API_ST}?action=get-table&table=${table}&qs=${encodeURIComponent(qs)}`).then(r=>r.json()).catch(()=>({rows:[]}));
-    const rows=data.rows||[];
-    all.push(...rows);
-    if(rows.length<limit)break;
-    offset+=limit;
+    const d=await fetch(`${API_ST}?action=get-table&table=${table}&qs=${encodeURIComponent(qs)}`).then(r=>r.json()).catch(()=>({rows:[]}));
+    const rows=d.rows||[];all.push(...rows);
+    if(rows.length<limit)break;offset+=limit;
   }
   return all;
 }
@@ -351,57 +682,56 @@ async function loadAllRows(table,select,order){
 // ── FULL SYNC ─────────────────────────────────────────────────────────────────
 async function doFullSync(){
   const btn=document.getElementById('btn-sync');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Syncing…';}
-  setProgress(0,'Starting…');
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span>';}
+  setProgress(0,'Starting sync…');
   try{
-    setProgress(5,'Fetching events…');
-    const evArr=await fetchAllPages('events');
-    setProgress(28,`${evArr.length} events — saving…`);
-    await sbPost('save-events',{events:evArr});
+    setProgress(5,'Fetching events from Tripleseat…');
+    const evArr=await fetchPages('events');
+    setProgress(25,'Saving events…');
+    await batchPost('save-events','events',evArr,50);        // 50/batch — events are large JSON
 
-    setProgress(30,'Fetching bookings…');
-    const bkArr=await fetchAllPages('bookings');
-    setProgress(43,`${bkArr.length} bookings — saving…`);
-    await sbPost('save-bookings',{bookings:bkArr});
+    setProgress(35,'Fetching bookings…');
+    const bkArr=await fetchPages('bookings');
+    setProgress(45,'Saving bookings…');
+    await batchPost('save-bookings','bookings',bkArr,100);   // 100/batch
 
-    setProgress(45,'Fetching accounts…');
-    const acArr=await fetchAllPages('accounts');
-    setProgress(55,`${acArr.length} accounts — saving…`);
-    await sbPost('save-accounts',{accounts:acArr});
+    setProgress(48,'Fetching accounts…');
+    const acArr=await fetchPages('accounts');
+    setProgress(55,'Saving accounts…');
+    await batchPost('save-accounts','accounts',acArr,500);
 
     setProgress(57,'Fetching contacts…');
-    const ctArr=await fetchAllPages('contacts');
-    setProgress(68,`${ctArr.length} contacts — saving…`);
-    await sbPost('save-contacts',{contacts:ctArr});
+    const ctArr=await fetchPages('contacts');
+    setProgress(66,'Saving contacts…');
+    await batchPost('save-contacts','contacts',ctArr,500);
 
-    setProgress(70,'Fetching leads…');
-    const ldArr=await fetchAllPages('leads');
-    setProgress(76,`${ldArr.length} leads — saving…`);
-    await sbPost('save-leads',{leads:ldArr});
+    setProgress(68,'Fetching leads…');
+    const ldArr=await fetchPages('leads');
+    setProgress(75,'Saving leads…');
+    await batchPost('save-leads','leads',ldArr,100);
 
     setProgress(78,'Saving checkpoint…');
     await sbPost('save-sync-checkpoint',{total_events:evArr.length,total_bookings:bkArr.length,total_contacts:ctArr.length,total_accounts:acArr.length,total_leads:ldArr.length});
 
+    // Outreach profiles (non-fatal)
     try{
-      const out=buildLegacyOutreach(ldArr,bkArr,acArr,ctArr);
+      const out=buildOutreach(ldArr,bkArr,acArr,ctArr);
       for(let i=0;i<out.length;i+=300){setProgress(78+Math.round((i/Math.max(out.length,1))*17),'Saving profiles…');await sbPost('save-outreach-contacts',{contacts:out.slice(i,i+300)});}
-    }catch(e){console.warn('outreach profiles non-fatal:',e.message);}
+    }catch(e){console.warn('outreach profiles:',e.message);}
 
     allEvents=evArr.length>0?evArr:bkArr;
     pipeline=buildPipeline(allEvents);
     queue=(await fetch(`${API_ST}?action=get-queue`).then(r=>r.json()).catch(()=>({queue:[]}))).queue||[];
-    setProgress(100,'✓ Done');hideProgress();
-    document.getElementById('last-sync-label').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    setStatus(`✓ ${evArr.length} events, ${ctArr.length} contacts synced`,'ok');
+    setProgress(100,'✓ Complete');hideProgress();
+    document.getElementById('sync-label').textContent='Synced '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    setStatus(`✓ ${evArr.length} events · ${ctArr.length} contacts synced`,'ok');
     setTimeout(()=>setStatus('',''),6000);
     dbConfigured=true;updateBadges();renderTab(activeTab);
-  }catch(err){
-    console.error('[doFullSync]',err);setStatus('Sync error: '+err.message,'er');
-  }
-  if(btn){btn.disabled=false;btn.textContent='↻ Full Sync';}
+  }catch(err){console.error('[sync]',err);setStatus('Sync error: '+err.message,'er');}
+  if(btn){btn.disabled=false;btn.textContent='↻ Sync';}
 }
 
-async function fetchAllPages(endpoint){
+async function fetchPages(endpoint){
   const all=[];let page=1,total=1;
   while(page<=Math.min(total,150)){
     const res=await fetch(`${API_TS}?endpoint=${endpoint}&page=${page}&limit=100`);
@@ -412,13 +742,19 @@ async function fetchAllPages(endpoint){
   }
   return all;
 }
+
+// ── BATCH POST — fixes Netlify 6MB body limit for large TS objects ────────────
+async function batchPost(action, key, items, size){
+  for(let i=0;i<items.length;i+=size) await sbPost(action,{[key]:items.slice(i,i+size)});
+}
 async function sbPost(action,body){
   const res=await fetch(`${API_ST}?action=${action}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const data=await res.json().catch(()=>({}));
-  if(!res.ok||data.ok===false)console.error(`[sbPost] ${action}:`,data.error||res.status);
-  return data;
+  const d=await res.json().catch(()=>({}));
+  if(!res.ok||d.ok===false)console.error(`[store] ${action}:`,d.error||res.status);
+  return d;
 }
-function buildLegacyOutreach(leads,bookings,accounts,contacts){
+
+function buildOutreach(leads,bookings,accounts,contacts){
   const map={},byC={},byA={};
   bookings.forEach(b=>{if(b.contact_id){byC[b.contact_id]=byC[b.contact_id]||[];byC[b.contact_id].push(b);}if(b.account_id){byA[b.account_id]=byA[b.account_id]||[];byA[b.account_id].push(b);}});
   const aMap={};accounts.forEach(a=>aMap[a.id]=a);
@@ -447,273 +783,293 @@ function showTab(t){
 }
 function renderTab(t){
   if(t==='cmd')renderCmd();
-  else if(t==='tent')renderCat('futureTentative');
-  else if(t==='prospect')renderCat('futureProspect');
-  else if(t==='definite')renderCat('futureDefinite');
-  else if(t==='closed')renderPastCustomers();
-  else if(t==='lost')renderOldInquiries();
+  else if(t==='tent')renderCat('futureTent');
+  else if(t==='prospect')renderCat('futurePros');
+  else if(t==='definite')renderCat('futureDef');
+  else if(t==='closed')renderPast();
+  else if(t==='lost')renderOld();
   else if(t==='years')renderYears();
   else if(t==='queue')renderQueue();
   else if(t==='debug')renderDebug();
 }
 function updateBadges(){
   const p=pipeline;
-  document.getElementById('bg-tent').textContent=(p.futureTentative||[]).length;
-  document.getElementById('bg-prospect').textContent=(p.futureProspect||[]).length;
-  document.getElementById('bg-definite').textContent=(p.futureDefinite||[]).length;
-  document.getElementById('bg-closed').textContent=(p.closed||[]).length+(p.pastDefinite||[]).length;
-  document.getElementById('bg-lost').textContent=(p.lost||[]).length+(p.pastTentative||[]).length+(p.pastProspect||[]).length;
+  document.getElementById('bg-tent').textContent=(p.futureTent||[]).length;
+  document.getElementById('bg-prospect').textContent=(p.futurePros||[]).length;
+  document.getElementById('bg-definite').textContent=(p.futureDef||[]).length;
+  document.getElementById('bg-closed').textContent=(p.closed||[]).length+(p.pastDef||[]).length;
+  document.getElementById('bg-lost').textContent=(p.lost||[]).length+(p.pastTent||[]).length+(p.pastPros||[]).length;
   document.getElementById('bg-queue').textContent=queue.filter(q=>['needs_review','approved','ready_to_send'].includes(q.status)).length;
 }
-function sc(n,l,color,tab){return`<div class="sc" onclick="${tab?`showTab('${tab}')`:''}" ${!tab?'style="cursor:default"':''}><div class="sn" style="color:${color}">${typeof n==='number'?n.toLocaleString():n}</div><div class="sl">${l}</div></div>`;}
 
 // ── COMMAND CENTER ────────────────────────────────────────────────────────────
 function renderCmd(){
   const p=document.getElementById('pane-cmd');
   if(!dbConfigured){renderSetupPane('pane-cmd');return;}
-  if(!allEvents.length){p.innerHTML=`<div class="emp"><div class="emp-i">⟳</div><h3>No data loaded</h3><p>Click "↻ Full Sync" to import from Tripleseat.</p><br><button class="btn ba" onclick="doFullSync()">Full Sync now</button></div>`;return;}
-  const ft=pipeline.futureTentative||[];
-  const fp=pipeline.futureProspect||[];
-  const fd=pipeline.futureDefinite||[];
-  const pastCust=(pipeline.closed||[]).length+(pipeline.pastDefinite||[]).length;
-  const urgentTent=ft.filter(o=>o._urgency==='urgent'||o._urgency==='high').slice(0,6);
+  if(!allEvents.length){
+    p.innerHTML=`<div class="empty"><div class="empty-icon">◎</div><div class="empty-title">No data loaded</div><div class="empty-sub">Click Sync to import from Tripleseat</div><br><button class="btn btn-primary" onclick="doFullSync()" style="margin:0 auto;display:flex">Sync now</button></div>`;return;
+  }
+  const ft=pipeline.futureTent||[], fp=pipeline.futurePros||[], fd=pipeline.futureDef||[];
+  const pastCust=(pipeline.closed||[]).length+(pipeline.pastDef||[]).length;
+  const urgent=ft.filter(o=>o._urgency==='urgent'||o._urgency==='high').slice(0,5);
+  const staleProsp=fp.filter(o=>daysAgo(o.updated_at)>5).slice(0,4);
   const staleTent=ft.filter(o=>daysAgo(o.updated_at)>7).length;
-  const staleProsp=fp.filter(o=>daysAgo(o.updated_at)>5).slice(0,5);
-  const defTouch=fd.filter(o=>daysAgo(o.updated_at)>20).slice(0,4);
   const yr26=[...ft,...fp,...fd].filter(o=>o._date&&new Date(o._date).getFullYear()===2026);
   const yr27=[...ft,...fp,...fd].filter(o=>o._date&&new Date(o._date).getFullYear()===2027);
-  const totalGuests=ft.reduce((s,o)=>s+(parseInt((o.raw||o).guest_count)||0),0);
-  const readyDrafts=queue.filter(q=>['needs_review','approved'].includes(q.status)).length;
+  const guests=ft.reduce((s,o)=>s+(parseInt((o.raw||o).guest_count)||0),0);
+  const drafts=queue.filter(q=>['needs_review','approved'].includes(q.status)).length;
+
   p.innerHTML=`
-  <div style="margin-bottom:18px">
-    <div style="font-family:'Fraunces',serif;font-size:1.15rem;font-weight:700;margin-bottom:3px">Ryan Sales Command Center</div>
-    <div style="font-size:.75rem;color:var(--m)">Future events only — past events excluded from active pipeline</div>
+  <div style="margin-bottom:24px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">Ryan Sales Command Center</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:.67rem;color:var(--mute);letter-spacing:.08em">FUTURE EVENTS ONLY — PAST EXCLUDED FROM ACTIVE PIPELINE</div>
   </div>
-  <div class="sg">
-    ${sc(ft.length,'Future Tentative','var(--y)','tent')}
-    ${sc(fp.length,'Future Prospects','var(--pu)','prospect')}
-    ${sc(fd.length,'Upcoming Definite','var(--g)','definite')}
-    ${sc(pastCust,'Past Customers','var(--bl)','closed')}
-    ${sc(staleTent,'Stale Tentative','var(--r)','tent')}
-    ${sc(totalGuests?totalGuests.toLocaleString()+' guests':0,'Tent. Guest Total','var(--y)',null)}
-    ${sc(readyDrafts,'Drafts Ready','var(--g)','queue')}
+  <div class="stat-grid">
+    ${sc(ft.length,'Future Tentative','orange','tent')}
+    ${sc(fp.length,'Future Prospects','','prospect')}
+    ${sc(fd.length,'Upcoming Definite','green','definite')}
+    ${sc(pastCust,'Past Customers','blue','closed')}
+    ${sc(staleTent,'Stale Tentative','red','tent')}
+    ${sc(guests?guests.toLocaleString():'—','Tent. Guests','yellow',null)}
+    ${sc(drafts,'Drafts Ready','green','queue')}
   </div>
   <div class="two-col">
     <div>
-      <div class="sec-hdr"><div class="sec-title">🔥 Future Tentative — Follow Up Now</div><button class="btn bgh bs" onclick="showTab('tent')">All ${ft.length} →</button></div>
-      ${ft.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No future tentative events</h3></div>`:(urgentTent.length?urgentTent:ft.slice(0,6)).map(o=>oppCard(o,true)).join('')}
-      <hr class="div">
-      <div class="sec-hdr"><div class="sec-title">📋 Active Prospects</div><button class="btn bgh bs" onclick="showTab('prospect')">All ${fp.length} →</button></div>
-      ${fp.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No active prospects</h3></div>`:(staleProsp.length?staleProsp:fp.slice(0,5)).map(o=>oppCard(o,true)).join('')}
-      ${defTouch.length?`<hr class="div"><div class="sec-hdr"><div class="sec-title">📅 Definite Events Needing Touch</div><button class="btn bgh bs" onclick="showTab('definite')">All ${fd.length} →</button></div>${defTouch.map(o=>oppCard(o,true)).join('')}`:''}
+      <div class="sec-hdr">
+        <div class="sec-title">// Future Tentative — Follow Up Now</div>
+        <button class="btn btn-ghost btn-sm" onclick="showTab('tent')">All ${ft.length} →</button>
+      </div>
+      ${ft.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">✓</div><div class="empty-title">No future tentative events</div></div>`:(urgent.length?urgent:ft.slice(0,5)).map(o=>card(o,true)).join('')}
+
+      <hr class="divider">
+      <div class="sec-hdr">
+        <div class="sec-title">// Active Prospects</div>
+        <button class="btn btn-ghost btn-sm" onclick="showTab('prospect')">All ${fp.length} →</button>
+      </div>
+      ${fp.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No active prospects</div></div>`:(staleProsp.length?staleProsp:fp.slice(0,4)).map(o=>card(o,true)).join('')}
     </div>
     <div>
-      <div class="sec-hdr"><div class="sec-title">📅 2026 Active Leads</div><span style="font-size:.72rem;color:var(--m)">${yr26.length} with dates</span></div>
-      ${yr26.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No 2026 events with dates</h3></div>`:yr26.slice(0,5).map(o=>oppCard(o,false)).join('')}
-      ${yr26.length>5?`<button class="btn bgh bs" style="margin-top:6px" onclick="showTab('years')">+${yr26.length-5} more →</button>`:''}
-      <hr class="div">
-      <div class="sec-hdr"><div class="sec-title">🗓 2027 Active Leads</div><span style="font-size:.72rem;color:var(--m)">${yr27.length} with dates</span></div>
-      ${yr27.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No 2027 events with dates</h3></div>`:yr27.slice(0,5).map(o=>oppCard(o,false)).join('')}
-      ${yr27.length>5?`<button class="btn bgh bs" style="margin-top:6px" onclick="showTab('years')">+${yr27.length-5} more →</button>`:''}
+      <div class="sec-hdr">
+        <div class="sec-title">// 2026 Active Leads</div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">${yr26.length}</span>
+      </div>
+      ${yr26.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No 2026 events with dates</div></div>`:yr26.slice(0,5).map(o=>card(o,false)).join('')}
+      ${yr26.length>5?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showTab('years')">+${yr26.length-5} more</button>`:''}
+
+      <hr class="divider">
+      <div class="sec-hdr">
+        <div class="sec-title">// 2027 Active Leads</div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">${yr27.length}</span>
+      </div>
+      ${yr27.length===0?`<div class="empty" style="padding:24px"><div class="empty-icon">—</div><div class="empty-title">No 2027 events with dates</div></div>`:yr27.slice(0,5).map(o=>card(o,false)).join('')}
+      ${yr27.length>5?`<button class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="showTab('years')">+${yr27.length-5} more</button>`:''}
     </div>
   </div>`;
 }
+function sc(n,l,color,tab){
+  return`<div class="stat-cell" onclick="${tab?`showTab('${tab}')`:''}" ${!tab?'style="cursor:default"':''}>
+    <div class="stat-num ${color}">${typeof n==='number'?n.toLocaleString():n}</div>
+    <div class="stat-label">${l}</div>
+  </div>`;
+}
 
-// ── CATEGORY VIEW ─────────────────────────────────────────────────────────────
+// ── CATEGORY VIEWS ────────────────────────────────────────────────────────────
 function renderCat(cat){
-  const pm={futureTentative:'tent',futureProspect:'prospect',futureDefinite:'definite'};
-  const p=document.getElementById('pane-'+pm[cat]);
+  const pMap={futureTent:'tent',futurePros:'prospect',futureDef:'definite'};
+  const p=document.getElementById('pane-'+pMap[cat]);
   const list=pipeline[cat]||[];
-  const status=cat==='futureTentative'?'TENTATIVE':cat==='futureProspect'?'PROSPECT':'DEFINITE';
-  const hdrs={futureTentative:'Future Tentative — Active Sales Opportunities',futureProspect:'Future Prospects — Current Active Leads',futureDefinite:'Upcoming Definite Events — Booked Business'};
-  const notes={futureTentative:'Warm leads with real future dates. Not committed yet. Ryan\'s top follow-up priority.',futureProspect:'Active inquiries with future event dates. New prospects should hear back within 1-2 days.',futureDefinite:'Booked events with real future dates. Service mode only — no sales emails.'};
-  const totalGuests=list.reduce((s,o)=>s+(parseInt((o.raw||o).guest_count)||0),0);
+  const status=cat==='futureTent'?'TENTATIVE':cat==='futurePros'?'PROSPECT':'DEFINITE';
+  const labels={futureTent:'Future Tentative — Active Sales',futurePros:'Future Prospects — Active Leads',futureDef:'Upcoming Definite — Booked Events'};
+  const notes={futureTent:'Warm leads with real future dates. Not committed yet. Top priority.',futurePros:'Active inquiries with future dates. Follow up within 1-2 days on new ones.',futureDef:'Booked events. Service mode only — no sales emails.'};
+  const guests=list.reduce((s,o)=>s+(parseInt((o.raw||o).guest_count)||0),0);
   const stale=list.filter(o=>daysAgo(o.updated_at)>7).length;
+  const colMap={TENTATIVE:'yellow',PROSPECT:'purple',DEFINITE:'green'};
   p.innerHTML=`
-  <div style="background:${statusColor(status)}0f;border:1px solid ${statusColor(status)}33;border-radius:8px;padding:10px 14px;margin-bottom:16px">
-    <div style="font-size:.82rem;font-weight:600;color:${statusColor(status)};margin-bottom:3px">${hdrs[cat]}</div>
-    <div style="font-size:.75rem;color:var(--m)">${notes[cat]}</div>
+  <div style="border-left:3px solid var(--${colMap[status]});padding-left:14px;margin-bottom:20px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--white);margin-bottom:3px">${labels[cat]}</div>
+    <div style="font-size:.76rem;color:var(--dim)">${notes[cat]}</div>
   </div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:.74rem;font-family:'DM Mono',monospace;color:var(--m2)">
-    <span><span style="color:var(--m)">${list.length}</span> total</span>
-    ${totalGuests?`<span><span style="color:var(--m)">${totalGuests.toLocaleString()}</span> guests</span>`:''}
-    ${stale?`<span><span style="color:var(--r)">${stale}</span> stale 7d+</span>`:''}
+  <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">
+    <span>${list.length} events</span>
+    ${guests?`<span>${guests.toLocaleString()} guests</span>`:''}
+    ${stale?`<span style="color:var(--red)">${stale} stale 7d+</span>`:''}
   </div>
-  ${list.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No events in this category</h3><p>Only future events with real dates appear here.</p></div>`:''}
-  ${list.map(o=>oppCard(o,true)).join('')}`;
+  ${list.length===0?`<div class="empty"><div class="empty-icon">—</div><div class="empty-title">No events in this category</div><div class="empty-sub">Only future events with confirmed dates appear here</div></div>`:''}
+  ${list.map(o=>card(o,true)).join('')}`;
 }
 
 // ── PAST CUSTOMERS ────────────────────────────────────────────────────────────
-function renderPastCustomers(){
+function renderPast(){
   const p=document.getElementById('pane-closed');
-  const all=[...(pipeline.closed||[]),...(pipeline.pastDefinite||[])].sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
+  const all=[...(pipeline.closed||[]),...(pipeline.pastDef||[])].sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
   p.innerHTML=`
-  <div class="notice">Real past customers — Closed events and Definite events with past dates. Best candidates for reactivation and repeat business.</div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:.74rem;font-family:'DM Mono',monospace;color:var(--m2)">
-    <span><span style="color:var(--m)">${all.length}</span> total</span>
-    <span><span style="color:var(--bl)">${(pipeline.closed||[]).length}</span> Closed</span>
-    <span><span style="color:var(--g)">${(pipeline.pastDefinite||[]).length}</span> Past Definite</span>
+  <div class="notice">Real past customers — Closed events and past Definite events. Best candidates for reactivation and repeat business.</div>
+  <div style="display:flex;gap:20px;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute);margin-bottom:16px">
+    <span>${all.length} total</span>
+    <span style="color:var(--blue)">${(pipeline.closed||[]).length} Closed</span>
+    <span style="color:var(--green)">${(pipeline.pastDef||[]).length} Past Definite</span>
   </div>
-  ${all.length===0?`<div class="emp"><div class="emp-i">—</div><h3>No past customers yet</h3><p>Run Full Sync to load Closed and past Definite events.</p></div>`:''}
+  ${all.length===0?`<div class="empty"><div class="empty-icon">—</div><div class="empty-title">No past customers yet</div></div>`:''}
   ${all.map(o=>pastCard(o,'reactivation')).join('')}`;
 }
 
-// ── OLD INQUIRIES / LOST ──────────────────────────────────────────────────────
-function renderOldInquiries(){
+// ── OLD INQUIRIES ─────────────────────────────────────────────────────────────
+function renderOld(){
   const p=document.getElementById('pane-lost');
   const section=(label,list,color,note)=>`
     <div style="margin-bottom:24px">
-      <div style="background:${color}0f;border:1px solid ${color}33;border-radius:8px;padding:10px 14px;margin-bottom:12px">
-        <div style="font-size:.82rem;font-weight:600;color:${color};margin-bottom:3px">${label} <span style="font-weight:400">(${list.length})</span></div>
-        <div style="font-size:.73rem;color:var(--m)">${note}</div>
+      <div style="border-left:2px solid var(--${color});padding-left:12px;margin-bottom:12px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--${color});margin-bottom:2px">${label} — ${list.length}</div>
+        <div style="font-size:.74rem;color:var(--dim)">${note}</div>
       </div>
-      ${list.length===0?`<div class="emp" style="padding:20px"><h3>None</h3></div>`:list.slice(0,30).map(o=>pastCard(o,'nurture')).join('')}
-      ${list.length>30?`<div style="font-size:.72rem;color:var(--m2);text-align:center;padding:10px">+${list.length-30} more</div>`:''}
+      ${list.length===0?`<div class="empty" style="padding:20px"><div class="empty-title">None</div></div>`:list.slice(0,30).map(o=>pastCard(o,'nurture')).join('')}
+      ${list.length>30?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute);text-align:center;padding:10px">+${list.length-30} more</div>`:''}
     </div>`;
   p.innerHTML=
-    section('Past Tentative — Old Inquiries',pipeline.pastTentative||[],'var(--y)','Were tentative but have no real future date. Never booked. Do not imply they were customers.')
-   +section('Past Prospect — Old Inquiries',pipeline.pastProspect||[],'var(--pu)','Old inquiries that never moved forward. Soft nurture only.')
-   +section('Lost / Turned Down',pipeline.lost||[],'var(--r)','Lost or cancelled. Soft nurture only. Never imply they were a customer.');
+    section('Past Tentative',pipeline.pastTent||[],'yellow','No real future date. Old inquiry — do not imply they were customers.')
+   +section('Past Prospect',pipeline.pastPros||[],'purple','Old inquiry that never moved forward. Soft nurture only.')
+   +section('Lost / Turned Down',pipeline.lost||[],'red','Soft nurture only. Never imply they were a customer.');
 }
 
 // ── 2026 / 2027 ───────────────────────────────────────────────────────────────
 function renderYears(){
   const p=document.getElementById('pane-years');
-  const yearSection=yr=>{
-    const all=['futureTentative','futureProspect','futureDefinite'].flatMap(cat=>pipeline[cat]||[]).filter(o=>o._date&&new Date(o._date).getFullYear()===yr);
+  const yrSec=yr=>{
+    const all=['futureTent','futurePros','futureDef'].flatMap(c=>pipeline[c]||[]).filter(o=>o._date&&new Date(o._date).getFullYear()===yr);
     const byS={TENTATIVE:all.filter(o=>o.status==='TENTATIVE'),PROSPECT:all.filter(o=>o.status==='PROSPECT'),DEFINITE:all.filter(o=>o.status==='DEFINITE')};
-    if(!all.length)return`<div style="margin-bottom:24px"><div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;margin-bottom:8px;color:var(--a2)">${yr}</div><div style="font-size:.76rem;color:var(--m2)">No ${yr} events with confirmed dates in Tripleseat.</div></div>`;
+    if(!all.length)return`<div style="margin-bottom:24px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;color:var(--dim);margin-bottom:8px">${yr}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--mute)">No ${yr} events with confirmed dates in Tripleseat.</div></div>`;
+    const colMap={TENTATIVE:'yellow',PROSPECT:'purple',DEFINITE:'green'};
     return`<div style="margin-bottom:28px">
-      <div style="font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;margin-bottom:14px;color:var(--a2)">${yr} Active Leads <span style="font-size:.76rem;font-family:'DM Sans',sans-serif;color:var(--m);font-weight:400">${all.length} events</span></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:16px">${yr} <span style="font-size:.8rem;font-weight:400;color:var(--mute);font-family:'IBM Plex Mono',monospace">${all.length} events</span></div>
       <div class="yr-grid">
         ${['TENTATIVE','PROSPECT','DEFINITE'].map(st=>`
         <div class="yr-col">
-          <div class="yr-col-hdr" style="color:${statusColor(st)}">${st} <span style="color:var(--m2)">(${byS[st].length})</span></div>
-          ${byS[st].length===0?`<div style="font-size:.74rem;color:var(--m2);padding:8px 0">None</div>`:''}
-          ${byS[st].slice(0,20).map(o=>`<div style="padding:8px 0;border-bottom:1px solid var(--b)">
-            <div style="font-size:.84rem;font-weight:600">${esc(o._contact.name||'Unknown')}</div>
-            ${o._contact.company?`<div style="font-size:.7rem;color:var(--m)">${esc(o._contact.company)}</div>`:''}
-            <div style="font-size:.68rem;color:var(--m2);font-family:'DM Mono',monospace;margin-top:3px;display:flex;gap:8px;flex-wrap:wrap">
+          <div class="yr-col-hdr" style="color:var(--${colMap[st]})">${st} <span style="color:var(--mute)">(${byS[st].length})</span></div>
+          ${byS[st].length===0?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.63rem;color:var(--mute);padding:8px 0">None</div>`:''}
+          ${byS[st].slice(0,20).map(o=>`<div class="yr-item">
+            <div class="yr-item-name">${esc(o._contact.name||'Unknown')}</div>
+            ${o._contact.company?`<div class="yr-item-co">${esc(o._contact.company)}</div>`:''}
+            <div class="yr-item-meta">
               ${o._date?`<span>${fmtDate(o._date)}</span>`:''}
-              ${(o.raw||o).guest_count?`<span>${(o.raw||o).guest_count} guests</span>`:''}
-              ${daysAgo(o.updated_at)!==null?`<span style="color:${daysAgo(o.updated_at)>7?'var(--r)':'var(--m2)'}">${daysAgo(o.updated_at)}d ago</span>`:''}
+              ${(o.raw||o).guest_count?`<span>${(o.raw||o).guest_count}g</span>`:''}
+              ${daysAgo(o.updated_at)!==null?`<span style="color:${daysAgo(o.updated_at)>7?'var(--red)':'var(--mute)'}">${daysAgo(o.updated_at)}d</span>`:''}
             </div>
-            <div style="margin-top:5px;display:flex;gap:5px">
-              <button class="btn ba bs" onclick="queueOne('${esc(String(o.id))}')">Draft</button>
-              ${o._contact.email?`<a href="mailto:${esc(o._contact.email)}" class="btn bgh bs">Email</a>`:''}
+            <div class="yr-item-actions">
+              <button class="btn btn-primary btn-sm" onclick="queueOne('${esc(String(o.id))}')">Draft</button>
+              ${o._contact.email?`<a href="mailto:${esc(o._contact.email)}" class="btn btn-ghost btn-sm">Email</a>`:''}
             </div>
           </div>`).join('')}
-          ${byS[st].length>20?`<div style="font-size:.7rem;color:var(--m2);padding:8px 0">+${byS[st].length-20} more</div>`:''}
+          ${byS[st].length>20?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.63rem;color:var(--mute);padding:8px 0">+${byS[st].length-20} more</div>`:''}
         </div>`).join('')}
       </div>
     </div>`;
   };
-  p.innerHTML=yearSection(2026)+yearSection(2027);
+  p.innerHTML=yrSec(2026)+yrSec(2027);
 }
 
 // ── CARDS ─────────────────────────────────────────────────────────────────────
-function oppCard(o,showAction){
-  const raw=o.raw||o;
-  const contact=o._contact||extractContact(o);
-  const date=o._date||getEventDate(o);
-  const guests=parseInt(raw.guest_count)||0;
-  const ds=daysAgo(o.updated_at);
-  const dt=date?daysUntil(date):null;
+function card(o, showAction){
+  const raw=o.raw||o, contact=o._contact||getContact(o), date=o._date||getEventDate(o);
+  const guests=parseInt(raw.guest_count)||0, ds=daysAgo(o.updated_at), dt=date?daysUntil(date):null;
   const inQ=queue.some(q=>q.event_id===String(o.id)||q.contact_email===contact.email);
-  const action=showAction?suggestAction(o):'';
-  return`<div class="opp ${o._urgency||'low'}">
-    <div class="opp-header">
-      <div><div class="opp-name">${esc(contact.name||'Unknown')}</div>${contact.company?`<div class="opp-co">${esc(contact.company)}</div>`:''}</div>
-      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
-        ${o._score>0?`<span class="score ${o._urgency==='urgent'||o._urgency==='high'?'score-high':'score-med'}">${o._score}</span>`:''}
-        <span class="pill ${pillClass(o.status,true)}">${o.status||'?'}</span>
+  const action=showAction?getAction(o):'';
+  return`<div class="card ${o._urgency||'low'}">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${esc(contact.name||'Unknown')}</div>
+        ${contact.company?`<div class="card-co">${esc(contact.company)}</div>`:''}
+      </div>
+      <div class="card-right">
+        ${o._score>0?`<span class="score-badge ${o._score>=100?'score-high':'score-med'}">${o._score}</span>`:''}
+        ${statusDot(o.status,true)}
       </div>
     </div>
-    <div class="opp-meta">
-      ${contact.email?`<div><span>Email</span> ${esc(contact.email)}</div>`:'<div style="color:var(--r)"><span>Email</span> not on file</div>'}
-      ${contact.phone?`<div><span>Phone</span> ${esc(contact.phone)}</div>`:''}
-      ${date?`<div><span>Event</span> ${fmtDate(date)}</div>`:''}
-      ${guests?`<div><span>Guests</span> ${guests}</div>`:''}
-      ${o.location_name||(raw.location?.name)?`<div><span>Location</span> ${esc(o.location_name||raw.location?.name)}</div>`:''}
-      ${ds!==null?`<div style="color:${ds>7?'var(--r)':ds>3?'var(--y)':'var(--m2)'}"><span>Updated</span> ${ds}d ago</div>`:''}
-      ${dt!==null&&dt>=0?`<div style="color:${dt<=30?'var(--y)':'var(--m2)'}"><span>Days out</span> ${dt}</div>`:''}
+    <div class="card-meta">
+      ${contact.email?`<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value">${esc(contact.email)}</div></div>`:'<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value hot">not on file</div></div>'}
+      ${contact.phone?`<div class="card-meta-item"><div class="card-meta-label">Phone</div><div class="card-meta-value">${esc(contact.phone)}</div></div>`:''}
+      ${date?`<div class="card-meta-item"><div class="card-meta-label">Event</div><div class="card-meta-value">${fmtDate(date)}</div></div>`:''}
+      ${guests?`<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">${guests}</div></div>`:''}
+      ${ds!==null?`<div class="card-meta-item"><div class="card-meta-label">Updated</div><div class="card-meta-value ${ds>7?'hot':ds>3?'warm':''}">${ds}d ago</div></div>`:''}
+      ${dt!==null&&dt>=0?`<div class="card-meta-item"><div class="card-meta-label">Days Out</div><div class="card-meta-value ${dt<=30?'warm':''}">${dt}</div></div>`:''}
     </div>
-    ${action?`<div class="opp-action"><strong>Suggested:</strong> ${esc(action)}</div>`:''}
-    <div class="opp-footer">
-      ${inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ In queue</span>`:`<button class="btn ba bs" onclick="queueOne('${esc(String(o.id))}')">✨ Draft message</button>`}
-      ${contact.email?`<a href="mailto:${esc(contact.email)}" class="btn bgh bs">Email</a>`:''}
-      ${contact.phone?`<a href="tel:${esc(contact.phone)}" class="btn bgh bs">Call</a>`:''}
-    </div>
-  </div>`;
-}
-function pastCard(o,draftLabel){
-  const contact=o._contact||extractContact(o);
-  const date=o._date||getEventDate(o);
-  const raw=o.raw||o;
-  const guests=parseInt(raw.guest_count)||0;
-  const ds=daysAgo(o.updated_at);
-  const inQ=queue.some(q=>q.event_id===String(o.id)||q.contact_email===contact.email);
-  return`<div class="opp past-card">
-    <div class="opp-header">
-      <div><div class="opp-name">${esc(contact.name||'Unknown')}</div>${contact.company?`<div class="opp-co">${esc(contact.company)}</div>`:''}</div>
-      <span class="pill ${pillClass(o.status,false)}">${o.status||'?'}</span>
-    </div>
-    <div class="opp-meta">
-      ${contact.email?`<div><span>Email</span> ${esc(contact.email)}</div>`:'<div style="color:var(--r)"><span>Email</span> not on file</div>'}
-      ${contact.phone?`<div><span>Phone</span> ${esc(contact.phone)}</div>`:''}
-      ${date?`<div><span>Event date</span> ${fmtDate(date)}</div>`:''}
-      ${guests?`<div><span>Guests</span> ${guests}</div>`:''}
-      ${ds!==null?`<div><span>Updated</span> ${ds}d ago</div>`:''}
-    </div>
-    <div class="opp-footer">
-      ${inQ?`<span style="font-size:.7rem;color:var(--g);font-family:'DM Mono',monospace">✓ In queue</span>`:`<button class="btn ba bs" onclick="queueOne('${esc(String(o.id))}')">✨ Draft ${draftLabel}</button>`}
-      ${contact.email?`<a href="mailto:${esc(contact.email)}" class="btn bgh bs">Email</a>`:''}
+    ${action?`<div class="card-action"><strong>→</strong> ${esc(action)}</div>`:''}
+    <div class="card-footer">
+      ${inQ?`<span class="in-queue-badge">✓ In queue</span>`:`<button class="btn btn-primary btn-sm" onclick="queueOne('${esc(String(o.id))}')">✨ Draft</button>`}
+      ${contact.email?`<a href="mailto:${esc(contact.email)}" class="btn btn-ghost btn-sm">Email</a>`:''}
+      ${contact.phone?`<a href="tel:${esc(contact.phone)}" class="btn btn-ghost btn-sm">Call</a>`:''}
     </div>
   </div>`;
 }
 
-// ── EMAIL QUEUE ───────────────────────────────────────────────────────────────
-const WFC={draft_needed:'var(--m2)',draft_generated:'var(--bl)',needs_review:'var(--y)',approved:'var(--a)',ready_to_send:'var(--g)',sent:'var(--g)',skipped:'var(--m2)',failed:'var(--r)'};
+function pastCard(o, draftLabel){
+  const contact=o._contact||getContact(o), date=o._date||getEventDate(o);
+  const raw=o.raw||o, guests=parseInt(raw.guest_count)||0, ds=daysAgo(o.updated_at);
+  const inQ=queue.some(q=>q.event_id===String(o.id)||q.contact_email===contact.email);
+  return`<div class="card past">
+    <div class="card-top">
+      <div>
+        <div class="card-name">${esc(contact.name||'Unknown')}</div>
+        ${contact.company?`<div class="card-co">${esc(contact.company)}</div>`:''}
+      </div>
+      ${statusDot(o.status,false)}
+    </div>
+    <div class="card-meta">
+      ${contact.email?`<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value">${esc(contact.email)}</div></div>`:'<div class="card-meta-item"><div class="card-meta-label">Email</div><div class="card-meta-value hot">not on file</div></div>'}
+      ${contact.phone?`<div class="card-meta-item"><div class="card-meta-label">Phone</div><div class="card-meta-value">${esc(contact.phone)}</div></div>`:''}
+      ${date?`<div class="card-meta-item"><div class="card-meta-label">Event Date</div><div class="card-meta-value">${fmtDate(date)}</div></div>`:''}
+      ${guests?`<div class="card-meta-item"><div class="card-meta-label">Guests</div><div class="card-meta-value">${guests}</div></div>`:''}
+      ${ds!==null?`<div class="card-meta-item"><div class="card-meta-label">Updated</div><div class="card-meta-value">${ds}d ago</div></div>`:''}
+    </div>
+    <div class="card-footer">
+      ${inQ?`<span class="in-queue-badge">✓ In queue</span>`:`<button class="btn btn-primary btn-sm" onclick="queueOne('${esc(String(o.id))}')">✨ Draft ${draftLabel}</button>`}
+      ${contact.email?`<a href="mailto:${esc(contact.email)}" class="btn btn-ghost btn-sm">Email</a>`:''}
+    </div>
+  </div>`;
+}
+
+// ── QUEUE ─────────────────────────────────────────────────────────────────────
+const WFC={draft_needed:'var(--mute)',draft_generated:'var(--blue)',needs_review:'var(--yellow)',approved:'var(--orange)',ready_to_send:'var(--green)',sent:'var(--green)',skipped:'var(--mute)',failed:'var(--red)'};
 const WFL={draft_needed:'Draft needed',draft_generated:'Generated',needs_review:'Needs review',approved:'Approved',ready_to_send:'Ready',sent:'Sent',skipped:'Skipped',failed:'Failed'};
+
 function renderQueue(){
   const p=document.getElementById('pane-queue');
-  if(!queue.length){p.innerHTML=`<div class="emp"><div class="emp-i">✉</div><h3>Queue is empty</h3><p>Click "Draft message" on any opportunity card.</p></div>`;updateBadges();return;}
+  if(!queue.length){p.innerHTML=`<div class="empty"><div class="empty-icon">✉</div><div class="empty-title">Queue is empty</div><div class="empty-sub">Click "Draft" on any event card</div></div>`;updateBadges();return;}
   const byS={};queue.forEach(q=>{byS[q.status]=(byS[q.status]||0)+1;});
   const needDraft=queue.filter(q=>q.status==='draft_needed').length;
   const needReview=queue.filter(q=>['needs_review','draft_generated'].includes(q.status)).length;
   p.innerHTML=`
-  <div class="wfl">${Object.entries(WFL).map(([k,v])=>`<span class="wfi" style="color:${WFC[k]};background:${WFC[k]}1a">${v} (${byS[k]||0})</span>`).join('')}</div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-    <span style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600">${queue.length} in queue</span>
+  <div class="queue-legend">${Object.entries(WFL).map(([k,v])=>`<span class="queue-pill" style="color:${WFC[k]};background:${WFC[k]}1a">${v} (${byS[k]||0})</span>`).join('')}</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase">${queue.length} in queue</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap">
-      ${needDraft?`<button class="btn ba" onclick="generateAll()">✨ Generate ${needDraft}</button>`:''}
-      ${needReview?`<button class="btn bgg" onclick="approveAllReady()">✓ Approve all</button>`:''}
-      <button class="btn bgh" onclick="clearQueue()">Clear</button>
+      ${needDraft?`<button class="btn btn-primary btn-sm" onclick="generateAll()">✨ Generate ${needDraft}</button>`:''}
+      ${needReview?`<button class="btn btn-success btn-sm" onclick="approveAllReady()">✓ Approve all</button>`:''}
+      <button class="btn btn-ghost btn-sm" onclick="clearQueue()">Clear</button>
     </div>
   </div>
-  <div style="background:rgba(91,141,238,.07);border:1px solid rgba(91,141,238,.2);border-radius:7px;padding:8px 12px;margin-bottom:13px;font-size:.74rem;color:var(--bl)">
-    📨 No email provider connected. Copy approved emails and send manually. Mark as Sent after sending.
-  </div>
+  <div class="warn-notice">📨 No email provider connected. Copy approved emails and send manually.</div>
   ${queue.map(item=>{
-    const sc=WFC[item.status]||'var(--m)',sl=WFL[item.status]||item.status;
+    const sc=WFC[item.status]||'var(--mute)',sl=WFL[item.status]||item.status;
     const hasRisks=(item.risk_flags||[]).some(f=>f&&f!=='none');
-    return`<div class="opp ${['approved','ready_to_send'].includes(item.status)?'high':''}" id="qc-${item.id}">
-      <div class="opp-header">
-        <div><div class="opp-name">${esc(item.contact_name||'Unknown')} ${item.company?`<span style="font-size:.71rem;color:var(--m);font-weight:400">${esc(item.company)}</span>`:''}</div>
-        <div class="opp-co">${esc(item.contact_email||'')}${item.subject?' · '+esc(item.subject):''}</div></div>
-        <div style="display:flex;align-items:center;gap:5px">
-          ${hasRisks?`<span style="font-size:.63rem;color:var(--y);background:rgba(245,166,35,.1);padding:2px 6px;border-radius:20px">⚠ review</span>`:''}
-          <span class="pill" style="color:${sc};background:${sc}1a;border-color:${sc}44">${sl}</span>
+    return`<div class="card ${['approved','ready_to_send'].includes(item.status)?'high':'low'}">
+      <div class="card-top">
+        <div>
+          <div class="card-name">${esc(item.contact_name||'Unknown')}${item.company?` <span style="font-size:.74rem;color:var(--dim);font-weight:400">${esc(item.company)}</span>`:''}</div>
+          <div class="card-co">${esc(item.contact_email||'')}${item.subject?' · '+esc(item.subject):''}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          ${hasRisks?`<span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--yellow);background:var(--yellow-dim);padding:2px 6px">⚠ REVIEW</span>`:''}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;padding:2px 7px;letter-spacing:.07em;text-transform:uppercase;color:${sc};background:${sc}1a">${sl}</span>
         </div>
       </div>
-      ${item.body?`<div class="draft-body">${esc(item.body)}</div>`:''}
-      <div class="opp-footer">
-        ${item.status==='draft_needed'?`<button class="btn ba bs" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
-        ${['draft_generated','needs_review'].includes(item.status)?`<button class="btn bgh bs" onclick="openModal('${item.id}')">👁 Review${hasRisks?' ⚠':''}</button><button class="btn bgg bs" onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
-        ${item.status==='approved'?`<button class="btn bgg bs" onclick="markReady('${item.id}')">→ Ready</button><button class="btn bgh bs" onclick="openModal('${item.id}')">👁 View</button>`:''}
-        ${item.status==='ready_to_send'?`<button class="btn bgh bs" onclick="openModal('${item.id}')">📋 Copy & send</button><button class="btn bgg bs" onclick="markSent('${item.id}')">✓ Mark sent</button>`:''}
-        ${!['sent','skipped'].includes(item.status)?`<button class="btn bgh bs" onclick="skipItem('${item.id}')">Skip</button>`:''}
-        <button class="btn br bs" onclick="removeItem('${item.id}')">Remove</button>
+      ${item.body?`<div class="draft-preview">${esc(item.body)}</div>`:''}
+      <div class="card-footer">
+        ${item.status==='draft_needed'?`<button class="btn btn-primary btn-sm" onclick="generateOne('${item.id}')">✨ Generate</button>`:''}
+        ${['draft_generated','needs_review'].includes(item.status)?`<button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">Review${hasRisks?' ⚠':''}</button><button class="btn btn-success btn-sm" onclick="approveItem('${item.id}')">✓ Approve</button>`:''}
+        ${item.status==='approved'?`<button class="btn btn-success btn-sm" onclick="markReady('${item.id}')">→ Ready</button><button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">View</button>`:''}
+        ${item.status==='ready_to_send'?`<button class="btn btn-ghost btn-sm" onclick="openModal('${item.id}')">📋 Copy & send</button><button class="btn btn-success btn-sm" onclick="markSent('${item.id}')">✓ Sent</button>`:''}
+        ${!['sent','skipped'].includes(item.status)?`<button class="btn btn-ghost btn-sm" onclick="skipItem('${item.id}')">Skip</button>`:''}
+        <button class="btn btn-danger btn-sm" onclick="removeItem('${item.id}')">Remove</button>
       </div>
     </div>`;
   }).join('')}`;
@@ -723,23 +1079,24 @@ function renderQueue(){
 // ── DEBUG ─────────────────────────────────────────────────────────────────────
 function renderDebug(){
   const p=document.getElementById('pane-debug');
-  p.innerHTML=`<div style="font-family:'Fraunces',serif;font-size:1rem;font-weight:600;margin-bottom:13px">Debug / Storage Status</div>
-  <div class="dbg" id="dbg-content">Loading…</div>
-  <div style="margin-top:11px;display:flex;gap:7px;flex-wrap:wrap">
-    <button class="btn ba" onclick="loadDebug()">Refresh</button>
-    <button class="btn bgh" onclick="doFullSync()">↻ Full Sync</button>
+  p.innerHTML=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px">Debug / Sync Status</div>
+  <div class="debug-box" id="debug-box">Loading…</div>
+  <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+    <button class="btn btn-primary btn-sm" onclick="loadDebug()">Refresh</button>
+    <button class="btn btn-ghost btn-sm" onclick="doFullSync()">↻ Full Sync</button>
   </div>`;
   loadDebug();
 }
 async function loadDebug(){
-  const el=document.getElementById('dbg-content');if(!el)return;
+  const el=document.getElementById('debug-box');if(!el)return;
   try{
     const data=await fetch(`${API_ST}?action=debug`).then(r=>r.json());
     const sb={};allEvents.forEach(ev=>{const s=ev.status||'UNKNOWN';sb[s]=(sb[s]||0)+1;});
-    const noDate=allEvents.filter(ev=>!getEventDate(ev)).length;
-    const noEmail=allEvents.filter(ev=>!extractContact(ev).email).length;
     const ps={};Object.keys(pipeline).forEach(k=>ps[k]=(pipeline[k]||[]).length);
-    el.textContent=JSON.stringify({supabase:{configured:data.configured,tableCounts:data.tableCounts,syncMetadata:data.syncMetadata},local:{eventsLoaded:allEvents.length,statusBreakdown:sb,pipeline:ps,noRealDate:noDate,noEmail:noEmail,queueLength:queue.length,note:'TripleSeat uses 2000-01-01 as placeholder when no date is set'}},null,2);
+    el.textContent=JSON.stringify({
+      supabase:{configured:data.configured,tableCounts:data.tableCounts,syncMetadata:data.syncMetadata},
+      local:{eventsLoaded:allEvents.length,statusBreakdown:sb,pipeline:ps,queue:queue.length,note:'TripleSeat uses 2000-01-01 as placeholder for no date'}
+    },null,2);
   }catch(e){if(el)el.textContent='Error: '+e.message;}
 }
 
@@ -747,48 +1104,46 @@ async function loadDebug(){
 function queueOne(eventId){
   const ev=allEvents.find(e=>String(e.id)===String(eventId));
   if(!ev){console.warn('Event not found:',eventId);return;}
-  const contact=extractContact(ev);
+  const contact=getContact(ev);
   if(queue.find(q=>q.event_id===String(eventId)||q.contact_email===contact.email)){alert('Already in queue.');return;}
-  const item={id:'q_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),event_id:String(ev.id),contact_email:contact.email||'',contact_name:contact.name,company:contact.company||'',campaign_id:getCategory(ev),subject:'',body:'',risk_flags:[],status:'draft_needed',ts_status:ev.status,is_future:isFutureEvent(ev),_ev:ev,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
-  queue.push(item);saveQueueItem(item);updateBadges();showTab('queue');
+  const item={id:'q_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),event_id:String(ev.id),contact_email:contact.email||'',contact_name:contact.name,company:contact.company||'',campaign_id:getCat(ev),subject:'',body:'',risk_flags:[],status:'draft_needed',ts_status:ev.status,is_future:isFuture(ev),_ev:ev,created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+  queue.push(item);saveQItem(item);updateBadges();showTab('queue');
 }
 function clearQueue(){if(!confirm('Clear all?'))return;queue=[];fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue:[]})}).catch(()=>{});updateBadges();renderQueue();}
-function approveAllReady(){queue.filter(q=>['needs_review','draft_generated'].includes(q.status)).forEach(q=>{q.status='approved';q.updated_at=new Date().toISOString();updateQueueItem(q);});updateBadges();renderQueue();}
-function approveItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='approved';i.updated_at=new Date().toISOString();updateQueueItem(i);updateBadges();renderQueue();}}
-function skipItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='skipped';i.updated_at=new Date().toISOString();updateQueueItem(i);renderQueue();}}
-function markReady(id){const i=queue.find(q=>q.id===id);if(i){i.status='ready_to_send';i.updated_at=new Date().toISOString();updateQueueItem(i);renderQueue();}}
+function approveAllReady(){queue.filter(q=>['needs_review','draft_generated'].includes(q.status)).forEach(q=>{q.status='approved';q.updated_at=new Date().toISOString();updQItem(q);});updateBadges();renderQueue();}
+function approveItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='approved';i.updated_at=new Date().toISOString();updQItem(i);updateBadges();renderQueue();}}
+function skipItem(id){const i=queue.find(q=>q.id===id);if(i){i.status='skipped';i.updated_at=new Date().toISOString();updQItem(i);renderQueue();}}
+function markReady(id){const i=queue.find(q=>q.id===id);if(i){i.status='ready_to_send';i.updated_at=new Date().toISOString();updQItem(i);renderQueue();}}
 function markSent(id){
   const i=queue.find(q=>q.id===id);if(!i)return;
-  i.status='sent';i.sent_at=new Date().toISOString();i.updated_at=new Date().toISOString();
-  updateQueueItem(i);
+  i.status='sent';i.sent_at=new Date().toISOString();i.updated_at=new Date().toISOString();updQItem(i);
   fetch(`${API_ST}?action=record-sent`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:i.contact_email,name:i.contact_name,campaign:i.campaign_id,subject:i.subject,body:i.body})}).catch(()=>{});
   renderQueue();
 }
 function removeItem(id){queue=queue.filter(q=>q.id!==id);fetch(`${API_ST}?action=bulk-save-queue`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({queue})}).catch(()=>{});updateBadges();renderQueue();}
-async function saveQueueItem(item){await fetch(`${API_ST}?action=save-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
-async function updateQueueItem(item){await fetch(`${API_ST}?action=update-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
+async function saveQItem(item){await fetch(`${API_ST}?action=save-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
+async function updQItem(item){await fetch(`${API_ST}?action=update-queue-item`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(item)}).catch(()=>{});}
 
 // ── EMAIL GENERATION ──────────────────────────────────────────────────────────
 async function generateOne(itemId){
   const item=queue.find(q=>q.id===itemId);if(!item)return;
   item.status='draft_generated';renderQueue();
   const ev=item._ev||allEvents.find(e=>String(e.id)===item.event_id)||{};
-  const raw=ev.raw||ev;const contact=extractContact(ev);
+  const raw=ev.raw||ev, contact=getContact(ev);
   try{
-    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:{first_name:contact.first,last_name:contact.last,email:contact.email,company:contact.company,event_date:getEventDate(ev),event_description:raw.name||ev.name||'',guest_count:raw.guest_count||ev.guest_count||null,location_name:ev.location_name||raw.location?.name||'',last_booking_status:ev.status,is_future:isFutureEvent(ev),pipeline_category:item.campaign_id},campaign:item.campaign_id})});
+    const res=await fetch(API_AI,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contact:{first_name:contact.first,last_name:contact.last,email:contact.email,company:contact.company,event_date:getEventDate(ev),event_description:raw.name||ev.name||'',guest_count:raw.guest_count||ev.guest_count||null,location_name:ev.location_name||raw.location?.name||'',last_booking_status:ev.status,is_future:isFuture(ev),pipeline_category:item.campaign_id},campaign:item.campaign_id})});
     const data=await res.json();
     if(!res.ok)throw new Error(data.error||`HTTP ${res.status}`);
     item.subject=(data.subject||'Following up').replace(/[\u2014\u2013]/g,'-');
     item.body=(data.body||'Could not generate.').replace(/[\u2014\u2013]/g,'-');
     item.risk_flags=data.riskFlags||[];item.status='needs_review';
   }catch(err){item.body=`Error: ${err.message}`;item.risk_flags=[];item.status='needs_review';}
-  item.updated_at=new Date().toISOString();
-  updateQueueItem(item);renderQueue();updateBadges();
+  item.updated_at=new Date().toISOString();updQItem(item);renderQueue();updateBadges();
 }
 async function generateAll(){
   const pending=queue.filter(q=>q.status==='draft_needed');if(!pending.length)return;
   const btn=document.querySelector('[onclick="generateAll()"]');
-  if(btn){btn.disabled=true;btn.innerHTML='<span class="sp2"></span> Generating…';}
+  if(btn){btn.disabled=true;btn.innerHTML='<span class="spin"></span> Generating…';}
   for(let i=0;i<pending.length;i++){await generateOne(pending[i].id);if(i<pending.length-1)await new Promise(r=>setTimeout(r,350));}
   if(btn){btn.disabled=false;btn.innerHTML='✨ Generate';}
 }
@@ -797,29 +1152,44 @@ async function generateAll(){
 function openModal(itemId){
   const item=queue.find(q=>q.id===itemId);if(!item)return;
   modalQueueId=itemId;
-  document.getElementById('mt').textContent=`Draft: ${item.contact_name||'Unknown'}`;
-  document.getElementById('msub').value=item.subject||'';
-  document.getElementById('memail').value=item.body||'';
+  document.getElementById('modal-title').textContent=`DRAFT — ${(item.contact_name||'Unknown').toUpperCase()}`;
+  document.getElementById('modal-sub').value=item.subject||'';
+  document.getElementById('modal-body-text').value=item.body||'';
   const flags=(item.risk_flags||[]).filter(f=>f&&f!=='none');
-  document.getElementById('risk-display').innerHTML=flags.map(f=>`<div class="risk">⚠ ${esc(f)}</div>`).join('');
-  document.getElementById('mo').classList.add('open');
+  document.getElementById('modal-risks').innerHTML=flags.map(f=>`<div class="risk-flag">⚠ ${esc(f)}</div>`).join('');
+  document.getElementById('modal-overlay').classList.add('open');
 }
 function closeModal(){
-  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('msub').value;i.body=document.getElementById('memail').value;i.updated_at=new Date().toISOString();updateQueueItem(i);}}
-  document.getElementById('mo').classList.remove('open');modalQueueId=null;renderQueue();
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-sub').value;i.body=document.getElementById('modal-body-text').value;i.updated_at=new Date().toISOString();updQItem(i);}}
+  document.getElementById('modal-overlay').classList.remove('open');modalQueueId=null;renderQueue();
 }
 function approveFromModal(){
-  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('msub').value;i.body=document.getElementById('memail').value;i.status='approved';i.approved_at=new Date().toISOString();i.updated_at=new Date().toISOString();updateQueueItem(i);}}
+  if(modalQueueId){const i=queue.find(q=>q.id===modalQueueId);if(i){i.subject=document.getElementById('modal-sub').value;i.body=document.getElementById('modal-body-text').value;i.status='approved';i.approved_at=new Date().toISOString();i.updated_at=new Date().toISOString();updQItem(i);}}
   closeModal();
 }
 function copyModal(){
-  navigator.clipboard.writeText(`Subject: ${document.getElementById('msub').value}\n\n${document.getElementById('memail').value}`).then(()=>{const b=document.getElementById('bcm');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy',2000);});
+  navigator.clipboard.writeText(`Subject: ${document.getElementById('modal-sub').value}\n\n${document.getElementById('modal-body-text').value}`)
+    .then(()=>{const b=document.querySelector('.modal-foot .btn-ghost:nth-child(2)');if(b){b.textContent='✓ Copied';setTimeout(()=>b.textContent='Copy',2000);}});
 }
-document.getElementById('mo').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
 // ── SETUP ─────────────────────────────────────────────────────────────────────
-function renderSetupBanner(errMsg){document.getElementById('pane-cmd').innerHTML=`<div class="setup"><h3>⚙ Supabase not connected${errMsg?' — '+errMsg:''}</h3><ol><li>Go to <strong>supabase.com</strong> → open your project</li><li>Settings → API → copy <strong>Project URL</strong> → set as <code>SUPABASE_URL</code> in Netlify</li><li>Copy <strong>service_role key</strong> → set as <code>SUPABASE_KEY</code></li><li>Netlify → Deploys → Trigger deploy → refresh page → Full Sync</li></ol><div style="margin-top:12px;display:flex;gap:7px"><button class="btn ba" onclick="doFullSync()">↻ Full Sync</button><button class="btn bgh" onclick="showTab('debug')">Debug →</button></div></div>`;}
-function renderSetupPane(paneId){document.getElementById(paneId).innerHTML=`<div class="emp"><div class="emp-i">⚙</div><h3>Supabase not connected</h3><p>See Command Center for setup steps.</p></div>`;}
+function renderSetup(errMsg){
+  document.getElementById('pane-cmd').innerHTML=`<div class="setup">
+    <h3>⚙ Supabase not connected${errMsg?' — '+errMsg:''}</h3>
+    <ol>
+      <li>Go to <strong>supabase.com</strong> → open your project</li>
+      <li>Settings → API → copy <strong>Project URL</strong> → set as <code>SUPABASE_URL</code> in Netlify</li>
+      <li>Copy <strong>service_role key</strong> → set as <code>SUPABASE_KEY</code> in Netlify</li>
+      <li>Netlify → Deploys → Trigger deploy → refresh → Sync</li>
+    </ol>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="doFullSync()">↻ Sync</button>
+      <button class="btn btn-ghost" onclick="showTab('debug')">Debug →</button>
+    </div>
+  </div>`;
+}
+function renderSetupPane(id){document.getElementById(id).innerHTML=`<div class="empty"><div class="empty-icon">⚙</div><div class="empty-title">Supabase not connected</div><div class="empty-sub">See Command Center</div></div>`;}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 loadFromDB();
