@@ -395,7 +395,7 @@ function buildSnapshot(){
   });
   var confirmedRevWeek=defThisWeek.reduce(function(s,o){return s+getGrandTotal(o);},0);
 
-  // This month = Closed events + Definite events (future + past) within current calendar month
+  // This month = Closed + Definite events whose date falls in current calendar month
   var monthStart=new Date(now.getFullYear(),now.getMonth(),1);
   var monthEnd=new Date(now.getFullYear(),now.getMonth()+1,1);
   var defThisMonth=[].concat(pipeline.futureDef||[],pipeline.pastDef||[],pipeline.closed||[]).filter(function(o){
@@ -404,12 +404,43 @@ function buildSnapshot(){
   });
   var confirmedRevMonth=defThisMonth.reduce(function(s,o){return s+getGrandTotal(o);},0);
 
+  // YTD = Closed + Definite events whose date is in current year
+  var yearStart=new Date(now.getFullYear(),0,1);
+  var defYTD=[].concat(pipeline.futureDef||[],pipeline.pastDef||[],pipeline.closed||[]).filter(function(o){
+    var d=new Date(o._date||o.updated_at||0);
+    return d>=yearStart;
+  });
+  var confirmedRevYTD=defYTD.reduce(function(s,o){return s+getGrandTotal(o);},0);
+
   // Pipeline value = all future Definite events from today through end of 2028
   var cutoff2028=new Date('2029-01-01');
   var pipelineVal=(pipeline.futureDef||[]).filter(function(o){
     if(!o._date)return false;
     return new Date(o._date)<cutoff2028;
   }).reduce(function(s,o){return s+getGrandTotal(o);},0);
+
+  // Close rate = Closed / (Closed + Lost) — win rate on decided opportunities
+  var totalClosed=(pipeline.closed||[]).length;
+  var totalLost=(pipeline.lost||[]).length;
+  var closeRateAll=totalClosed+totalLost>0?Math.round(totalClosed/(totalClosed+totalLost)*100):null;
+
+  // YTD close rate — events created this year that are Closed or Lost
+  var closedYTD=(pipeline.closed||[]).filter(function(o){
+    var d=new Date((o.raw||o).created_at||o.created_at||0);
+    return d>=yearStart;
+  }).length;
+  var lostYTD=(pipeline.lost||[]).filter(function(o){
+    var d=new Date((o.raw||o).created_at||o.created_at||0);
+    return d>=yearStart;
+  }).length;
+  var closeRateYTD=closedYTD+lostYTD>0?Math.round(closedYTD/(closedYTD+lostYTD)*100):null;
+
+  // YTD leads = all events created this year
+  var leadsYTD=allEvents.filter(function(ev){
+    var raw=ev.raw||ev;
+    var d=new Date(raw.created_at||ev.created_at||0);
+    return d>=yearStart;
+  }).length;
 
   // Lead activity - last 7 days bar chart
   var days7=[];
@@ -491,11 +522,32 @@ function buildSnapshot(){
     +'<div><div class="snapshot-big" style="color:var(--green)">'+fmtMoney(confirmedRevWeek)+'</div>'
     +'<div class="snapshot-sub">CONFIRMED THIS WEEK &middot; '+defThisWeek.length+' event'+(defThisWeek.length!==1?'s':'')+'</div></div>'
     +'<div style="height:1px;background:var(--border)"></div>'
-    +'<div style="display:flex;gap:24px">'
-    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700">'+fmtMoney(confirmedRevMonth)+'</div>'
-    +'<div class="snapshot-sub">CLOSED + DEFINITE &middot; '+defThisMonth.length+' events</div></div>'
-    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.2rem;font-weight:700;color:var(--yellow)">'+fmtMoney(pipelineVal)+'</div>'
-    +'<div class="snapshot-sub">ALL DEFINITE THRU 2028</div></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
+    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.05rem;font-weight:700">'+fmtMoney(confirmedRevMonth)+'</div>'
+    +'<div class="snapshot-sub">THIS MONTH</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;color:var(--mute)">'+defThisMonth.length+' closed+def</div></div>'
+    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.05rem;font-weight:700;color:var(--orange)">'+fmtMoney(confirmedRevYTD)+'</div>'
+    +'<div class="snapshot-sub">THIS YEAR</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;color:var(--mute)">'+defYTD.length+' closed+def</div></div>'
+    +'<div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.05rem;font-weight:700;color:var(--yellow)">'+fmtMoney(pipelineVal)+'</div>'
+    +'<div class="snapshot-sub">PIPELINE</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;color:var(--mute)">all def thru 2028</div></div>'
+    +'</div>'
+    +'<div style="height:1px;background:var(--border)"></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+    +'<div>'
+    +'<div style="display:flex;align-items:baseline;gap:8px">'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.4rem;font-weight:700;color:'+(closeRateYTD!==null?(closeRateYTD>=50?'var(--green)':closeRateYTD>=30?'var(--yellow)':'var(--red)'):'var(--dim)')+'">'+(closeRateYTD!==null?closeRateYTD+'%':'--')+'</div>'
+    +(closeRateAll!==null?'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;color:var(--mute)">'+closeRateAll+'% all-time</div>':'')
+    +'</div>'
+    +'<div class="snapshot-sub">CLOSE RATE YTD</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;color:var(--mute)">'+closedYTD+' won / '+(closedYTD+lostYTD)+' decided</div>'
+    +'</div>'
+    +'<div>'
+    +'<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:1.4rem;font-weight:700;color:var(--orange)">'+leadsYTD+'</div>'
+    +'<div class="snapshot-sub">LEADS THIS YEAR</div>'
+    +'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:.55rem;color:var(--mute)">new inquiries in '+now.getFullYear()+'</div>'
+    +'</div>'
     +'</div>'
     +revenueNote
     +'</div></div>'
