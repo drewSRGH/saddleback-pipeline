@@ -172,7 +172,7 @@ exports.handler = async (event) => {
 
       if (action === 'get-table') {
         const table   = event.queryStringParameters?.table;
-        const qs      = event.queryStringParameters?.qs || 'select=*&limit=2000';
+        const qs      = event.queryStringParameters?.qs || 'select=*&limit=1000';
         const allowed = ['ts_bookings','ts_accounts','ts_contacts','ts_leads','ts_events','outreach_contacts'];
         if (!table || !allowed.includes(table)) {
           return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Invalid table: ' + table }) };
